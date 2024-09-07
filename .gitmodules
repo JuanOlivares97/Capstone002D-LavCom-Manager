@@ -1,6 +1,0 @@
-[submodule "food-manager"]
-	path = food-manager
-	url = https://github.com/JuanOlivares97/food-manager.git
-[submodule "laundry-manager"]
-	path = laundry-manager
-	url = https://github.com/JuanOlivares97/laundry-manager.git
