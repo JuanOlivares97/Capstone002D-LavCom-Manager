@@ -1,0 +1,11 @@
+{
+  "name": "food-manager",
+  "version": "1.0.0",
+  "description": "Aplicacion realizada para el Hospital de Melipilla, modulo Alimentacion",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}
