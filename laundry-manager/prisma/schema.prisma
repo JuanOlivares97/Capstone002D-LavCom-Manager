@@ -1,0 +1,125 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model articulo {
+  id_articulo      Int                @id @default(autoincrement())
+  nombre_articulo  String             @unique(map: "unique_nombre_articulo") @db.VarChar(255)
+  stock            Int
+  id_subgrupo_ropa Int
+  borrado          Boolean
+  subgrupo_ropa    subgrupo_ropa      @relation(fields: [id_subgrupo_ropa], references: [id_subgrupo_ropa], onDelete: NoAction, onUpdate: NoAction, map: "articulo_subgrupo_ropa")
+  detalle_registro detalle_registro[]
+
+  @@index([id_subgrupo_ropa], map: "articulo_subgrupo_ropa")
+}
+
+model detalle_registro {
+  id_detalle_registro Int      @id @default(autoincrement())
+  cantidad            Int
+  id_articulo         Int
+  id_registro         Int
+  registro            registro @relation(fields: [id_registro], references: [id_registro], onDelete: NoAction, onUpdate: NoAction, map: "detalle_registro_ibfk_1")
+  articulo            articulo @relation(fields: [id_articulo], references: [id_articulo], onDelete: NoAction, onUpdate: NoAction, map: "fk_detalle_registro_articulo1")
+
+  @@index([id_articulo], map: "fk_detalle_registro_articulo_idx")
+  @@index([id_registro], map: "id_registro")
+}
+
+model estamento {
+  id_estamento   Int        @id @default(autoincrement())
+  desc_estamento String     @unique(map: "unique_estamento") @db.VarChar(255)
+  usuarios       usuarios[]
+}
+
+model registro {
+  id_registro                               Int                @id @default(autoincrement())
+  rut_usuario_1                             Int
+  rut_usuario_2                             Int?
+  id_servicio                               Int?
+  cantidad_total                            Int
+  fecha                                     DateTime           @default(now()) @db.Timestamp(0)
+  observacion                               String?            @db.VarChar(500)
+  id_tipo_registro                          Int
+  detalle_registro                          detalle_registro[]
+  servicio                                  servicio?          @relation(fields: [id_servicio], references: [id_servicio], onDelete: NoAction, onUpdate: NoAction, map: "fk_id_servicio")
+  usuarios_registro_rut_usuario_1Tousuarios usuarios           @relation("registro_rut_usuario_1Tousuarios", fields: [rut_usuario_1], references: [rut_usuario], onDelete: NoAction, onUpdate: NoAction, map: "fk_registro_usuario1")
+  usuarios_registro_rut_usuario_2Tousuarios usuarios?          @relation("registro_rut_usuario_2Tousuarios", fields: [rut_usuario_2], references: [rut_usuario], onDelete: NoAction, onUpdate: NoAction, map: "fk_registro_usuario2")
+  tipo_registro                             tipo_registro      @relation(fields: [id_tipo_registro], references: [id_tipo_registro], onDelete: NoAction, onUpdate: NoAction, map: "registro_ibfk_1")
+
+  @@index([id_servicio], map: "fk_id_servicio")
+  @@index([rut_usuario_1], map: "fk_registro_usuario1_idx")
+  @@index([rut_usuario_2], map: "fk_registro_usuario2_idx")
+  @@index([id_tipo_registro], map: "id_tipo_registro")
+}
+
+model servicio {
+  id_servicio   Int        @id @default(autoincrement())
+  desc_servicio String     @unique(map: "unique_descripcion") @db.VarChar(255)
+  habilitado    Boolean
+  registro      registro[]
+  usuarios      usuarios[]
+}
+
+model subgrupo_ropa {
+  id_subgrupo_ropa Int        @id @default(autoincrement())
+  desc_subgrupo    String     @unique(map: "unique_desc_subgrupo") @db.VarChar(255)
+  articulo         articulo[]
+}
+
+model tipo_contrato {
+  id_tipo_contrato Int        @id @default(autoincrement())
+  tipo_contrato    String     @unique(map: "unique_tipo_contrato") @db.VarChar(255)
+  usuarios         usuarios[]
+}
+
+model tipo_registro {
+  id_tipo_registro Int        @id @default(autoincrement())
+  tipo_registro    String     @db.VarChar(255)
+  registro         registro[]
+}
+
+model tipo_usuario {
+  id_tipo_usuario Int        @id @default(autoincrement())
+  tipo_usuario    String     @db.VarChar(255)
+  usuarios        usuarios[]
+}
+
+model unidad_sigcom {
+  id_unidad_sigcom Int        @id @default(autoincrement())
+  unidad_sigcom    String     @unique(map: "uniqueUnidadSigcom") @db.VarChar(255)
+  usuarios         usuarios[]
+}
+
+model usuarios {
+  id_usuario                                Int           @id @default(autoincrement())
+  rut_usuario                               Int           @unique(map: "rut_usuario_UNIQUE")
+  dv_usuario                                String        @db.VarChar(1)
+  nombre                                    String        @db.VarChar(255)
+  id_servicio                               Int
+  id_tipo_contrato                          Int
+  id_unidad_sigcom                          Int
+  id_estamento                              Int
+  id_tipo_usuario                           Int
+  username                                  String        @unique(map: "username_UNIQUE") @db.VarChar(255)
+  pwd                                       String        @db.VarChar(255)
+  borrado                                   Boolean
+  registro_registro_rut_usuario_1Tousuarios registro[]    @relation("registro_rut_usuario_1Tousuarios")
+  registro_registro_rut_usuario_2Tousuarios registro[]    @relation("registro_rut_usuario_2Tousuarios")
+  tipo_usuario                              tipo_usuario  @relation(fields: [id_tipo_usuario], references: [id_tipo_usuario], onDelete: NoAction, onUpdate: NoAction, map: "fk_tipo_usuario")
+  estamento                                 estamento     @relation(fields: [id_estamento], references: [id_estamento], onDelete: NoAction, onUpdate: NoAction, map: "usuario_estamento")
+  servicio                                  servicio      @relation(fields: [id_servicio], references: [id_servicio], onDelete: NoAction, onUpdate: NoAction, map: "usuario_servicio")
+  tipo_contrato                             tipo_contrato @relation(fields: [id_tipo_contrato], references: [id_tipo_contrato], onDelete: NoAction, onUpdate: NoAction, map: "usuario_tipo_contrato")
+  unidad_sigcom                             unidad_sigcom @relation(fields: [id_unidad_sigcom], references: [id_unidad_sigcom], onDelete: NoAction, onUpdate: NoAction, map: "usuario_unidad_sigcom")
+
+  @@index([id_tipo_usuario], map: "fk_tipo_usuario")
+  @@index([id_estamento], map: "usuario_estamento")
+  @@index([id_servicio], map: "usuario_servicio")
+  @@index([id_tipo_contrato], map: "usuario_tipo_contrato")
+  @@index([id_unidad_sigcom], map: "usuario_unidad_sigcom")
+}
