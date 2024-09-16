@@ -3,7 +3,7 @@ const expressLayout = require('express-ejs-layouts')
 const path = require('path');
 const userRouter = require('./routes/user.routes');
 const articulosRouter = require('./routes/articulos.routes');
-
+const reportesRouter = require('./routes/reportes.routes')
 const app = express();
 
 app.use(expressLayout)
@@ -17,9 +17,10 @@ console.log(path.join(__dirname, "static"));
 
 app.use('/', userRouter);
 app.use('/clothes', articulosRouter);
+app.use('/reports', reportesRouter)
 
 app.get("/template", (req, res) => {
-    res.render("clothes/articulos");
+    res.render("reports/home");
 });
 
 const port = process.env.PORT || 3000;
