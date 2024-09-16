@@ -600,7 +600,7 @@ const AG_GRID_LOCALE_ES = {
 document.addEventListener('DOMContentLoaded', async function () {
     let gridApi;
 
-    const response = await fetch('/articulos');
+    const response = await fetch('/clothes/get-clothes');
     const articulos = await response.json();
 
     const gridOptions = {

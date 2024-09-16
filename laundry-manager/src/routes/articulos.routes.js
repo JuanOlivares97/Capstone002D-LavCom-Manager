@@ -3,6 +3,6 @@ const articulosController = require('../controllers/articulos.controller');
 
 const router = Router();
 
-router.get('/articulos', articulosController.getArticulos);
+router.get('/get-clothes', articulosController.getArticulos);
 
 module.exports = router;

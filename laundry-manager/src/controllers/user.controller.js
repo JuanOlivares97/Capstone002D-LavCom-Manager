@@ -1,6 +1,6 @@
 function renderLogin(req, res) {
     try {
-        return res.render("login");
+        return res.render("auth/login");
     } catch (error) {
         return res.status(500).json({ message: "Internal server error" });
     }
@@ -8,7 +8,7 @@ function renderLogin(req, res) {
 
 function renderRecuperarContrasenaForm(req, res) {
     try {
-        return res.render("recuperar_pwd_form");
+        return res.render("auth/recuperar_pwd_form");
     } catch (error) {
         return res.status(500).json({ message: "Internal server error" });
     }
@@ -16,7 +16,7 @@ function renderRecuperarContrasenaForm(req, res) {
 
 function renderRecuperarContrasenaInfo(req, res) {
     try {
-        return res.render("recuperar_pwd_info");
+        return res.render("auth/recuperar_pwd_info");
     } catch (error) {
         return res.status(500).json({ message: "Internal server error" });
     }
