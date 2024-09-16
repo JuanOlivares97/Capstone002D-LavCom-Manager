@@ -1,6 +1,25 @@
 <div class="grid grid-cols-2 gap-4">
-    <a href="#" class="block p-4 bg-white rounded shadow hover:bg-gray-200 transition duration-300">Option 1</a>
-    <a href="#" class="block p-4 bg-white rounded shadow hover:bg-gray-200 transition duration-300">Option 2</a>
-    <a href="#" class="block p-4 bg-white rounded shadow hover:bg-gray-200 transition duration-300">Option 3</a>
-    <a href="#" class="block p-4 bg-white rounded shadow hover:bg-gray-200 transition duration-300">Option 4</a>
+    <button onclick="openEntregarServiciosModal()" class="flex items-center p-4 bg-white rounded shadow hover:bg-gray-200 transition duration-300">
+        <%- include('../../icons/entregar') %>
+        <span class="ml-2">Entregar ropa limpia a servicios</span>
+    </button>
+    <a href="#" class="flex items-center p-4 bg-white rounded shadow hover:bg-gray-200 transition duration-300">
+        <%- include('../../icons/baja') %>
+        <span class="ml-2">Dar ropa de baja</span>
+    </a>
+    <a href="#" class="flex items-center p-4 bg-white rounded shadow hover:bg-gray-200 transition duration-300">
+        <%- include('../../icons/recibir') %>
+        <span class="ml-2">Recibir ropa limpia desde lavandería</span>
+    </a>
+    <a href="#" class="flex items-center p-4 bg-white rounded shadow hover:bg-gray-200 transition duration-300">
+        <%- include('../../icons/perdida') %>
+        <span class="ml-2">Declarar ropa perdida</span>
+    </a>
 </div>
+
+<h1 class="text-2xl text-black mt-3">Artículos</h1>
+<button type="button" class="bg-yellow-500 text-black p-2 rounded hover:bg-yellow-400 mt-3" id="openModal">Crear Artículo</button>
+<div id="grid" class="ag-theme-quartz h-96 w-8/12 mt-3"></div>
+<%- include('../modals/editar_articulo_modal') %>
+<%- include('../modals/crear_articulo_modal') %>
+<%- include('../modals/entregar_ropa_servicios_modal') %>
