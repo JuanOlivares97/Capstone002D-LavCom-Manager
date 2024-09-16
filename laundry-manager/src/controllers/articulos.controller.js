@@ -1,5 +1,9 @@
 const prisma = require('../server/prisma');
 
+function showHome(req, res) {
+    res.render('clothes/articulos')
+}
+
 async function getArticulos(req, res) {
     try {
         const articulos = await prisma.articulo.findMany({
@@ -14,5 +18,6 @@ async function getArticulos(req, res) {
 }
 
 module.exports = {
-    getArticulos
+    getArticulos,
+    showHome
 }
