@@ -7,6 +7,9 @@ function showHome(req, res) {
 async function getArticulos(req, res) {
     try {
         const articulos = await prisma.articulo.findMany({
+            where: {
+                borrado: false
+            },
             include: {
                 subgrupo_ropa: true
             }
