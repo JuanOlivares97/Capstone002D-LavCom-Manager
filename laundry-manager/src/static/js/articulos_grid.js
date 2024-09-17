@@ -19,10 +19,9 @@ document.addEventListener('DOMContentLoaded', async function () {
                 headerName: "Acciones",
                 field: "actions",
                 cellRenderer: function (params) {
-                    console.log(params.data.subgrupo_ropa);
                     return `
                         <button class="edit bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 text-sm rounded mr-1" onclick="editArticulo(${JSON.stringify(params.data).replace(/"/g, '&quot;')})">Editar</button>
-                        <button class="delete bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 text-sm rounded" onclick="deleteArticulo(${params.data.id_articulo})">Borrar</button>
+                        <button class="delete bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 text-sm rounded" onclick="deleteArticulo(${JSON.stringify(params.data).replace(/"/g, '&quot;')})">Borrar</button>
                     `;
                 },
                 flex: 1
@@ -42,9 +41,7 @@ document.addEventListener('DOMContentLoaded', async function () {
     gridApi = agGrid.createGrid(gridDiv, gridOptions);
 });
 
-window.editArticulo = function (data) {
-    console.log(data);
-    
+window.editArticulo = function (data) {    
     const modal = document.getElementById("editar_articulo_modal");
 
     const modalTitle = modal.getElementsByTagName("h2");
@@ -67,9 +64,9 @@ window.editArticulo = function (data) {
     }, 10); // Small delay to ensure the class is applied after removing 'hidden'
 }
 
-window.deleteArticulo = function (id) {
+window.deleteArticulo = function (data) {
     Swal.fire({
-        title: `¿Estás seguro de que deseas borrar el articulo con id ${id}?`,
+        title: `¿Estás seguro de que deseas borrar el articulo ${data.nombre_articulo}?`,
         text: "¡No podrás revertir esto! ¿Deseas continuar? ",
         icon: 'warning',
         showCancelButton: true,
