@@ -13,12 +13,13 @@ async function addArticulo() {
     const newRow = document.createElement('div');
     newRow.className = 'flex items-center space-x-2 mt-2';
     newRow.innerHTML = `
-      <span class="text-sm font-semibold">${rowId}</span>
+      <span class="text-sm font-semibold row-number">${rowId}</span>
       <select class="flex-grow p-2 border rounded" name="articulo_${rowId}" required>
         <option value="">Seleccionar artículo</option>
         <!-- Agregar opciones dinámicamente desde el servidor -->
       </select>
       <input type="number" name="cantidad_${rowId}" class="w-28 p-2 border rounded" placeholder="Cantidad" required>
+      <button type="button" class="bg-red-500 text-white p-2 rounded hover:bg-red-700 remove-articulo">Remove</button>
     `;
     document.getElementById('entregar_ropa_servicios_container').appendChild(newRow);
 
@@ -31,6 +32,19 @@ async function addArticulo() {
         option.value = articulo.id_articulo;
         option.innerText = articulo.nombre_articulo;
         selectArticulo.appendChild(option);
+    });
+
+    newRow.querySelector('.remove-articulo').addEventListener('click', function() {
+        newRow.remove();
+        rowId--;
+        updateRowNumbers();
+    });
+}
+
+function updateRowNumbers() {
+    const rows = document.querySelectorAll('#entregar_ropa_servicios_container > div');
+    rows.forEach((row, index) => {
+        row.querySelector('.row-number').innerText = index + 1;
     });
 }
 
@@ -52,8 +66,15 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
         });
 
+        let data = {
+            rut_usuario_1: document.querySelector("input[name='rut_usuario_1']").value,
+            rut_usuario_2: document.querySelector("select[name='rut_usuario_2']").value,
+            servicio: document.querySelector("select[name='servicio']").value,
+            articulos: articulosData
+        }
+
         if (articulosData.length !== 0) {
-            alert(JSON.stringify(articulosData));
+            alert(JSON.stringify(data));
         }
     });
     

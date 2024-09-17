@@ -7,7 +7,8 @@ async function renderHome(req, res) {
                 borrado: false
             }
         });
-        res.render('clothes/articulos', { usuarios });
+        const servicios = await prisma.servicio.findMany();
+        res.render('clothes/articulos', { usuarios, servicios });
     } catch (error) {
         return res.status(500).json({ message: "Internal server error" });
     }

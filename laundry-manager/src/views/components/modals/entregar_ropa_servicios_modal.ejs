@@ -1,12 +1,32 @@
 <div class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden opacity-0 transition-opacity duration-300" id="entregar_ropa_servicios_modal">
-    <div class="bg-white rounded-lg shadow-lg p-8 max-w-3xl w-full transform scale-95 transition-transform duration-300">
+    <div class="bg-white rounded-lg shadow-lg p-8 max-w-3xl w-full transform scale-95 transition-transform duration-300 h-full">
         <h2 class="text-2xl font-bold mb-6 text-center">Entregar ropa limpia a servicios</h2>
-        <div class="flex justify-between mt-6">
-            <button type="button" class="bg-blue-500 text-white p-2 rounded hover:bg-blue-800" onclick="addArticulo()">Añadir artículo</button>
-        </div>
-        <form id="entregar_ropa_servicios_form">
-            <div id="entregar_ropa_servicios_container">
-
+        <form id="entregar_ropa_servicios_form" class="flex flex-col h-full">
+            <div class="mb-4">
+                <label for="rut_usuario_1" class="block text-sm font-medium text-gray-700">Usuario que realiza la entrega:</label>
+                <input type="text" name="rut_usuario_1" required disabled value="RUT LOGUEADO" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+            </div>
+            <div class="mb-4">
+                <label for="rut_usuario_2" class="block text-sm font-medium text-gray-700">Usuario que recibe la entrega:</label>
+                <select name="rut_usuario_2" class="mt-1 block w-full px-3 py-2 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                    <% usuarios.forEach(u => { %>
+                        <option value="<%= u.rut_usuario %>"><%= u.nombre %></option>
+                    <% }) %>
+                </select>
+            </div>
+            <div class="mb-4">
+                <label for="servicio" class="block text-sm font-medium text-gray-700">Servicio:</label>
+                <select name="servicio" class="mt-1 block w-full px-3 py-2 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                    <% servicios.forEach(s => { %>
+                        <option value="<%= s.id_servicio %>"><%= s.desc_servicio %></option>
+                    <% }) %>
+                </select>
+            </div>
+            <div class="flex justify-between mt-6">
+                <button type="button" class="bg-blue-500 text-white p-2 rounded hover:bg-blue-800" onclick="addArticulo()">Añadir artículo</button>
+            </div>
+            <div id="entregar_ropa_servicios_container" class="flex-grow overflow-y-auto max-h-96 mt-4 border-t border-gray-200 pt-4">
+                <!-- Rows will be added here dynamically -->
             </div>
             <div class="flex justify-between mt-6">
                 <button type="button" class="bg-red-500 text-white p-2 rounded hover:bg-red-800" id="closeModalEntregarRopaServicios">Cancelar</button>
