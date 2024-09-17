@@ -1,12 +1,17 @@
 <div class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden opacity-0 transition-opacity duration-300" id="entregar_ropa_servicios_modal">
-    <div class="bg-white rounded-lg shadow-lg p-8 max-w-2xl w-full transform scale-95 transition-transform duration-300">
+    <div class="bg-white rounded-lg shadow-lg p-8 max-w-3xl w-full transform scale-95 transition-transform duration-300">
         <h2 class="text-2xl font-bold mb-6 text-center">Entregar ropa limpia a servicios</h2>
         <div class="flex justify-between mt-6">
-            <button type="button" class="bg-blue-500 text-white p-2 rounded hover:bg-blue-800">Añadir artículo</button>
+            <button type="button" class="bg-blue-500 text-white p-2 rounded hover:bg-blue-800" onclick="addArticulo()">Añadir artículo</button>
         </div>
-        <div class="flex justify-between mt-6">
-            <button type="button" class="bg-red-500 text-white p-2 rounded hover:bg-red-800" id="closeModalEntregarRopaServicios">Cancelar</button>
-            <button type="submit" class="bg-green-500 text-white p-2 rounded hover:bg-green-800">Guardar cambios</button>
-        </div>
+        <form id="entregar_ropa_servicios_form">
+            <div id="entregar_ropa_servicios_container">
+
+            </div>
+            <div class="flex justify-between mt-6">
+                <button type="button" class="bg-red-500 text-white p-2 rounded hover:bg-red-800" id="closeModalEntregarRopaServicios">Cancelar</button>
+                <button type="submit" class="bg-green-500 text-white p-2 rounded hover:bg-green-800">Guardar cambios</button>
+            </div>
+        </form>
     </div>
 </div>
