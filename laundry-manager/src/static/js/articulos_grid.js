@@ -42,7 +42,7 @@ document.addEventListener('DOMContentLoaded', async function () {
     gridApi = agGrid.createGrid(gridDiv, gridOptions);
 });
 
-function editArticulo(data) {
+window.editArticulo = function (data) {
     console.log(data);
     
     const modal = document.getElementById("editar_articulo_modal");
@@ -67,7 +67,7 @@ function editArticulo(data) {
     }, 10); // Small delay to ensure the class is applied after removing 'hidden'
 }
 
-function deleteArticulo(id) {
+window.deleteArticulo = function (id) {
     Swal.fire({
         title: `¿Estás seguro de que deseas borrar el articulo con id ${id}?`,
         text: "¡No podrás revertir esto! ¿Deseas continuar? ",
