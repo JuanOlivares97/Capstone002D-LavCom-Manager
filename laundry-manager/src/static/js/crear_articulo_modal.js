@@ -18,14 +18,4 @@ document.addEventListener("DOMContentLoaded", function() {
             modal.classList.add('hidden');
         }, 300); // Duration should match the CSS transition duration
     });
-
-    modal.addEventListener('click', (e) => {
-        if (event.target === modal) {
-            modal.classList.add('opacity-0');
-            modal.querySelector('.transform').classList.add('scale-95');
-            setTimeout(() => {
-                modal.classList.add('hidden');
-            }, 300); // Duration should match the CSS transition duration
-        }
-    });
 });
