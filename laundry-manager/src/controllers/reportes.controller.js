@@ -1,5 +1,9 @@
 function showHome(req, res) {
-    res.render('reports/home')
+    try {
+        res.render('reports/home')
+    } catch (error) {
+        return res.status(500).json({ message: "Internal server error" });
+    }
 }
 
 module.exports = {

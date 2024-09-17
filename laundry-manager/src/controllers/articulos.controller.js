@@ -1,7 +1,16 @@
 const prisma = require('../server/prisma');
 
-function showHome(req, res) {
-    res.render('clothes/articulos')
+async function renderHome(req, res) {
+    try {
+        const usuarios = await prisma.usuarios.findMany({
+            where: {
+                borrado: false
+            }
+        });
+        res.render('clothes/articulos', { usuarios });
+    } catch (error) {
+        return res.status(500).json({ message: "Internal server error" });
+    }
 }
 
 async function getArticulos(req, res) {
@@ -22,5 +31,5 @@ async function getArticulos(req, res) {
 
 module.exports = {
     getArticulos,
-    showHome
+    renderHome
 }
