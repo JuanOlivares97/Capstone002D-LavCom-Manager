@@ -3,8 +3,6 @@ const userController = require('../controllers/user.controller');
 
 const router = Router();
 
-router.get('/login', userController.renderLogin); 
-router.get('/recuperar_pwd_form', userController.renderRecuperarContrasenaForm);
-router.get('/recuperar_pwd_info', userController.renderRecuperarContrasenaInfo);
+router.get('/get-usuarios', userController.getUsuarios);
 
 module.exports = router;

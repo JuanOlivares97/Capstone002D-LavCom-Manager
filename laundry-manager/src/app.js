@@ -2,6 +2,7 @@ const express = require('express');
 const expressLayout = require('express-ejs-layouts')
 const path = require('path');
 const userRouter = require('./routes/user.routes');
+const authRouter = require('./routes/auth.routes');
 const articulosRouter = require('./routes/articulos.routes');
 const reportesRouter = require('./routes/reportes.routes')
 const app = express();
@@ -15,7 +16,8 @@ app.set('views', './src/views');
 app.use(express.static(path.join(__dirname, "static")))
 console.log(path.join(__dirname, "static"));
 
-app.use('/', userRouter);
+app.use('/auth', authRouter);
+app.use('/users', userRouter);
 app.use('/clothes', articulosRouter);
 app.use('/reports', reportesRouter)
 

@@ -1,29 +1,20 @@
-function renderLogin(req, res) {
-    try {
-        return res.render("auth/login", {layout:false});
-    } catch (error) {
-        return res.status(500).json({ message: "Internal server error" });
-    }
-}
+const prisma = require('../server/prisma');
 
-function renderRecuperarContrasenaForm(req, res) {
+async function getUsuarios(req, res) {
     try {
-        return res.render("auth/recuperar_pwd_form", {layout:false});
+        const users = await prisma.usuarios.findMany({
+            where: {
+                borrado: false
+            }
+        });
+        return res.json(users);
     } catch (error) {
-        return res.status(500).json({ message: "Internal server error" });
-    }
-}
-
-function renderRecuperarContrasenaInfo(req, res) {
-    try {
-        return res.render("auth/recuperar_pwd_info", {layout:false});
-    } catch (error) {
+        console.log(error);
+        
         return res.status(500).json({ message: "Internal server error" });
     }
 }
 
 module.exports = {
-    renderLogin,
-    renderRecuperarContrasenaForm,
-    renderRecuperarContrasenaInfo
+    getUsuarios
 }
