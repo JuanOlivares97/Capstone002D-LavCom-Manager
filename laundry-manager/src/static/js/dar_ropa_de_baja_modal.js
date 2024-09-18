@@ -102,9 +102,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 document.addEventListener('DOMContentLoaded', function () {
     const tipoDadaDeBajaSelect = document.getElementById('tipo_dada_de_baja');
-    const servicioSelect = document.getElementById('servicio');
+    const servicioSelect = document.getElementById('servicio_db');
 
-    function toggleServicioSelect() {
+    function toggleServicioSelectDarRopaDeBaja() {
         if (tipoDadaDeBajaSelect.value === '2') {
             servicioSelect.disabled = true;
             servicioSelect.value = '';
@@ -115,8 +115,8 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-    tipoDadaDeBajaSelect.addEventListener('change', toggleServicioSelect);
+    tipoDadaDeBajaSelect.addEventListener('change', toggleServicioSelectDarRopaDeBaja);
 
     // Initial check
-    toggleServicioSelect();
+    toggleServicioSelectDarRopaDeBaja();
 });
