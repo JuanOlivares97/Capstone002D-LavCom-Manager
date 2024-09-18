@@ -1,4 +1,4 @@
-function openRecibirRopaLimpiaLav() {
+function openRecibirRopaLimpiaLavModal() {
     const modal = document.querySelector('#recibir_ropa_limpia_lav_modal');
     modal.classList.remove('hidden');
     setTimeout(() => {
