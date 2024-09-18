@@ -49,7 +49,8 @@ function updateRowNumbersRecibirLav() {
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
-    document.getElementById('entregar_ropa_servicios_form').addEventListener('submit', function (e) {
+    const form_recibir_ropa_limpia_lav = document.getElementById('recibir_ropa_limpia_lav_form');
+    form_recibir_ropa_limpia_lav.addEventListener('submit', function (e) {
         e.preventDefault();
         const articulosData = [];
         const filas = document.querySelectorAll('#recibir_ropa_limpia_lav_container > div');
@@ -67,9 +68,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
 
         let data = {
-            rut_usuario_1: document.querySelector("input[name='rut_usuario_1']").value,
-            rut_usuario_2: document.querySelector("select[name='rut_usuario_2']").value,
-            servicio: document.querySelector("select[name='servicio']").value,
+            rut_usuario_1: form_recibir_ropa_limpia_lav.querySelector("input[name='rut_usuario_1']").value,
             articulos: articulosData
         }
 

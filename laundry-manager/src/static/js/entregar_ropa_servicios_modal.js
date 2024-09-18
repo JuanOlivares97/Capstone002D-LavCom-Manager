@@ -49,7 +49,8 @@ function updateRowNumbersEntregarServicios() {
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
-    document.getElementById('entregar_ropa_servicios_form').addEventListener('submit', function (e) {
+    const entregar_ropa_servicios_form = document.getElementById('entregar_ropa_servicios_form');
+    entregar_ropa_servicios_form.addEventListener('submit', function (e) {
         e.preventDefault();
         const articulosData = [];
         const filas = document.querySelectorAll('#entregar_ropa_servicios_container > div');
@@ -67,9 +68,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
 
         let data = {
-            rut_usuario_1: document.querySelector("input[name='rut_usuario_1']").value,
-            rut_usuario_2: document.querySelector("select[name='rut_usuario_2']").value,
-            servicio: document.querySelector("select[name='servicio']").value,
+            rut_usuario_1: entregar_ropa_servicios_form.querySelector("input[name='rut_usuario_1']").value,
+            rut_usuario_2: entregar_ropa_servicios_form.querySelector("select[name='rut_usuario_2']").value,
+            servicio: entregar_ropa_servicios_form.querySelector("select[name='servicio']").value,
             articulos: articulosData
         }
 
