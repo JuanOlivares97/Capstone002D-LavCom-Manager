@@ -48,3 +48,35 @@ document.addEventListener('DOMContentLoaded', async function () {
     const gridDiv = document.querySelector("#gridForReportsHome");
     gridApi = agGrid.createGrid(gridDiv, gridOptions);
 });
+
+
+document.addEventListener('DOMContentLoaded', async function () {
+    let gridApi;
+
+    const gridOptions = {
+        // Data to be displayed
+        rowData: [],
+        localeText: AG_GRID_LOCALE_ES,
+        // Columns to be displayed (Should match rowData properties)
+        columnDefs: [
+            { headerName:"Articulo", field: "id", flex: 1 },
+            { headerName:"Ropa Limpia en Ropería", field: "ropa_limpia_roperia", flex: 1 },
+            { headerName: "Ropa en Servicios", field: "ropa_servicios", flex: 1 },
+            { headerName: "Ropa sucia en Ropería", field: "ropa_sucia_roperia", flex: 1 },
+            { headerName: "Ropa en Tránsito", field: "ropa_transito", flex: 1 },
+            { headerName: "Pérdidas Totales", field: "perdida_Total", flex: 1 },
+            { headerName: "Bajas Totales", field: "baja_total", flex: 1 },
+            
+        ],
+        pagination: true,
+        paginationPageSize: 15,
+        paginationAutoPageSize: true,
+        defaultColDef: {
+            resizable: false,
+            sortable: true,
+        },
+    };
+
+    const gridDiv = document.querySelector("#gridForReportsStockGeneral");
+    gridApi = agGrid.createGrid(gridDiv, gridOptions);
+});
