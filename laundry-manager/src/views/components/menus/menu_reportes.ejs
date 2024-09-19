@@ -1,18 +1,34 @@
 <div class="grid grid-cols-2 gap-4">
-    <button onclick="openEntregarServiciosModal()" class="flex items-center p-4 bg-white rounded shadow hover:bg-gray-200 transition duration-300">
-        <%- include('../../icons/entregar') %>
-        <span class="ml-2">Reporte de Baja y Pérdida</span>
+    
+    <button id="openModalReporteGeneral" onclick="toggleModal('#modal_stock_general','#openModalReporteGeneral','#closeModalReporteGeneral')" class="flex items-center p-4 bg-white rounded shadow hover:bg-gray-200 transition duration-300">
+        <%- include('../../icons/chart') %>
+        <span class="ml-2">Reporte Stock General Hospital</span>
     </button>
-    <a href="#" class="flex items-center p-4 bg-white rounded shadow hover:bg-gray-200 transition duration-300">
-        <%- include('../../icons/baja') %>
-        <span class="ml-2">Reporte Stock Ropa Limpia</span>
-    </a>
-    <a href="#" class="flex items-center p-4 bg-white rounded shadow hover:bg-gray-200 transition duration-300">
-        <%- include('../../icons/recibir') %>
+    
+    <button class="flex items-center p-4 bg-white rounded shadow hover:bg-gray-200 transition duration-300">
+        <%- include('../../icons/clipboard') %>
+        <span class="ml-2">Reporte de Ropa en Servicios</span>
+    </button>
+    
+    <button class="flex items-center p-4 bg-white rounded shadow hover:bg-gray-200 transition duration-300">
+        <%- include('../../icons/arrow_path') %>
+        <span class="ml-2">Reporte de Stock de Ropa Sucia en Ropería</span>
+    </button>
+    
+    <button class="flex items-center p-4 bg-white rounded shadow hover:bg-gray-200 transition duration-300">
+        <%- include('../../icons/clipboard_document') %>
         <span class="ml-2">Reporte en Tránsito</span>
-    </a>
-    <a href="#" class="flex items-center p-4 bg-white rounded shadow hover:bg-gray-200 transition duration-300">
-        <%- include('../../icons/perdida') %>
-        <span class="ml-2">Balance General</span>
-    </a>
+    </button>
+
+    <button class="flex items-center p-4 bg-white rounded shadow hover:bg-gray-200 transition duration-300">
+        <%- include('../../icons/presentation_chart') %>
+        <span class="ml-2">Reporte de Bajas y Pérdidas del mes</span>
+    </button>
+
+    <button class="flex items-center p-4 bg-white rounded shadow hover:bg-gray-200 transition duration-300">
+        <%- include('../../icons/document_download') %>
+        <span class="ml-2">Descarga de Reportes</span>
+    </button>    
 </div>
+
+
