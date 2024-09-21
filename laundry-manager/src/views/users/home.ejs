@@ -1,5 +1,15 @@
 
 <main class="flex-1 p-6">
-    <h2 class="text-2xl">Contenido</h2>
+    <button 
+        id="openModalAddUser" 
+        onclick="toggleModal('#modal_crear_usuario','#openModalAddUser','#closeModalAddUser')" 
+        type="button" 
+        class="bg-green-500 flex gap-2 text-white p-2 rounded hover:bg-yellow-400 mt-3" >
+        <%- include('../icons/add_user') %>
+        <span class="class=ml-2">Crear Nuevo Usuario</span>
+    </button>
+    <div id="gridForUsers" class="ag-theme-quartz h-96 w-max-screen mt-3"></div>
 </main>
-<%- include('../components/modals/crear_usuario_modal') %>
+<%- include('../components/modals/users/crear_usuario_modal') %>
+<script type="module" src="/js/reportsHome_grid.js"></script>
+<script src="/js/openReport_modal.js"></script>
