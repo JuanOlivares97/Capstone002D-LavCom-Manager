@@ -6,8 +6,8 @@ const userRouter = require('./routes/user.routes');
 const authRouter = require('./routes/auth.routes');
 const articulosRouter = require('./routes/articulos.routes');
 const reportesRouter = require('./routes/reportes.routes')
-const dashboardController = require('./routes/dashboard.routes')
-
+const dashboardRouter = require('./routes/dashboard.routes')
+const helpRouter = require('./routes/help.routes')
 const app = express();
 
 app.use(expressLayout)
@@ -23,7 +23,8 @@ app.use('/auth', authRouter);
 app.use('/users', userRouter);
 app.use('/clothes', articulosRouter);
 app.use('/reports', reportesRouter);
-app.use('/dashboard', dashboardController);
+app.use('/dashboard', dashboardRouter);
+app.use('/help', helpRouter)
 
 app.get("/template", (req, res) => {
     res.render("reports/home");
