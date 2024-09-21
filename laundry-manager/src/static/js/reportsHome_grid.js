@@ -20,7 +20,7 @@ function createGrid(gridId, rowData, columnDefs) {
     }
 }
 
-document.addEventListener('DOMContentLoaded', async function () {
+document.addEventListener('DOMContentLoaded', async function () {   
     // Primer grid: Reportes Home
     createGrid("#gridForReportsHome", [
         { id: 1, servicio: "Lavado", fecha: "2024-09-16", usuario: "Juan Pérez", estado: "Entregado" },
@@ -57,7 +57,7 @@ document.addEventListener('DOMContentLoaded', async function () {
     // Tercer Grid: Reporte de Ropa en Servicios
     createGrid('#gridForReportRopaServicios', [],
         [
-            { headerName: "Id", field: "id", flex: 1 },
+            { headerName: "Id", field: "id"},
             { headerName: "Articulo", field: "articulo", flex: 1 },
             { headerName: "Total en Servicio", field: "total_servicio", flex: 1 },
         ]
@@ -66,7 +66,7 @@ document.addEventListener('DOMContentLoaded', async function () {
     // Cuarto Grid: Reporte de Stock de Ropa Sucia en Ropería
     createGrid('#gridForReporteRopaSuciaRoperia', [], 
         [
-            { headerName: "#", field: "id", flex: 1},
+            { headerName: "#", field: "id"},
             { headerName: "Articulo", field: "articulo", flex: 1 },
             { headerName: "Ropa Sucia Roperia", field: "sucia_roperia", flex: 1 },
         ]
@@ -75,7 +75,7 @@ document.addEventListener('DOMContentLoaded', async function () {
     // Quinto Grid: Reporte de Stock de en Tránsito
     createGrid('#gridForReporteRopaTransito', [], 
         [
-            { headerName: "#", field: "id", flex: 1},
+            { headerName: "#", field: "id"},
             { headerName: "Articulo", field: "articulo", flex: 1 },
             { headerName: "Ropa en Lavanderia Externa", field: "ropa_transito", flex: 1 },
         ]
@@ -84,10 +84,29 @@ document.addEventListener('DOMContentLoaded', async function () {
     // Sexto Grid: Reporte de de Bajas y Perdidas del Mes
     createGrid('#gridForReporteBajasPerdidas', [], 
         [
-            { headerName: "#", field: "id", flex: 1},
+            { headerName: "#", field: "id"},
             { headerName: "Articulo", field: "articulo", flex: 1 },
             { headerName: "Perdidas", field: "perdidas", flex: 1 },
-            { headerName: "bajas", field: "perdidas", flex: 1 }
+            { headerName: "bajas", field: "perdidas", flex: 1 },
+            
+        ]
+    )
+
+    // Septimo Grid: Listado de Usuarios
+    createGrid('#gridForUsers', [], 
+        [
+            { headerName: "#", field: "id"},
+            { headerName: "Rut", field: "articulo" },
+            { headerName: "Nombre", field: "perdidas", flex: 1 },
+            {
+                headerName: "Acciones",
+                field: "actions",
+                cellRenderer: function (params) {
+                    return `
+                        <button class="edit bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 text-sm rounded mr-1" onclick="editArticulo(${JSON.stringify(params.data).replace(/"/g, '&quot;')})">Editar</button>
+                    `;
+                }
+            }
         ]
     )
 });
