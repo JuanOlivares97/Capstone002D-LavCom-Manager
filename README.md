@@ -45,7 +45,7 @@ Este proyecto está desarrollado utilizando **SvelteKit**. A continuación, se d
    npm run dev
    ```
 
-4. **Acceso al proyecto**: Abre tu navegador web y navega a `http://localhost:5174` para ver la aplicación en funcionamiento.
+4. **Acceso al proyecto**: Abre tu navegador web y navega a `http://localhost:3000` para ver la aplicación en funcionamiento.
 
 ## Fases del Capstone 2024
 
