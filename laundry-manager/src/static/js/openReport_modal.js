@@ -1,27 +1,29 @@
-function toggleModal(idModal,btnAbrirmodal, btnCerrarModal) {
-    const modal = document.querySelector(idModal ); // idModal debería ser un selector válido, como '#modalId'
-    if (!modal) return; // Verifica si el modal existe
+document.addEventListener('DOMContentLoaded', () => {
+    function toggleModal(idModal, btnAbrirModal, btnCerrarModal) {
+        const modal = document.querySelector(idModal);
+        const openModal = document.querySelector(btnAbrirModal);
+        const closeModal = document.querySelector(btnCerrarModal);
 
-    const openModal = document.querySelector(btnAbrirmodal);
-    const closeModal = document.querySelector(btnCerrarModal);
+        if (!modal || !openModal || !closeModal) return;
 
-    if (openModal) {
         openModal.addEventListener('click', () => {
             modal.classList.remove('hidden');
             setTimeout(() => {
                 modal.classList.remove('opacity-0');
-                modal.querySelector('.transform').classList.remove('scale-95');
             }, 10);
         });
-    }
 
-    if (closeModal) {
         closeModal.addEventListener('click', () => {
             modal.classList.add('opacity-0');
-            modal.querySelector('.transform').classList.add('scale-95');
             setTimeout(() => {
                 modal.classList.add('hidden');
             }, 300);
         });
     }
-}
+
+    toggleModal('#modal_stock_general', '#openModalReporteGeneral', '#closeModalReporteGeneral')
+    toggleModal('#modal_ropa_servicios', '#openModalRopaServicios', '#closeModalRopaServicios')
+    toggleModal('#modal_ropa_sucia_roperia', '#openModalRopaSuciaRoperia', '#closeModalRopaSuciaRoperia')
+    toggleModal('#modal_ropa_transito', '#openModalRopaTransito', '#closeModalRopatransito')
+    toggleModal('#modal_ropa_baja', '#openModalRopaBaja', '#closeModalRopaBaja')
+});
