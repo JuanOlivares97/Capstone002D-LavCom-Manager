@@ -19,7 +19,7 @@ async function addArticuloEntregarServicios() {
         <!-- Agregar opciones dinámicamente desde el servidor -->
       </select>
       <input type="number" name="cantidad_${rowIdEntregaServicios}" class="w-28 p-2 border rounded" placeholder="Cantidad" required>
-      <button type="button" class="bg-red-500 text-white p-2 rounded hover:bg-red-700 remove-articulo-entregar-servicio">Remove</button>
+      <button type="button" class="bg-red-500 text-white p-2 rounded hover:bg-red-700 remove-articulo-entregar-servicio">Borrar</button>
     `;
     document.getElementById('entregar_ropa_servicios_container').appendChild(newRow);
 

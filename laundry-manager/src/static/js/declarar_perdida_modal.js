@@ -19,7 +19,7 @@ async function addArticuloDeclararPerdida() {
         <!-- Agregar opciones dinámicamente desde el servidor -->
       </select>
       <input type="number" name="cantidad_${rowIdDeclararPerdida}" class="w-28 p-2 border rounded" placeholder="Cantidad" required>
-      <button type="button" class="bg-red-500 text-white p-2 rounded hover:bg-red-700 remove-articulo-declarar-perdida">Remove</button>
+      <button type="button" class="bg-red-500 text-white p-2 rounded hover:bg-red-700 remove-articulo-declarar-perdida">Borrar</button>
     `;
     document.getElementById('declarar_perdida_container').appendChild(newRow);
 

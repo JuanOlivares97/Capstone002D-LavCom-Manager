@@ -19,7 +19,7 @@ async function addArticuloRecibirRopaLimpiaLav() {
         <!-- Agregar opciones dinámicamente desde el servidor -->
       </select>
       <input type="number" name="cantidad_${rowIdRecibirLav}" class="w-28 p-2 border rounded" placeholder="Cantidad" required>
-      <button type="button" class="bg-red-500 text-white p-2 rounded hover:bg-red-700 remove-articulo-recibir-lavanderia">Remove</button>
+      <button type="button" class="bg-red-500 text-white p-2 rounded hover:bg-red-700 remove-articulo-recibir-lavanderia">Borrar</button>
     `;
     document.getElementById('recibir_ropa_limpia_lav_container').appendChild(newRow);
 
