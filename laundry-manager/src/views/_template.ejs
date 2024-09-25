@@ -9,9 +9,10 @@
     <!--ACA VAN LOS ESTILOS CSS-->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Tailwind CSS CDN TEMPORAL, PARA NO PERDER TIEMPO EJECUTANDO COMANDOS-->
+
     <script src="https://cdn.jsdelivr.net/npm/ag-grid-community/dist/ag-grid-community.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    
+
     <script src="/static/js/colapsar_menu.js"></script>
     <script
         src="https://cdn.jsdelivr.net/npm/ag-charts-enterprise@10.2.0/dist/umd/ag-charts-enterprise.js?t=1726567870631"></script>
@@ -28,43 +29,40 @@
             --ag-row-hover-color: rgb(216, 226, 255);
         }
 
-        /* Estilo inicial del sidebar */
+        /* Custom width for collapsed sidebar */
+        #sidebar.collapsed {
+            width: 5.5rem;
+        }
+
+        /* Ancho normal del sidebar */
         #sidebar {
             width: 16rem;
-            /* Ancho normal (64px) */
             transition: width 0.3s ease;
-            /* Transición suave */
         }
 
-        /* Cuando el sidebar esté colapsado */
-        #sidebar.collapsed {
-            width: 4rem;
-            /* Colapsar el sidebar a solo 16px (solo íconos visibles) */
-        }
-
-        /* Ocultar los textos inicialmente */
-        #menu li span {
-            display: inline;
+        /* Ocultar el texto de los elementos del menú */
+        .sidebar-text {
             transition: opacity 0.3s ease;
         }
 
-        /* Cuando el sidebar esté colapsado, ocultar los textos */
-        #sidebar.collapsed #menu li span {
+        /* Cuando el sidebar esté colapsado, ocultar el texto */
+        #sidebar.collapsed .sidebar-text {
             display: none;
-            /* Textos ocultos */
         }
 
-        /* Ajustar el contenido principal cuando el sidebar esté colapsado */
-        #mainContent {
-            transition: margin-left 0.3s ease;
-            /* Transición suave para el margen */
-            margin-left: 16rem;
-            /* Cuando el sidebar esté expandido */
+        /* Ocultar el logo grande cuando el sidebar esté colapsado */
+        #sidebar.collapsed #logo {
+            display: none;
         }
 
-        #sidebar.collapsed+#mainContent {
-            margin-left: 4rem;
-            /* Ajuste del margen cuando el sidebar está colapsado */
+        /* Mostrar el logo pequeño cuando el sidebar esté colapsado */
+        #sidebar.collapsed #smallLogo {
+            display: block;
+        }
+
+        /* Inicialmente ocultar el logo pequeño */
+        #smallLogo {
+            display: none;
         }
     </style>
 </head>
