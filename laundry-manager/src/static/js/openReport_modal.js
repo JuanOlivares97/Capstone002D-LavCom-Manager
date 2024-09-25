@@ -21,10 +21,5 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    toggleModal('#modal_stock_general', '#openModalReporteGeneral', '#closeModalReporteGeneral')
-    toggleModal('#modal_ropa_servicios', '#openModalRopaServicios', '#closeModalRopaServicios')
-    toggleModal('#modal_ropa_sucia_roperia', '#openModalRopaSuciaRoperia', '#closeModalRopaSuciaRoperia')
-    toggleModal('#modal_ropa_transito', '#openModalRopaTransito', '#closeModalRopatransito')
-    toggleModal('#modal_ropa_baja', '#openModalRopaBaja', '#closeModalRopaBaja')
     toggleModal('#modal_crear_usuario','#openModalAddUser','#closeModalAddUser')
 });
