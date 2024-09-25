@@ -1,15 +1,20 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Laundry Manager</title>
-    <link rel="icon" type="image/png" sizes="32x32" href="/img/logo_hospital.webp"/>
+    <link rel="icon" type="image/png" sizes="32x32" href="/img/logo_hospital.webp" />
     <!--ACA VAN LOS ESTILOS CSS-->
-    <script src="https://cdn.tailwindcss.com"></script> <!-- Tailwind CSS CDN TEMPORAL, PARA NO PERDER TIEMPO EJECUTANDO COMANDOS-->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Tailwind CSS CDN TEMPORAL, PARA NO PERDER TIEMPO EJECUTANDO COMANDOS-->
     <script src="https://cdn.jsdelivr.net/npm/ag-grid-community/dist/ag-grid-community.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="https://cdn.jsdelivr.net/npm/ag-charts-enterprise@10.2.0/dist/umd/ag-charts-enterprise.js?t=1726567870631"></script>
+    
+    <script src="/static/js/colapsar_menu.js"></script>
+    <script
+        src="https://cdn.jsdelivr.net/npm/ag-charts-enterprise@10.2.0/dist/umd/ag-charts-enterprise.js?t=1726567870631"></script>
     <style>
         .ag-theme-quartz {
             /* Changes the color of the grid text */
@@ -19,17 +24,58 @@
             /* Changes the header color of the top row */
             --ag-header-background-color: rgb(228, 237, 250);
             /* Changes the hover color of the row*/
+
             --ag-row-hover-color: rgb(216, 226, 255);
+        }
+
+        /* Estilo inicial del sidebar */
+        #sidebar {
+            width: 16rem;
+            /* Ancho normal (64px) */
+            transition: width 0.3s ease;
+            /* Transición suave */
+        }
+
+        /* Cuando el sidebar esté colapsado */
+        #sidebar.collapsed {
+            width: 4rem;
+            /* Colapsar el sidebar a solo 16px (solo íconos visibles) */
+        }
+
+        /* Ocultar los textos inicialmente */
+        #menu li span {
+            display: inline;
+            transition: opacity 0.3s ease;
+        }
+
+        /* Cuando el sidebar esté colapsado, ocultar los textos */
+        #sidebar.collapsed #menu li span {
+            display: none;
+            /* Textos ocultos */
+        }
+
+        /* Ajustar el contenido principal cuando el sidebar esté colapsado */
+        #mainContent {
+            transition: margin-left 0.3s ease;
+            /* Transición suave para el margen */
+            margin-left: 16rem;
+            /* Cuando el sidebar esté expandido */
+        }
+
+        #sidebar.collapsed+#mainContent {
+            margin-left: 4rem;
+            /* Ajuste del margen cuando el sidebar está colapsado */
         }
     </style>
 </head>
 <%- include('partials/_header') %>
-<main class="flex-1 p-6">
-    <%-body%>
-</main>
-<!--ENTRE ESTE COMENTARIO Y EL INCLUDE DE ABAJO VAN MODALS-->
-<%- include('partials/_footer') %>
+    <main class="flex-1 p-6">
+        <%-body%>
+    </main>
+    <!--ENTRE ESTE COMENTARIO Y EL INCLUDE DE ABAJO VAN MODALS-->
+    <%- include('partials/_footer') %>
 
-<!--ACA VAN SCRIPTS DE JS-->
-</body>
+        <!--ACA VAN SCRIPTS DE JS-->
+        </body>
+
 </html>
