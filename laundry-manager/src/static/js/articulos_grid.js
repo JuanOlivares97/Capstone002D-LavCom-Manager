@@ -69,7 +69,7 @@ window.deleteArticulo = function (data) {
         title: `¿Estás seguro de que deseas borrar el articulo ${data.nombre_articulo}?`,
         text: "¡No podrás revertir esto! ¿Deseas continuar? ",
         icon: 'warning',
-        showCancelButton: true,
+        renderCancelButton: true,
         confirmButtonColor: '#3085d6',
         cancelButtonColor: '#d33',
         confirmButtonText: 'Sí, bórralo!',

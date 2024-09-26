@@ -15,11 +15,11 @@ async function getUsuarios(req, res) {
     }
 }
 
-async function showHome(req, res) {
+async function renderHome(req, res) {
     res.render('users/home')
 }
 
 module.exports = {
     getUsuarios,
-    showHome
+    renderHome
 }

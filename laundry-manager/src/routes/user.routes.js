@@ -3,7 +3,7 @@ const userController = require('../controllers/user.controller');
 
 const router = Router();
 
-router.get('/home', userController.showHome)
+router.get('/home', userController.renderHome)
 
 router.get('/get-usuarios', userController.getUsuarios);
 

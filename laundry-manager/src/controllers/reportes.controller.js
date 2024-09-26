@@ -1,4 +1,4 @@
-function showHome(req, res) {
+function renderHome(req, res) {
     try {
         res.render('reports/home')
     } catch (error) {
@@ -7,5 +7,5 @@ function showHome(req, res) {
 }
 
 module.exports = {
-    showHome
+    renderHome
 }
