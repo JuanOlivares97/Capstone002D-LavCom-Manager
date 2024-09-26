@@ -12,21 +12,22 @@
             background-position: center;
         }
     </style>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body class="h-screen flex items-center justify-center">
-    <div class="bg-white shadow-lg rounded-2xl p-8 max-w-sm w-full border-2 border-black">
+    <div class="bg-white shadow-lg rounded-2xl p-8 max-w-sm w-full border-2 border-black" id="login-container">
         <div class="flex justify-center mb-6">
             <%- include("../icons/logo_hospital") %>
         </div>
         <h1 class="text-2xl mb-6 text-center text-black">Iniciar sesión</h1>
-        <form>
+        <form id="login-form">
             <div class="mb-4">
                 <label for="username" class="block text-black-700 mb-2">Usuario</label>
-                <input type="text" id="username" class="w-full p-2 border rounded-lg" placeholder="Nombre de usuario">
+                <input type="text" name="username" class="w-full p-2 border rounded-lg" placeholder="Nombre de usuario">
             </div>
             <div class="mb-6">
                 <label for="password" class="block text-black-700 mb-2">Contraseña</label>
-                <input type="password" id="password" class="w-full p-2 border rounded-lg" placeholder="Contraseña">
+                <input type="password" name="pwd" class="w-full p-2 border rounded-lg" placeholder="Contraseña">
             </div>
             <button type="submit" class="w-full bg-black text-white p-2 rounded-lg hover:bg-gray-800 font-bold">Iniciar
                 Sesion</button>
@@ -35,5 +36,6 @@
             <a href="#" class="text-blue-500 hover:underline font-bold">Recuperar contraseña</a>
         </p>
     </div>
+    <script src="/js/auth/login.js"></script>
 </body>
 </html>

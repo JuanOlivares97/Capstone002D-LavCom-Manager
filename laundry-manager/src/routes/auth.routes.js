@@ -1,10 +1,11 @@
 const { Router } = require('express');
-const userController = require('../controllers/auth.controller');
+const authController = require('../controllers/auth.controller');
 
 const router = Router();
 
-router.get('/login', userController.renderLogin); 
-router.get('/recuperar_pwd_form', userController.renderRecuperarContrasenaForm);
-router.get('/recuperar_pwd_info', userController.renderRecuperarContrasenaInfo);
+router.get('/login', authController.renderLogin); 
+router.get('/recuperar_pwd_form', authController.renderRecuperarContrasenaForm);
+router.get('/recuperar_pwd_info', authController.renderRecuperarContrasenaInfo);
+router.post('/login', authController.login);
 
 module.exports = router;
