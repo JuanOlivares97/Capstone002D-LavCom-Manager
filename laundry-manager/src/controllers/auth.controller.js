@@ -49,6 +49,7 @@ async function login(req, res) {
         const token = jwt.sign(token_data, process.env.JWT_SECRET, { expiresIn: "8h" });
 
         res.cookie("token", token, { path: "/" });
+        res.cookie("logged-in", true, { path: "/" });
 
         return res.status(200).json({ message: "Has iniciado sesión, bienvenido", success: true });
     } catch (error) {
