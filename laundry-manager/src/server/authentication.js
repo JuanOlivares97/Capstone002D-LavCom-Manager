@@ -37,7 +37,24 @@ async function loginForbidden(req, res, next) {
     }
 }
 
+async function rolesAllowed(roles) {
+    return (req, res, next) => {
+        try {
+            const role = req.user.tipo_usuario;
+
+            if (!roles.includes(role)) {
+                return res.status(403).json({ message: "Forbidden" });
+            }
+
+            next();
+        } catch (error) {
+            return res.status(500).json({ message: "Internal server error" });
+        }
+    }
+}
+
 module.exports = {
     loginRequired,
-    loginForbidden
+    loginForbidden,
+    rolesAllowed
 }
