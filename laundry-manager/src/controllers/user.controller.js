@@ -116,5 +116,9 @@ async function renderHome(req, res) {
 
 module.exports = {
     getUsuarios,
-    renderHome
+    renderHome,
+    getUsuario,
+    createUsuario,
+    updateUsuario,
+    deleteUsuario
 }
