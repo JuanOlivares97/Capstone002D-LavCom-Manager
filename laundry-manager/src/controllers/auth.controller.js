@@ -53,14 +53,24 @@ async function login(req, res) {
 
         return res.status(200).json({ message: "Has iniciado sesión, bienvenido", success: true });
     } catch (error) {
-        console.log(error);
         return res.status(500).json({ message: "Internal server error", success: false });
     } 
+}
+
+async function logout(req, res) {
+    try {
+        res.clearCookie("token");
+        res.clearCookie("logged-in");
+        return res.status(200).json({ message: "Has cerrado sesión", success: true });
+    } catch (error) {
+        return res.status(500).json({ message: "Internal server error", success: false });
+    }
 }
 
 module.exports = {
     renderLogin,
     renderRecuperarContrasenaForm,
     renderRecuperarContrasenaInfo,
-    login
+    login,
+    logout
 }
