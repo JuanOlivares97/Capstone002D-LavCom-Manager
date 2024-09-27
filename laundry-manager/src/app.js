@@ -8,6 +8,7 @@ const articulosRouter = require('./routes/articulos.routes');
 const reportesRouter = require('./routes/reportes.routes')
 const dashboardRouter = require('./routes/dashboard.routes')
 const helpRouter = require('./routes/help.routes')
+
 const app = express();
 
 app.use(expressLayout)
@@ -26,8 +27,9 @@ app.use('/reports', reportesRouter);
 app.use('/dashboard', dashboardRouter);
 app.use('/help', helpRouter)
 
+
 app.get("/template", (req, res) => {
-    res.render("reports/home");
+    res.render("error",{layout:false});
 });
 
 const port = process.env.PORT || 3000;

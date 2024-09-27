@@ -1,15 +1,14 @@
-
 <main class="flex-1 p-6">
     <button 
         id="openModalAddUser"  
         type="button" 
-        class="bg-green-500 flex gap-2 text-white p-2 rounded hover:bg-green-400 mt-3" >
+        class="flex gap-2 text-black p-2 rounded hover:bg-gray-400 hover:text-white transition duration-300 mt-3" >
         <%- include('../icons/add_user') %>
         <span class="class=ml-2">Crear Nuevo Usuario</span>
     </button>
     
     <div id="gridForUsers" class="ag-theme-quartz h-96 w-max-screen mt-3"></div>
-    <button id="downloadUsers" class="w-full mt-2 bg-green-500 text-white p-2 rounded hover:bg-green-400"></button>
+    <button id="downloadUsers" class="w-full mt-2 bg-green-500 text-white p-2 rounded hover:bg-green-400 transition duration-300"></button>
 </main>
 <%- include('../components/modals/users/crear_usuario_modal') %>        
 <script type="module" src="/js/reportsHome_grid.js"></script>
