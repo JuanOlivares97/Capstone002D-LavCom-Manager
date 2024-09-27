@@ -1,5 +1,5 @@
 const prisma = require('../server/prisma');
-const bcrypt = require('bcryptjs');
+const bcrypt = require('bcrypt');
 
 async function getUsuarios(req, res) {
     try {
