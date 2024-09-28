@@ -1,3 +1,4 @@
+const { get } = require("../routes/reportes.routes");
 const prisma = require("../server/prisma");
 
 function renderHome(req, res) {
@@ -24,13 +25,40 @@ async function getFullReport(req, res) {
             bajas_totales: row.f7
         }));
 
-        return res.json(formattedResult);
+        return res.status(200).json(formattedResult);
     } catch (error) {
         return res.status(500).json({ message: "Internal server error" });
     }
 }
 
+async function getServicesReport(req, res) {
+    try {
+        const result = await prisma.$queryRaw`
+            SELECT  
+                a.id_articulo,
+                a.nombre_articulo,
+                s.desc_servicio,
+                COALESCE(SUM(CASE WHEN r.id_tipo_registro = 1 THEN dr.cantidad ELSE 0 END), 0) - 
+                COALESCE(SUM(CASE WHEN r.id_tipo_registro = 2 THEN dr.cantidad ELSE 0 END), 0) - 
+                COALESCE(SUM(CASE WHEN r.id_tipo_registro = 6 THEN dr.cantidad ELSE 0 END), 0) - 
+                COALESCE(SUM(CASE WHEN r.id_tipo_registro = 7 THEN dr.cantidad ELSE 0 END), 0) AS ropa_servicios
+            FROM articulo a
+            CROSS JOIN servicio s
+            LEFT JOIN registro r ON r.id_servicio = s.id_servicio
+            LEFT JOIN detalle_registro dr ON dr.id_registro = r.id_registro AND dr.id_articulo = a.id_articulo
+            GROUP BY a.id_articulo, s.desc_servicio
+            ORDER BY a.id_articulo, s.desc_servicio;
+        `;
+        console.log(result.length);
+        
+        return res.status(200).json(result);
+    } catch (error) {
+        return res.status(500).json({ message: "Internal server error", error });
+    }
+}
+
 module.exports = {
     renderHome,
-    getFullReport
-}
+    getFullReport,
+    getServicesReport
+};
