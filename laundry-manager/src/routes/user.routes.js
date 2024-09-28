@@ -5,6 +5,6 @@ const router = Router();
 
 router.get('/home', userController.showHome)
 
-router.get('/get-usuarios', userController.getUsuarios);
+router.get('/get-users', userController.getUsuarios);
 
 module.exports = router;
