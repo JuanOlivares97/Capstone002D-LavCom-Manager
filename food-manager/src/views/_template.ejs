@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="es-CL">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Food Manager</title>
+    <link rel="icon" type="image/png" sizes="32x32" href="/img/logo_hospital.webp" />
+    <!--ACA VAN LOS ESTILOS CSS-->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Tailwind CSS CDN TEMPORAL, PARA NO PERDER TIEMPO EJECUTANDO COMANDOS-->
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/ag-grid-community/dist/ag-grid-community.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/ag-charts-enterprise@10.2.0/dist/umd/ag-charts-enterprise.js?t=1726567870631"></script>
+    <script src="/js/colapsar_menu.js" defer></script>
+        <style>
+            .ag-theme-quartz {
+                /* Changes the color of the grid text */
+                --ag-foreground-color: rgb(14, 68, 145);
+                /* Changes the color of the grid background */
+                --ag-background-color: #e2e3e5;
+                /* Changes the header color of the top row */
+                --ag-header-background-color: rgb(228, 237, 250);
+                /* Changes the hover color of the row*/
+    
+                --ag-row-hover-color: rgb(216, 226, 255);
+            }
+    
+            /* Custom width for collapsed sidebar */
+            #sidebar.collapsed {
+                width: 5.5rem;
+            }
+    
+            /* Ancho normal del sidebar */
+            #sidebar {
+                width: 16rem;
+                transition: width 0.3s ease;
+            }
+    
+            /* Ocultar el texto de los elementos del menú */
+            .sidebar-text {
+                transition: opacity 0.3s ease;
+            }
+    
+            /* Cuando el sidebar esté colapsado, ocultar el texto */
+            #sidebar.collapsed .sidebar-text {
+                display: none;
+            }
+    
+            /* Ocultar el logo grande cuando el sidebar esté colapsado */
+            #sidebar.collapsed #logo {
+                display: none;
+            }
+    
+            /* Mostrar el logo pequeño cuando el sidebar esté colapsado */
+            #sidebar.collapsed #smallLogo {
+                display: block;
+            }
+    
+            /* Inicialmente ocultar el logo pequeño */
+            #smallLogo {
+                display: none;
+            }
+        </style>
+</head>
+
+<body class="bg-gray-100 font-sans leading-normal tracking-normal min-h-screen flex">
+    <%- include('partials/_header') %>
+        <main class="flex-1 p-6">
+            <%-body%>
+        </main>
+        <!--ENTRE ESTE COMENTARIO Y EL INCLUDE DE ABAJO VAN MODALS-->
+        <%- include('partials/_footer') %>
+
+            <!--ACA VAN SCRIPTS DE JS-->
+</body>
+
+</html>
