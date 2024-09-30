@@ -1,13 +1,14 @@
-<body class="bg-gray-100 font-sans leading-normal tracking-normal min-h-screen flex">
+<body class="bg-gray-100 font-sans leading-normal tracking-normal min-h-screen max-w-screen flex">
     <!-- Sidebar -->
-    <aside id="sidebar" class="bg-[#CFE2FF] shadow-lg p-6 flex flex-col items-center transition-all duration-300">
+    <aside id="sidebar"
+        class="hidden md:block flex flex-col md:items-center transition-all duration-300 bg-[#CFE2FF] shadow-lg p-6 ">
         <!-- Logo grande (el que desaparecerá al hacer clic) -->
-        <div id="logo" class="mb-4">
+        <div id="logo" class="mb-4 flex items-center justify-center">
             <%- include('../icons/logo_hospital_menu') %>
         </div>
 
         <!-- Logo pequeño (el que aparecerá cuando el sidebar esté colapsado) -->
-        <div id="smallLogo" class="mb-6 hidden">
+        <div id="smallLogo" class="mb-4 hidden flex items-center justify-center py-8">
             <%- include('../icons/logo_hospital_small') %> <!-- Este es el logo pequeño -->
         </div>
 
@@ -15,51 +16,125 @@
         <nav class="w-full">
             <ul id="menu">
                 <li class="mb-4">
-                    <a href="/reports/home" class="flex items-center p-2 text-black hover:bg-white rounded transition duration-300">
+                    <a href="/reports/home"
+                        class="flex items-center p-2 text-black hover:bg-white rounded transition duration-300">
                         <%- include("../icons/reportes_icon") %>
-                        <span class="ml-2 sidebar-text">Reportes</span>
+                            <span class="ml-2 sidebar-text">Reportes</span>
                     </a>
                 </li>
                 <li class="mb-4">
-                    <a href="/clothes/home" class="flex items-center p-2 text-black hover:bg-white rounded transition duration-300">
+                    <a href="/clothes/home"
+                        class="flex items-center p-2 text-black hover:bg-white rounded transition duration-300">
                         <%- include("../icons/articulos_icon") %>
-                        <span class="ml-2 sidebar-text">Artículos</span>
+                            <span class="ml-2 sidebar-text">Artículos</span>
                     </a>
                 </li>
                 <li class="mb-4">
-                    <a href="/dashboard/home" class="flex items-center p-2 text-black hover:bg-white rounded transition duration-300">
+                    <a href="/dashboard/home"
+                        class="flex items-center p-2 text-black hover:bg-white rounded transition duration-300">
                         <%- include("../icons/dashboard_icon") %>
-                        <span class="ml-2 sidebar-text">Dashboard</span>
+                            <span class="ml-2 sidebar-text">Dashboard</span>
                     </a>
                 </li>
                 <li class="mb-4">
-                    <a href="/users/home" class="flex items-center p-2 text-black hover:bg-white rounded transition duration-300">
+                    <a href="/users/home"
+                        class="flex items-center p-2 text-black hover:bg-white rounded transition duration-300">
                         <%- include("../icons/user_group") %>
-                        <span class="ml-2 sidebar-text">Usuarios</span>
+                            <span class="ml-2 sidebar-text">Usuarios</span>
                     </a>
                 </li>
                 <li class="mb-4">
                     <a href="#" class="flex items-center p-2 text-black hover:bg-white rounded transition duration-300">
                         <%- include("../icons/ayuda_icon") %>
-                        <span class="ml-2 sidebar-text">Ayuda</span>
+                            <span class="ml-2 sidebar-text">Ayuda</span>
                     </a>
                 </li>
             </ul>
         </nav>
     </aside>
 
+    <!-- Menu Mobile -->
+    <nav style="z-index: 9999;" id="menuMobile"
+        class="hidden bg-[#CFE2FF] absolute r-0 h-screen w-screen w-full rounded transition duration-500">
+        <ul id="menu" class="flex flex-col items-center mt-4">
+            <li class="mb-4 w-full flex justify-center">
+                <a href="#" class="flex items-center p-2 text-black hover:bg-white">
+                    <%- include("../icons/logo_hospital_menu") %>
+                </a>
+            </li>
+            <li class="mb-4 w-full flex justify-center">
+                <a href="/reports/home"
+                    class="flex items-center p-2 text-black hover:bg-white rounded transition duration-300">
+                    <%- include("../icons/reportes_icon") %>
+                        <span class="ml-2 sidebar-text">Reportes</span>
+                </a>
+            </li>
+            <li class="mb-4 w-full flex justify-center">
+                <a href="/clothes/home"
+                    class="flex items-center p-2 text-black hover:bg-white rounded transition duration-300">
+                    <%- include("../icons/articulos_icon") %>
+                        <span class="ml-2 sidebar-text">Artículos</span>
+                </a>
+            </li>
+            <li class="mb-4 w-full flex justify-center">
+                <a href="/dashboard/home"
+                    class="flex items-center p-2 text-black hover:bg-white rounded transition duration-300">
+                    <%- include("../icons/dashboard_icon") %>
+                        <span class="ml-2 sidebar-text">Dashboard</span>
+                </a>
+            </li>
+            <li class="mb-4 w-full flex justify-center">
+                <a href="/users/home"
+                    class="flex items-center p-2 text-black hover:bg-white rounded transition duration-300">
+                    <%- include("../icons/user_group") %>
+                        <span class="ml-2 sidebar-text">Usuarios</span>
+                </a>
+            </li>
+            <li class="mb-4 w-full flex justify-center">
+                <a href="#" class="flex items-center p-2 text-black hover:bg-white rounded transition duration-300">
+                    <%- include("../icons/ayuda_icon") %>
+                        <span class="ml-2 sidebar-text">Ayuda</span>
+                </a>
+            </li>
+            <li class="mb-4 w-full flex justify-center">
+                <button
+                    class="hidden lg:flex bg-transparent text-black px-6 py-2 rounded hover:bg-gray-400 hover:text-white transition duration-300 items-center">
+                    <%- include("../icons/logout_icon") %>
+                        <a href="/login">Cerrar Sesión</a>
+                </button>
+            </li>
+
+            <!-- Cerrar Menu Icon (X) -->
+            <li class="absolute top-4 right-4">
+                <button id="closeMenuMobile"
+                    class="flex items-center p-2 text-black hover:bg-white rounded transition duration-300">
+                    <!-- Simple X Icon using text -->
+                    <span class="text-2xl">×</span>
+                </button>
+            </li>
+        </ul>
+    </nav>
+
     <!-- Contenido Principal -->
     <div class="flex-1 flex flex-col">
-        <header class="bg-[#CFE2FF] shadow-lg p-4 border-b-0 flex justify-between items-center">
+        <header class="bg-[#CFE2FF] shadow-lg p-4 border-b-0 flex justify-between items-center max-w-screen">
             <!-- Botón para colapsar el sidebar -->
-            <button id="toggleSidebar" class="bg-transparent text-black px-4 py-2 rounded transition duration-300 flex items-center">
+            <button id="toggleSidebar"
+                class="hidden md:block bg-transparent text-black px-4 py-2 rounded transition duration-300 flex items-center">
                 <%- include("../icons/menu_icon") %>
             </button>
 
-            <h1 class="text-center text-2xl flex-1">SISTEMA DE CONTROL DE LAVANDERÍA</h1>
+            <h1 class="text-center text-lg flex-1 md:text-xl lg:text-2xl">SISTEMA DE CONTROL DE LAVANDERÍA</h1>
 
-            <button class="bg-transparent text-black px-4 py-2 rounded hover:bg-gray-400 hover:text-white transition duration-300 flex items-center">
+            <button id="toggleSidebarMobile"
+                class="md:hidden bg-transparent text-black px-4 py-2 rounded transition duration-300 flex items-center">
+                <%- include("../icons/menu_icon") %>
+            </button>
+
+            <button class="hidden lg:flex bg-transparent
+             text-black px-6 py-2 rounded hover:bg-gray-400
+              hover:text-white transition duration-300 items-center">
                 <%- include("../icons/logout_icon") %>
-                <a href="/login">Cerrar Sesión</a>
+                    <a href="/login">Cerrar Sesión</a>
             </button>
         </header>
