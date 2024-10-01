@@ -46,6 +46,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const gridOptions = {
             rowData: rowData,
             localeText: AG_GRID_LOCALE_ES,
+            resizable:true,
             columnDefs: columnDefs,
             pagination: true,
             paginationPageSize: 15,
