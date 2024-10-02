@@ -30,31 +30,32 @@ async function getUsuario(req, res) {
 
 async function createUsuario(req, res) {
     try {
-        const new_usuario = {
-            id_usuario: null,
-            rut_usuario: req.body.rut_usuario,
-            dv_usuario: req.body.dv_usuario,
-            nombre: req.body.nombre,
-            id_servicio: req.body.id_servicio,
-            id_tipo_contrato: req.body.id_tipo_contrato,   
-            id_unidad_sigcom: req.body.id_unidad_sigcom,
-            id_estamento: req.body.id_estamento,
-            id_tipo_usuario: req.body.id_tipo_usuario,
-            username: req.body.username,
-            pwd: bcrypt.hashSync(req.body.pwd, 10),
-            borrado: 0
-        }
+        const hashedPassword = bcrypt.hashSync(req.body.pwd, 10);
+
         const user = await prisma.usuarios.create({
-            data: new_usuario
+            data: {
+                rut_usuario: parseInt(req.body.rut_usuario),
+                dv_usuario: req.body.dv_usuario,
+                nombre: req.body.nombre,
+                id_servicio: parseInt(req.body.id_servicio),
+                id_tipo_contrato: parseInt(req.body.id_tipo_contrato),
+                id_unidad_sigcom: parseInt(req.body.id_unidad_sigcom),
+                id_estamento: parseInt(req.body.id_estamento),
+                id_tipo_usuario: parseInt(req.body.id_tipo_usuario),
+                username: req.body.username,
+                pwd: hashedPassword,
+                borrado: false
+            }
         });
-        
+
         if (!user) {
-            return res.status(400).json({ message: "Error creating user" });
+            return res.status(400).json({ message: "Error al crear usuario" });
         }
 
         return res.status(201).json({ message: "Usuario creado exitosamente" });
     } catch (error) {
-        return res.status(500).json({ message: "Internal server error" });
+        console.error(error);
+        return res.status(500).json({ message: "Error interno del servidor: " + error.message });
     }
 }
 
