@@ -1,18 +1,21 @@
-<div class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden opacity-0 transition-opacity duration-300" id="crear_articulo_modal">
+<div class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden opacity-0 transition-opacity duration-300"
+    id="crear_articulo_modal">
     <div class="bg-white rounded-lg shadow-lg p-8 max-w-sm w-full transform scale-95 transition-transform duration-300">
         <h2 class="text-2xl font-bold mb-6 text-center">Crear Artículo</h2>
         <form>
             <div class="mb-4">
                 <label for="nombre" class="block text-black-700 mb-2">Nombre</label>
-                <input type="text" name="nombre" class="w-full p-2 border rounded" placeholder="Ingrese el nombre del artículo" required>
+                <input type="text" name="nombre" class="w-full p-2 border rounded"
+                    placeholder="Ingrese el nombre del artículo" required>
             </div>
             <div class="mb-4">
                 <label for="stock" class="block text-black-700 mb-2">Stock</label>
-                <input type="number" name="stock" class="w-full p-2 border rounded" placeholder="Ingrese la cantidad en stock" required>
+                <input type="number" name="stock" class="w-full p-2 border rounded"
+                    placeholder="Ingrese la cantidad en stock" required>
             </div>
             <div class="mb-4">
                 <label for="subgrupo" class="block text-black-700 mb-2">Subgrupo</label>
-                <select id="subgrupo" class="w-full p-2 border rounded" required>
+                <select name="subgrupo" id="subgrupo" class="w-full p-2 border rounded" required>
                     <option value="" disabled selected>Seleccione un subgrupo</option>
                     <option value="subgrupo1">Subgrupo 1</option>
                     <option value="subgrupo2">Subgrupo 2</option>
@@ -20,8 +23,10 @@
                 </select>
             </div>
             <div class="flex justify-between mt-6">
-                <button type="button" class="bg-red-500 text-white p-2 rounded hover:bg-red-800" id="closeModal">Cancelar</button>
-                <button type="submit" class="bg-green-500 text-white p-2 rounded hover:bg-green-800">Crear Artículo</button>
+                <button type="button" class="bg-red-500 text-white p-2 rounded hover:bg-red-800"
+                    id="closeModal">Cancelar</button>
+                <button type="submit" class="bg-green-500 text-white p-2 rounded hover:bg-green-800">Crear
+                    Artículo</button>
             </div>
         </form>
     </div>
