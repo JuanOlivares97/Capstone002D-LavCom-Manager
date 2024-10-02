@@ -1,8 +1,8 @@
-import {AG_GRID_LOCALE_ES} from './utils.js'
-document.addEventListener('DOMContentLoaded', async function () {
+import { AG_GRID_LOCALE_ES } from "./utils.js";
+document.addEventListener("DOMContentLoaded", async function () {
     let gridApi;
 
-    const response = await fetch('/clothes/get-clothes');
+    const response = await fetch("/clothes/get-clothes");
     const articulos = await response.json();
 
     const gridOptions = {
@@ -11,21 +11,34 @@ document.addEventListener('DOMContentLoaded', async function () {
         localeText: AG_GRID_LOCALE_ES,
         // Columns to be displayed (Should match rowData properties)
         columnDefs: [
-            { headerName:"ID", field: "id_articulo", flex: 1 },
-            { headerName:"Nombre", field: "nombre_articulo", flex: 1 },
+            { headerName: "ID", field: "id_articulo", flex: 1 },
+            {
+                headerName: "Nombre",
+                field: "nombre_articulo",
+                flex: 1,
+                filter: true,
+            },
             { field: "stock", flex: 1 },
-            { field: "subgrupo_ropa.desc_subgrupo", headerName: "Subgrupo", flex: 1 },
+            {
+                field: "subgrupo_ropa.desc_subgrupo",
+                headerName: "Subgrupo",
+                flex: 1,
+            },
             {
                 headerName: "Acciones",
                 field: "actions",
                 cellRenderer: function (params) {
                     return `
-                        <button class="edit bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 text-sm rounded mr-1" onclick="editArticulo(${JSON.stringify(params.data).replace(/"/g, '&quot;')})">Editar</button>
-                        <button class="delete bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 text-sm rounded" onclick="deleteArticulo(${JSON.stringify(params.data).replace(/"/g, '&quot;')})">Borrar</button>
+                        <button class="edit bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 text-sm rounded mr-1" onclick="editArticulo(${JSON.stringify(
+                            params.data
+                        ).replace(/"/g, "&quot;")})">Editar</button>
+                        <button class="delete bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 text-sm rounded" onclick="deleteArticulo(${JSON.stringify(
+                            params.data
+                        ).replace(/"/g, "&quot;")})">Borrar</button>
                     `;
                 },
-                flex: 1
-            }
+                flex: 1,
+            },
         ],
         pagination: true,
         paginationPageSize: 15,
@@ -41,7 +54,7 @@ document.addEventListener('DOMContentLoaded', async function () {
     gridApi = agGrid.createGrid(gridDiv, gridOptions);
 });
 
-window.editArticulo = function (data) {    
+window.editArticulo = function (data) {
     const modal = document.getElementById("editar_articulo_modal");
 
     const modalTitle = modal.getElementsByTagName("h2");
@@ -57,30 +70,26 @@ window.editArticulo = function (data) {
     stockInput.value = data.stock;
     subgrupoInput.value = data.id_subgrupo_ropa;
 
-    modal.classList.remove('hidden');
+    modal.classList.remove("hidden");
     setTimeout(() => {
-        modal.classList.remove('opacity-0');
-        modal.querySelector('.transform').classList.remove('scale-95');
+        modal.classList.remove("opacity-0");
+        modal.querySelector(".transform").classList.remove("scale-95");
     }, 10); // Small delay to ensure the class is applied after removing 'hidden'
-}
+};
 
 window.deleteArticulo = function (data) {
     Swal.fire({
         title: `¿Estás seguro de que deseas borrar el articulo ${data.nombre_articulo}?`,
         text: "¡No podrás revertir esto! ¿Deseas continuar? ",
-        icon: 'warning',
+        icon: "warning",
         renderCancelButton: true,
-        confirmButtonColor: '#3085d6',
-        cancelButtonColor: '#d33',
-        confirmButtonText: 'Sí, bórralo!',
-        cancelButtonText: 'Cancelar'
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Sí, bórralo!",
+        cancelButtonText: "Cancelar",
     }).then((result) => {
         if (result.isConfirmed) {
-            Swal.fire(
-                '¡Borrado!',
-                'El artículo ha sido borrado.',
-                'success'
-            );
+            Swal.fire("¡Borrado!", "El artículo ha sido borrado.", "success");
         }
     });
-}
+};
