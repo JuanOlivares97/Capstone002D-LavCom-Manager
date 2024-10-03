@@ -1,2 +1,5 @@
-laundry-manager/node_modules
-laundry-manager/.env
+# Ignorar todas las carpetas node_modules
+**/node_modules
+
+# Ignorar todos los archivos .env
+**/.env
