@@ -1,5 +1,5 @@
 import { AG_GRID_LOCALE_ES } from './utils.js';
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
     function toggleModal(idModal, btnAbrirModal, btnCerrarModal, gridId, buttonToDownload, rowData, columnDefs, sheetName, fileName) {
         const modal = document.querySelector(idModal);
         const openModal = document.querySelector(btnAbrirModal);
@@ -124,6 +124,10 @@ document.addEventListener('DOMContentLoaded', () => {
         'stock_general.xlsx'      // Nombre del archivo
     );
 
+    
+    const response = await fetch('/reports/get-report');
+    const stockClothes = await response.json();
+    
     // Tercer Grid: Reporte de Ropa en Servicios
     toggleModal(
         '#modal_ropa_servicios', 
@@ -131,19 +135,22 @@ document.addEventListener('DOMContentLoaded', () => {
         '#closeModalRopaServicios',
         "#gridForReportRopaServicios", 
         "#ExportRopaServicios", 
-        [], 
+        stockClothes,  
         [
-            { headerName: "Articulo", field: "id", flex: 1 },
-            { headerName: "Ropa Limpia en Ropería", field: "ropa_limpia_roperia", flex: 1 },
+            { headerName: "Articulo", field: "id_articulo", flex: 1 },
+            { headerName: "Ropa Limpia en Ropería", field: "roperia_limpio", flex: 1 },
             { headerName: "Ropa en Servicios", field: "ropa_servicios", flex: 1 },
-            { headerName: "Ropa sucia en Ropería", field: "ropa_sucia_roperia", flex: 1 },
-            { headerName: "Ropa en Tránsito", field: "ropa_transito", flex: 1 },
-            { headerName: "Pérdidas Totales", field: "perdida_Total", flex: 1 },
-            { headerName: "Bajas Totales", field: "baja_total", flex: 1 }
+            { headerName: "Ropa sucia en Ropería", field: "roperia_sucio", flex: 1 },
+            { headerName: "Ropa en Tránsito", field: "en_lavanderia", flex: 1 },
+            { headerName: "Pérdidas Totales", field: "perdidas_totales", flex: 1 },
+            { headerName: "Bajas Totales", field: "bajas_totales", flex: 1 }
         ],
         'Ropa en Servicios',  // Nombre de la hoja
         'stock_en_servicios.xlsx'      // Nombre del archivo
     );
+
+    const response2 = await fetch('/reports/get-report');
+    const dirtyCLothes = await response2.json();
 
     // Cuarto Grid: Reporte de Stock de Ropa Sucia en Ropería
     toggleModal(
@@ -152,11 +159,11 @@ document.addEventListener('DOMContentLoaded', () => {
         '#closeModalRopaSuciaRoperia',
         "#gridForReporteRopaSuciaRoperia", 
         "#ExportRopaSuciaToExcel", 
-        [],
+        dirtyCLothes,
         [
-            { headerName: "#", field: "id" },
-            { headerName: "Articulo", field: "articulo", flex: 1 },
-            { headerName: "Ropa Sucia Roperia", field: "sucia_roperia", flex: 1 },
+            { headerName: "#", field: "id_articulo" },
+            { headerName: "Articulo", field: "nombre_articulo", flex: 1 },
+            { headerName: "Ropa Sucia Roperia", field: "roperia_sucio", flex: 1 },
         ],
         'Ropa Sucia en Roperia',  // Nombre de la hoja
         'ropa_sucia_en_roperia.xlsx'      // Nombre del archivo
@@ -179,6 +186,9 @@ document.addEventListener('DOMContentLoaded', () => {
         'ropa_en_transito.xlsx'      // Nombre del archivo
     );
 
+    const response3 = await fetch('/reports/get-bajas-perdidas');
+    const ropaBajaPerdidas = await response3.json();
+
     // Sexto Grid: Reporte de de Bajas y Perdidas del Mes
     toggleModal(
         '#modal_ropa_baja',
@@ -186,12 +196,12 @@ document.addEventListener('DOMContentLoaded', () => {
         '#closeModalRopaBaja',
         "#gridForReporteBajasPerdidas", 
         "#ExportRopaBaja", 
-        [],
+        ropaBajaPerdidas,
         [
-            { headerName: "#", field: "id" },
-            { headerName: "Articulo", field: "articulo", flex: 1 },
-            { headerName: "Perdidas", field: "perdidas", flex: 1 },
-            { headerName: "bajas", field: "perdidas", flex: 1 },
+            { headerName: "#", field: "id_articulo" },
+            { headerName: "Articulo", field: "nombre_articulo", flex: 1 },
+            { headerName: "Perdidas", field: "perdidas_totales", flex: 1 },
+            { headerName: "bajas", field: "bajas_totales", flex: 1 },
 
         ],
         'Ropa dada De baja',  // Nombre de la hoja
