@@ -4,7 +4,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const modal = document.querySelector(idModal);
         const openModal = document.querySelector(btnAbrirModal);
         const closeModal = document.querySelector(btnCerrarModal);
-
+        
         if (!modal || !openModal || !closeModal) return;
 
         let gridInitialized = false; // Variable para verificar si el grid ya ha sido inicializado
@@ -100,7 +100,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         anchor.click();
         window.URL.revokeObjectURL(url);
     }
-
+    
+    const response = await fetch('/reports/get-report');
+    const generalReport = await response.json();
 
     // Segundo grid: Stock General
     toggleModal(
@@ -109,33 +111,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         '#closeModalReporteGeneral', 
         "#gridForReportsStockGeneral", 
         "#ExportGeneralToExcel", 
-        [
-            { id: 1, servicio: "Lavado", fecha: "2024-09-16", usuario: "Juan Pérez", estado: "Entregado" },
-            { id: 2, servicio: "Planchado", fecha: "2024-09-16", usuario: "María Gómez", estado: "Entregado" }
-        ], 
-        [
-            { headerName: "ID", field: "id", flex: 1 },
-            { headerName: "Servicio", field: "servicio", flex: 1 },
-            { headerName: "Fecha", field: "fecha", flex: 1 },
-            { headerName: "Usuario", field: "usuario", flex: 1 },
-            { headerName: "Estado", field: "estado", flex: 1 }
-        ],
-        'Reporte Stock General',  // Nombre de la hoja
-        'stock_general.xlsx'      // Nombre del archivo
-    );
-
-    
-    const response = await fetch('/reports/get-report');
-    const stockClothes = await response.json();
-    
-    // Tercer Grid: Reporte de Ropa en Servicios
-    toggleModal(
-        '#modal_ropa_servicios', 
-        '#openModalRopaServicios', 
-        '#closeModalRopaServicios',
-        "#gridForReportRopaServicios", 
-        "#ExportRopaServicios", 
-        stockClothes,  
+        generalReport, 
         [
             { headerName: "Articulo", field: "id_articulo", flex: 1 },
             { headerName: "Ropa Limpia en Ropería", field: "roperia_limpio", flex: 1 },
@@ -145,12 +121,36 @@ document.addEventListener('DOMContentLoaded', async () => {
             { headerName: "Pérdidas Totales", field: "perdidas_totales", flex: 1 },
             { headerName: "Bajas Totales", field: "bajas_totales", flex: 1 }
         ],
+        'Reporte Stock General',  // Nombre de la hoja
+        'stock_general.xlsx'      // Nombre del archivo
+    );
+
+    
+    const responseServices = await fetch('/reports/get-services-report');
+    const servicesReport = await responseServices.json();
+
+    // Tercer Grid: Reporte de Ropa en Servicios
+    toggleModal(
+        '#modal_ropa_servicios', 
+        '#openModalRopaServicios', 
+        '#closeModalRopaServicios',
+        "#gridForReportRopaServicios", 
+        "#ExportRopaServicios", 
+        servicesReport,  
+        [
+            { headerName: "Articulo", field: "id_articulo", flex: 1 },
+            { headerName: "Ropa Limpia en Ropería", field: "nombre_articulo", flex: 1 },
+            { headerName: "Ropa en Servicios", field: "unidad_sigcom", flex: 1 },
+            { headerName: "Ropa sucia en Ropería", field: "ropa_servicios", flex: 1 }
+        ],
         'Ropa en Servicios',  // Nombre de la hoja
         'stock_en_servicios.xlsx'      // Nombre del archivo
     );
 
-    const response2 = await fetch('/reports/get-report');
-    const dirtyCLothes = await response2.json();
+    const responseServicesDown = await fetch('/reports/get-bajas-services');
+    const servicesDownReport = await responseServicesDown.json();
+
+    
 
     // Cuarto Grid: Reporte de Stock de Ropa Sucia en Ropería
     toggleModal(
@@ -159,7 +159,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         '#closeModalRopaSuciaRoperia',
         "#gridForReporteRopaSuciaRoperia", 
         "#ExportRopaSuciaToExcel", 
-        dirtyCLothes,
+        generalReport,
         [
             { headerName: "#", field: "id_articulo" },
             { headerName: "Articulo", field: "nombre_articulo", flex: 1 },
@@ -176,11 +176,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         '#closeModalRopatransito',
         "#gridForReporteRopaTransito", 
         "#ExportRopatransito", 
-        [],
+        generalReport,
         [
-            { headerName: "#", field: "id" },
-            { headerName: "Articulo", field: "articulo", flex: 1 },
-            { headerName: "Ropa en Lavanderia Externa", field: "ropa_transito", flex: 1 },
+            { headerName: "#", field: "id_articulo" },
+            { headerName: "Articulo", field: "nombre_articulo", flex: 1 },
+            { headerName: "Ropa en Lavanderia Externa", field: "en_lavanderia", flex: 1 },
         ],
         'Stock de Ropa en Transito',  // Nombre de la hoja
         'ropa_en_transito.xlsx'      // Nombre del archivo
@@ -206,6 +206,25 @@ document.addEventListener('DOMContentLoaded', async () => {
         ],
         'Ropa dada De baja',  // Nombre de la hoja
         'ropa_de_baja.xlsx'      // Nombre del archivo
+    );
+
+    // Septimo Grid: Reporte de Ropa de Baja en Servicios
+    toggleModal(
+        '#modal_ropa_baja_servicios', 
+        '#openModalRopaBajaServicios', 
+        '#closeModalRopaBajaServicios',
+        "#gridForReportRopaBajaServicios", 
+        "#ExportRopaBajaServicios", 
+        servicesDownReport,  
+        [
+            { headerName: "Mes y año", field: "mes_anio", flex: 1 },
+            { headerName: "ID", field: "id_articulo", flex: 1 },
+            { headerName: "Articulo", field: "nombre_articulo", flex: 1 },
+            { headerName: "Unidad Sigcom", field: "unidad_sigcom", flex: 1 },
+            { headerName: "Ropa Baja en Servicios", field: "ropa_baja_servicios", flex: 1 }
+        ],
+        'Baja en Servicios',  // Nombre de la hoja
+        'baja_en_servicios.xlsx'      // Nombre del archivo
     );
 
     createGrid('#gridForUsers','#downloadUsers', [],
