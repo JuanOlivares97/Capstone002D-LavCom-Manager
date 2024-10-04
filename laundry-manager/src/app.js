@@ -22,7 +22,6 @@ app.set('view engine', 'ejs');
 app.set('views', './src/views');
 
 app.use(express.static(path.join(__dirname, "static")))
-console.log(path.join(__dirname, "static"));
 
 app.use('/auth', authRouter);
 app.use('/users', userRouter);
