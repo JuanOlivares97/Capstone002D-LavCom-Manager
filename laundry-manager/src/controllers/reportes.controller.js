@@ -33,14 +33,19 @@ async function getFullReport(req, res) {
 async function getServicesReport(req, res) {
     try {
         const result = await prisma.$queryRaw`CALL get_services_report();   `;
-        console.log(result.length);
-        
-        return res.status(200).json(result);
+        // Format the result to map the column names correctly
+        const formattedResult = result.map(row => ({
+            id_articulo: row.f0,
+            nombre_articulo: row.f1,
+            unidad_sigcom: row.f2,
+            ropa_servicios: row.f3,
+        }));
+
+        return res.status(200).json(formattedResult);
     } catch (error) {
         return res.status(500).json({ message: "Internal server error " + error });
     }
 }
-
 
 async function getBajasyPerdidas(req, res) {
     try {
@@ -64,9 +69,34 @@ async function getBajasyPerdidas(req, res) {
     }
 }
 
+async function getServicesDownReport(req, res) {
+    try {
+        const fecha = new Date();
+        const anio = fecha.getFullYear();
+        const mes = fecha.getMonth() + 1;
+
+        const result = await prisma.$queryRaw`
+            CALL obtener_ropa_baja_servicios(${mes}, ${anio});
+        `;
+
+        const formattedResult = result.map(row => ({
+            mes_anio: row.f0,
+            id_articulo: row.f1,
+            nombre_articulo: row.f2,
+            unidad_sigcom: row.f3,
+            ropa_baja_servicios: row.f4
+        }));
+
+        return res.status(200).json(formattedResult);
+    } catch (error) {
+        return res.status(500).json({ message: "Internal server error: " + error });
+    }
+}
+
 module.exports = {
     renderHome,
     getFullReport,
     getServicesReport,
-    getBajasyPerdidas
+    getBajasyPerdidas,
+    getServicesDownReport
 };
