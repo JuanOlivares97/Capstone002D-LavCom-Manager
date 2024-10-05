@@ -7,8 +7,8 @@ async function renderHome(req, res) {
                 borrado: false,
             },
         });
-        const servicios = await prisma.servicio.findMany();
-        res.render("clothes/home", { usuarios, servicios });
+        const unidades_sigcom = await prisma.unidad_sigcom.findMany();
+        res.render("clothes/home", { usuarios, unidades_sigcom });
     } catch (error) {
         return res.status(500).json({ message: "Internal server error" });
     }
@@ -105,10 +105,42 @@ async function deleteArticulo(req, res) {
     }
 }
 
+async function entregarUnidadSigcom(req, res) {
+    try {
+        const data = req.body;
+        const result = await prisma.registro.create({
+            data: {
+                rut_usuario_1: parseInt(data.rut_usuario_1),
+                rut_usuario_2: parseInt(data.rut_usuario_2),
+                id_unidad_sigcom: parseInt(data.id_unidad_sigcom),
+                id_tipo_registro: 1,
+                detalle_registro: {
+                    create: data.articulos.map(a => {
+                        return {
+                            cantidad: parseInt(a.cantidad),
+                            id_articulo: parseInt(a.id_articulo),
+                        };
+                    })
+                },
+                cantidad_total: data.articulos.reduce((acc, a) => acc + parseInt(a.cantidad), 0),
+            },
+        })
+
+        if (!result) {
+            return res.status(400).json({ message: "Error creating registro" });
+        }   
+
+        return res.status(200).json({ message: "Registro creado exitosamente" });
+    } catch (error) {
+        return res.status(500).json({ message: "Internal server error" });
+    }
+}
+
 module.exports = {
     getArticulos,
     renderHome,
     createArticulo,
     updateArticulo,
     deleteArticulo,
+    entregarUnidadSigcom,
 };

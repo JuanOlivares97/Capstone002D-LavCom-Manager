@@ -9,4 +9,6 @@ router.post("/create-clothes", articulosController.createArticulo);
 router.put("/update-clothes", articulosController.updateArticulo);
 router.delete("/delete-clothes", articulosController.deleteArticulo);
 
+router.post("/entregar-unidad-sigcom", articulosController.entregarUnidadSigcom);
+
 module.exports = router;
