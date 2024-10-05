@@ -60,7 +60,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             const input = fila.querySelector('input');
             if (select.value && input.value) {
                 articulosData.push({
-                    id: index + 1,
                     articuloId: select.value,
                     cantidad: input.value
                 });
@@ -70,7 +69,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         let data = {
             rut_usuario_1: declarar_perdida_form.querySelector("input[name='rut_usuario_1']").value,
             tipo_perdida: declarar_perdida_form.querySelector("select[name='tipo_perdida']").value,
-            servicio: declarar_perdida_form.querySelector("select[name='servicio']").value,
+            id_unidad_sigcom: declarar_perdida_form.querySelector("select[name='unidad_sigcom']").value,
             observaciones: declarar_perdida_form.querySelector("textarea[name='observaciones']").value,
             articulos: articulosData
         }
@@ -96,27 +95,27 @@ document.addEventListener('DOMContentLoaded', async () => {
         while (container.firstChild) {
             container.removeChild(container.firstChild);
         }
-        rowIdEntregaServicios = 0;
+        rowIdEntregaUnidadSigcom = 0;
     });
 })
 
 document.addEventListener('DOMContentLoaded', function () {
     const tipoPerdidaSelect = document.getElementById('tipo_perdida');
-    const servicioSelect = document.getElementById('servicio_dp');
+    const uSigcomSelect = document.getElementById('unidad_sigcom_db');
 
-    function toggleServicioSelectDeclararPerdida() {
+    function toggleuSigcomSelectDeclararPerdida() {
         if (tipoPerdidaSelect.value === '2') {
-            servicioSelect.disabled = true;
-            servicioSelect.value = '';
-            servicioSelect.classList.add('bg-gray-200', 'cursor-not-allowed');
+            uSigcomSelect.disabled = true;
+            uSigcomSelect.value = '';
+            uSigcomSelect.classList.add('bg-gray-200', 'cursor-not-allowed');
         } else {
-            servicioSelect.disabled = false;
-            servicioSelect.classList.remove('bg-gray-200', 'cursor-not-allowed');
+            uSigcomSelect.disabled = false;
+            uSigcomSelect.classList.remove('bg-gray-200', 'cursor-not-allowed');
         }
     }
 
-    tipoPerdidaSelect.addEventListener('change', toggleServicioSelectDeclararPerdida);
+    tipoPerdidaSelect.addEventListener('change', toggleuSigcomSelectDeclararPerdida);
 
     // Initial check
-    toggleServicioSelectDeclararPerdida();
+    toggleuSigcomSelectDeclararPerdida();
 });

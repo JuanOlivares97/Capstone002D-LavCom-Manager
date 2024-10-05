@@ -1,4 +1,4 @@
-<% if (1 === 2) { %>
+<% if (1 === 1) { %>
     <h2 class="text-2xl mb-3">Menú de ropa limpia</h2>
     <%- include('../components/menus/menu_ropa_limpia') %>
 <% } %>
@@ -7,7 +7,7 @@
     <h1>Menú de administrador</h1>
 <% } %>
 
-<% if (1 === 1) { %>
+<% if (1 === 2) { %>
     <h2 class="text-2xl mb-3">Menú de ropa sucia</h2>
     <%- include('../components/menus/menu_ropa_sucia') %>
 <% } %>
@@ -16,7 +16,7 @@
 <div id="grid" class="ag-theme-quartz h-96 w-max-screen mt-3"></div>
 <%- include('../components/modals/clothes/editar_articulo_modal') %>
 <%- include('../components/modals/clothes/crear_articulo_modal') %>
-<%- include('../components/modals/clothes/entregar_ropa_servicios_modal') %>
+<%- include('../components/modals/clothes/entregar_ropa_unidad_sigcom_modal') %>
 <%- include('../components/modals/clothes/recibir_ropa_limpia_lav_modal') %>
 <%- include('../components/modals/clothes/dar_ropa_de_baja_modal') %>
 <%- include('../components/modals/clothes/declarar_perdida_modal') %>
@@ -25,7 +25,7 @@
 <script src="/js/crear_articulo_modal.js"></script>
 <script type="module" src="/js/articulos_grid.js"></script>
 <script src="/js/editar_articulo_modal.js"></script>
-<script src="/js/entregar_ropa_servicios_modal.js"></script>
+<script src="/js/entregar_ropa_unidad_sigcom_modal.js"></script>
 <script src="/js/recibir_ropa_limpia_lav_modal.js"></script>
 <script src="/js/dar_ropa_de_baja_modal.js"></script>
 <script src="/js/declarar_perdida_modal.js"></script>

@@ -15,10 +15,10 @@
                 </select>
             </div>
             <div class="mb-4">
-                <label for="servicio" class="block text-sm font-medium text-gray-700">Servicio:</label>
-                <select name="servicio" class="mt-1 block w-full px-3 py-2 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-                    <% servicios.forEach(s => { %>
-                        <option value="<%= s.id_servicio %>"><%= s.desc_servicio %></option>
+                <label for="unidad_sigcom" class="block text-sm font-medium text-gray-700">Unidad Sigcom:</label>
+                <select id="unidad_sigcom_db" name="unidad_sigcom" class="mt-1 block w-full px-3 py-2 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                    <% unidades_sigcom.forEach(u => { %>
+                        <option value="<%= u.id_unidad_sigcom %>"><%= u.unidad_sigcom %></option>
                     <% }) %>
                 </select>
             </div>

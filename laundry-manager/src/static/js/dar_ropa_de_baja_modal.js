@@ -70,7 +70,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         let data = {
             rut_usuario_1: dar_ropa_de_baja_form.querySelector("input[name='rut_usuario_1']").value,
             tipo_dada_de_baja: dar_ropa_de_baja_form.querySelector("select[name='tipo_dada_de_baja']").value,
-            servicio: dar_ropa_de_baja_form.querySelector("select[name='servicio']").value,
+            id_unidad_sigcom: dar_ropa_de_baja_form.querySelector("select[name='unidad_sigcom']").value,
             observaciones: dar_ropa_de_baja_form.querySelector("textarea[name='observaciones']").value,
             articulos: articulosData
         }
@@ -96,27 +96,27 @@ document.addEventListener('DOMContentLoaded', async () => {
         while (container.firstChild) {
             container.removeChild(container.firstChild);
         }
-        rowIdEntregaServicios = 0;
+        rowIdEntregaUnidadSigcom = 0;
     });
 })
 
 document.addEventListener('DOMContentLoaded', function () {
     const tipoDadaDeBajaSelect = document.getElementById('tipo_dada_de_baja');
-    const servicioSelect = document.getElementById('servicio_db');
+    const UnidadSigcomSelect = document.getElementById('unidad_sigcom_db');
 
-    function toggleServicioSelectDarRopaDeBaja() {
+    function toggleUnidadSigcomSelectDarRopaDeBaja() {
         if (tipoDadaDeBajaSelect.value === '2') {
-            servicioSelect.disabled = true;
-            servicioSelect.value = '';
-            servicioSelect.classList.add('bg-gray-200', 'cursor-not-allowed');
+            UnidadSigcomSelect.disabled = true;
+            UnidadSigcomSelect.value = '';
+            UnidadSigcomSelect.classList.add('bg-gray-200', 'cursor-not-allowed');
         } else {
-            servicioSelect.disabled = false;
-            servicioSelect.classList.remove('bg-gray-200', 'cursor-not-allowed');
+            UnidadSigcomSelect.disabled = false;
+            UnidadSigcomSelect.classList.remove('bg-gray-200', 'cursor-not-allowed');
         }
     }
 
-    tipoDadaDeBajaSelect.addEventListener('change', toggleServicioSelectDarRopaDeBaja);
+    tipoDadaDeBajaSelect.addEventListener('change', toggleUnidadSigcomSelectDarRopaDeBaja);
 
     // Initial check
-    toggleServicioSelectDarRopaDeBaja();
+    toggleUnidadSigcomSelectDarRopaDeBaja();
 });
