@@ -43,7 +43,7 @@ model registro {
   rut_usuario_2                             Int?
   id_unidad_sigcom                          Int?
   cantidad_total                            Int
-  fecha                                     DateTime           @default(now()) @db.Timestamp(0)
+  fecha                                     String             @db.VarChar(255)
   observacion                               String?            @db.VarChar(500)
   id_tipo_registro                          Int
   detalle_registro                          detalle_registro[]
@@ -92,7 +92,7 @@ model tipo_usuario {
 model unidad_sigcom {
   id_unidad_sigcom Int        @id @default(autoincrement())
   unidad_sigcom    String     @unique(map: "uniqueUnidadSigcom") @db.VarChar(255)
-  registro      registro[]
+  registro         registro[]
   usuarios         usuarios[]
 }
 

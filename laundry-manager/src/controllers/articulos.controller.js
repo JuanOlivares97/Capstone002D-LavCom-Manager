@@ -1,4 +1,5 @@
 const prisma = require("../server/prisma");
+const tempo = require("@formkit/tempo");
 
 async function renderHome(req, res) {
     try {
@@ -107,6 +108,8 @@ async function deleteArticulo(req, res) {
 
 async function entregarUnidadSigcom(req, res) {
     try {
+        var fecha = new Date();
+        fecha = tempo.format(fecha, "YYYY-MM-DD HH:mm:ss A", "cl");
         const data = req.body;
         const result = await prisma.registro.create({
             data: {
@@ -123,6 +126,7 @@ async function entregarUnidadSigcom(req, res) {
                     })
                 },
                 cantidad_total: data.articulos.reduce((acc, a) => acc + parseInt(a.cantidad), 0),
+                fecha: fecha,
             },
         })
 
@@ -138,6 +142,8 @@ async function entregarUnidadSigcom(req, res) {
 
 async function darRopaDeBaja(req, res) {
     try {
+        var fecha = new Date();
+        fecha = tempo.format(fecha, "YYYY-MM-DD HH:mm:ss A", "cl");
         const data = req.body;
         const resultado = await prisma.$transaction(async (prisma) => {
             const registro = await prisma.registro.create({
@@ -153,6 +159,7 @@ async function darRopaDeBaja(req, res) {
                             id_articulo: parseInt(a.id_articulo),
                         }))
                     },
+                    fecha: fecha,
                 }
             });
 
