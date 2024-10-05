@@ -46,19 +46,19 @@ document.addEventListener('DOMContentLoaded', async () => {
         const gridOptions = {
             rowData: rowData,
             localeText: AG_GRID_LOCALE_ES,
+            resizable:true,
             columnDefs: columnDefs,
             pagination: true,
             paginationPageSize: 15,
-            paginationAutoPageSize: true,
             defaultColDef: {
-                resizable: false,
+                resizable: true,
                 sortable: true,
             },
             onGridReady: function (params) {
                 const exportButton = document.querySelector(buttonToDownload);
                 if (exportButton) {
                     exportButton.innerText = 'Exportar a Excel';
-                    
+
                     // Añadir evento al botón
                     exportButton.addEventListener('click', async () => {
                         // Función para exportar los datos a Excel usando ExcelJS
@@ -131,8 +131,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Tercer Grid: Reporte de Ropa en Servicios
     toggleModal(
-        '#modal_ropa_servicios', 
-        '#openModalRopaServicios', 
+        '#modal_ropa_servicios',
+        '#openModalRopaServicios',
         '#closeModalRopaServicios',
         "#gridForReportRopaServicios", 
         "#ExportRopaServicios", 
@@ -227,19 +227,91 @@ document.addEventListener('DOMContentLoaded', async () => {
         'baja_en_servicios.xlsx'      // Nombre del archivo
     );
 
-    createGrid('#gridForUsers','#downloadUsers', [],
+    // Septimo Grid: Reporte de Ropa de Baja en Servicios
+    toggleModal(
+        '#modal_ropa_baja_servicios', 
+        '#openModalRopaBajaServicios', 
+        '#closeModalRopaBajaServicios',
+        "#gridForReportRopaBajaServicios", 
+        "#ExportRopaBajaServicios", 
+        servicesDownReport,  
         [
-            { headerName: "#", field: "id" },
-            { headerName: "Rut", field: "articulo" },
-            { headerName: "Nombre", field: "perdidas", flex: 1 },
-            {
-                headerName: "Acciones",
-                field: "actions",
-                cellRenderer: function (params) {
-                    return `
-                        <button class="edit bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 text-sm rounded mr-1" onclick="editArticulo(${JSON.stringify(params.data).replace(/"/g, '&quot;')})">Editar</button>
-                    `;
-                }
+            { headerName: "Mes y año", field: "mes_anio", flex: 1 },
+            { headerName: "ID", field: "id_articulo", flex: 1 },
+            { headerName: "Articulo", field: "nombre_articulo", flex: 1 },
+            { headerName: "Unidad Sigcom", field: "unidad_sigcom", flex: 1 },
+            { headerName: "Ropa Baja en Servicios", field: "ropa_baja_servicios", flex: 1 }
+        ],
+        'Baja en Servicios',  // Nombre de la hoja
+        'baja_en_servicios.xlsx'      // Nombre del archivo
+    );
+
+    const responseUsers = await fetch('/users/get-users');
+    const users = await responseUsers.json();
+
+    createGrid('#gridForUsers', '#downloadUsers', users, [
+        { headerName: "#", field: "id_usuario" },
+        {
+            headerName: "Rut",
+            valueGetter: function (params) {
+                // Concatenar rut_usuario con dv_usuario
+                return `${params.data.rut_usuario}-${params.data.dv_usuario}`;
             }
-        ])
+        },
+        { headerName: "Nombre", field: "nombre", flex: 1 },
+        {
+            headerName: "Acciones",
+            field: "actions",
+            cellRenderer: function (params) {
+                return `
+                <button id="openModalEditUser" class="edit bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 text-sm rounded mr-1" onclick="editUser(${JSON.stringify(params.data).replace(/"/g, '&quot;')})">Editar</button>
+            `;
+            }
+        }
+    ]);
+
+    window.editUser = function (data) {
+        const modal = document.getElementById('modal_editar_usuario');
+
+        // Título del modal
+        const modalTitle = modal.getElementsByTagName("h2")[0];
+        modalTitle.innerText = `Editar Usuario con RUT: ${data.rut_usuario}-${data.dv_usuario}`;
+
+        // Campos del formulario
+        const rutInput = modal.querySelector("input[id='erut_usuario']");
+        const nombreInput = modal.querySelector("input[id='enombre']");
+        const servicioInput = modal.querySelector("select[id='eservicio']");
+        const contratoInput = modal.querySelector("select[id='etipo_contrato']");
+        const sigcomInput = modal.querySelector("select[id='eunidad_sigcom']");
+        const estamentoInput = modal.querySelector("select[id='eestamento']");
+        const tipoUsuarioInput = modal.querySelector("select[id='etipo_usuario']");
+        const usernameInput = modal.querySelector("input[id='eusername']");
+        const passwordInput = modal.querySelector("input[id='epwd']");
+
+        // Asignar valores de los datos
+        rutInput.value = `${data.rut_usuario}-${data.dv_usuario}`;
+        nombreInput.value = data.nombre;
+        servicioInput.value = data.id_servicio;
+        contratoInput.value = data.id_tipo_contrato;
+        sigcomInput.value = data.id_unidad_sigcom;
+        estamentoInput.value = data.id_estamento;
+        tipoUsuarioInput.value = data.id_tipo_usuario;
+        usernameInput.value = data.username;
+        passwordInput.value = data.pwd;
+
+        modal.classList.remove('hidden');
+        setTimeout(() => {
+            modal.classList.remove('opacity-0');
+        }, 10);
+    }
+    const modal = document.getElementById('modal_editar_usuario');
+    const closeModal = document.querySelector('#closeModalEditUser');
+
+    closeModal.addEventListener('click', () => {
+        modal.classList.add('opacity-0');
+        setTimeout(() => {
+            modal.classList.add('hidden');
+        }, 300); // Duration should match the CSS transition duration
+    });
+
 });

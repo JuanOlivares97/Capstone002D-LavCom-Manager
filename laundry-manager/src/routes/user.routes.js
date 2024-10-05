@@ -5,7 +5,7 @@ const router = Router();
 
 router.get('/home', userController.renderHome)
 
-router.get('/get-usuarios', userController.getUsuarios);
+router.get('/get-users', userController.getUsuarios);
 
 router.post('/create-user', userController.createUsuario)
 
