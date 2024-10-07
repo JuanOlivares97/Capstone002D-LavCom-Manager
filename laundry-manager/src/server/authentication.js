@@ -1,60 +1,36 @@
 const jwt = require("jsonwebtoken");
+const prisma = require("../server/prisma");
 
 async function loginRequired(req, res, next) {
     try {
-        const loggedIn = req.cookies["logged-in"];
-
-        if (!loggedIn) {
+        const token = req.cookies["token"];
+        if (!token) {
             return res.redirect("/auth/login");
         }
 
-        const token = req.cookies["token"];
+        // Verificar el token JWT
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
-        console.log(decoded);
-
         if (!decoded) {
             return res.redirect("/auth/login");
         }
 
-        req.user = decoded;
+        // Buscar el usuario en la base de datos
+        const user = await prisma.usuarios.findUnique({
+            where: { id_usuario: decoded.id_usuario }
+        });
 
+        if (!user) {
+            return res.redirect("/auth/login");
+        }
+
+        req.user = user; // Añadir el usuario al objeto req
         next();
     } catch (error) {
-        return res.status(500).json({ message: "Internal server error" });
-    }
-}
-
-async function loginForbidden(req, res, next) {
-    try {
-        const loggedIn = req.cookies["logged-in"];
-
-        if (loggedIn) {
-            return res.redirect("/help/home");
-        }
-    } catch (error) {
-        return res.status(500).json({ message: "Internal server error" });
-    }
-}
-
-async function rolesAllowed(roles) {
-    return (req, res, next) => {
-        try {
-            const role = req.user.tipo_usuario;
-
-            if (!roles.includes(role)) {
-                return res.status(403).json({ message: "Forbidden" });
-            }
-
-            next();
-        } catch (error) {
-            return res.status(500).json({ message: "Internal server error" });
-        }
+        console.error("Error during authentication:", error);
+        return res.status(401).json({ message: "Unauthorized access" });
     }
 }
 
 module.exports = {
-    loginRequired,
-    loginForbidden,
-    rolesAllowed
+    loginRequired
 }
