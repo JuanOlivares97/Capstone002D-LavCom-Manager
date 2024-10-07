@@ -42,6 +42,7 @@ async function login(req, res) {
         }
 
         const token_data = {
+            id_usuario: user.id_usuario,
             rut: `${user.rut_usuario}-${user.dv_usuario}`,
             nombre: user.nombre,
             tipo_usuario: user.id_tipo_usuario
@@ -50,6 +51,7 @@ async function login(req, res) {
 
         res.cookie("token", token, { path: "/" });
         res.cookie("logged-in", true, { path: "/" });
+        res.cookie("tipo_usuario", user.id_tipo_usuario, { path: "/" });
 
         return res.status(200).json({ message: "Has iniciado sesión, bienvenido", success: true });
     } catch (error) {
