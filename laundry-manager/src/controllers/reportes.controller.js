@@ -2,7 +2,7 @@ const prisma = require("../server/prisma");
 
 function renderHome(req, res) {
     try {
-        return res.render('reports/home')
+        return res.render('reports/home', {tipo_usuario: req.user.tipo_usuario})
     } catch (error) {
         return res.status(500).json({ message: "Internal server error" });
     }

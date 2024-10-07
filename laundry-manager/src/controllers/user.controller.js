@@ -112,7 +112,7 @@ async function deleteUsuario(req, res) {
 }
 
 async function renderHome(req, res) {
-    res.render('users/home')
+    res.render('users/home', {tipo_usuario: req.user.tipo_usuario})
 }
 
 module.exports = {
