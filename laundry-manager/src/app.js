@@ -7,6 +7,9 @@ const articulosRouter = require('./routes/articulos.routes');
 const reportesRouter = require('./routes/reportes.routes')
 const dashboardRouter = require('./routes/dashboard.routes')
 const helpRouter = require('./routes/help.routes')
+
+const loginRequired = require('./server/authentication').loginRequired;
+
 const cookieParser = require('cookie-parser');
 
 const app = express();
@@ -24,11 +27,11 @@ app.set('views', './src/views');
 app.use(express.static(path.join(__dirname, "static")))
 
 app.use('/auth', authRouter);
-app.use('/users', userRouter);
-app.use('/clothes', articulosRouter);
-app.use('/reports', reportesRouter);
-app.use('/dashboard', dashboardRouter);
-app.use('/help', helpRouter)
+app.use('/users',loginRequired, userRouter);
+app.use('/clothes',loginRequired, articulosRouter);
+app.use('/reports',loginRequired, reportesRouter);
+app.use('/dashboard',loginRequired, dashboardRouter);
+app.use('/help',loginRequired, helpRouter)
 
 
 app.get("/template", (req, res) => {
