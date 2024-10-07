@@ -9,7 +9,8 @@ async function renderHome(req, res) {
             },
         });
         const unidades_sigcom = await prisma.unidad_sigcom.findMany();
-        res.render("clothes/home", { usuarios, unidades_sigcom, tipo_usuario: req.user.tipo_usuario });
+        const tipo_user = req.cookies["tipo_usuario"];
+        res.render("clothes/home", { usuarios, unidades_sigcom, tipo_usuario: parseInt(tipo_user) });
     } catch (error) {
         return res.status(500).json({ message: "Internal server error" });
     }

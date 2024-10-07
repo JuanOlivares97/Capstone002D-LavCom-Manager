@@ -112,7 +112,8 @@ async function deleteUsuario(req, res) {
 }
 
 async function renderHome(req, res) {
-    res.render('users/home', {tipo_usuario: req.user.tipo_usuario})
+    const tipo_user = req.cookies["tipo_usuario"];
+    res.render('users/home', {tipo_usuario: parseInt(tipo_user)})
 }
 
 module.exports = {
