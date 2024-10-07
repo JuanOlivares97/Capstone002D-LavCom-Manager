@@ -1,14 +1,18 @@
-<% if (1 === 1) { %>
-    <h2 class="text-2xl mb-3">Menú de ropa limpia</h2>
+<% if (tipo_usuario === 2) { %>
+    <h2 class="text-2xl my-3">Menú de ropa limpia</h2>
     <%- include('../components/menus/menu_ropa_limpia') %>
 <% } %>
 
-<% if (2 === 1) { %>
-    <h1>Menú de administrador</h1>
+<% if (tipo_usuario === 1) { %>
+    <h1 class="text-3xl my-3 text-center">Menú de administrador</h1>
+    <h2 class="text-2xl my-3">Menú de ropa limpia</h2>
+    <%- include('../components/menus/menu_ropa_limpia') %>
+    <h2 class="text-2xl my-3">Menú de ropa sucia</h2>
+    <%- include('../components/menus/menu_ropa_sucia') %>
 <% } %>
 
-<% if (1 === 2) { %>
-    <h2 class="text-2xl mb-3">Menú de ropa sucia</h2>
+<% if (tipo_usuario === 3) { %>
+    <h2 class="text-2xl my-3">Menú de ropa sucia</h2>
     <%- include('../components/menus/menu_ropa_sucia') %>
 <% } %>
 <h1 class="text-2xl text-black mt-3">Artículos</h1>

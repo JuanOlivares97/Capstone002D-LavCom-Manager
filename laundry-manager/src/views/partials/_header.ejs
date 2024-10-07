@@ -1,117 +1,62 @@
+<% 
+// Definir las secciones y qué tipo de usuarios tienen acceso a ellas
+const secciones = [
+    { icon: "../icons/reportes_icon", label: "Reportes", link: "/reports/home", tipos: [1, 2] }, // Admin, Encargado de ropa limpia
+    { icon: "../icons/articulos_icon", label: "Artículos", link: "/clothes/home", tipos: [1, 2, 3] }, // Admin, Encargado ropa limpia, Encargado ropa sucia
+    { icon: "../icons/dashboard_icon", label: "Dashboard", link: "/dashboard/home", tipos: [1] }, // Solo Admin
+    { icon: "../icons/user_group", label: "Usuarios", link: "/users/home", tipos: [1] }, // Solo Admin
+    { icon: "../icons/ayuda_icon", label: "Ayuda", link: "/help/home", tipos: [1, 2, 3] } // Admin, Encargado ropa limpia, Encargado ropa sucia
+];
+
+// Función para verificar si el usuario tiene acceso a la sección
+function tieneAcceso(tiposPermitidos, tipoUsuario) {
+    return tiposPermitidos.includes(tipoUsuario);
+}
+%>  
 <body class="bg-gray-100 font-sans leading-normal tracking-normal min-h-screen max-w-screen flex">
     <!-- Sidebar -->
-    <aside id="sidebar"
-        class="hidden md:block flex flex-col md:items-center transition-all duration-300 bg-[#CFE2FF] shadow-lg p-6 ">
-        <!-- Logo grande (el que desaparecerá al hacer clic) -->
-        <div id="logo" class="mb-4 flex items-center justify-center">
-            <%- include('../icons/logo_hospital_menu') %>
-        </div>
+    <!-- Sidebar -->
+<aside id="sidebar" class="hidden md:block flex flex-col md:items-center transition-all duration-300 bg-[#CFE2FF] shadow-lg p-6">
+    <!-- Logo grande (el que desaparecerá al hacer clic) -->
+    <div id="logo" class="mb-4 flex items-center justify-center">
+        <%- include('../icons/logo_hospital_menu') %>
+    </div>
 
-        <!-- Logo pequeño (el que aparecerá cuando el sidebar esté colapsado) -->
-        <div id="smallLogo" class="mb-4 hidden flex items-center justify-center py-8">
-            <%- include('../icons/logo_hospital_small') %> <!-- Este es el logo pequeño -->
-        </div>
+    <!-- Logo pequeño (el que aparecerá cuando el sidebar esté colapsado) -->
+    <div id="smallLogo" class="mb-4 hidden flex items-center justify-center py-8">
+        <%- include('../icons/logo_hospital_small') %> <!-- Este es el logo pequeño -->
+    </div>
 
-        <!-- Menú -->
-        <nav class="w-full">
-            <ul id="menu">
-                <li class="mb-4">
-                    <a href="/reports/home"
-                        class="flex items-center p-2 text-black hover:bg-white rounded transition duration-300">
-                        <%- include("../icons/reportes_icon") %>
-                            <span class="ml-2 sidebar-text">Reportes</span>
-                    </a>
-                </li>
-                <li class="mb-4">
-                    <a href="/clothes/home"
-                        class="flex items-center p-2 text-black hover:bg-white rounded transition duration-300">
-                        <%- include("../icons/articulos_icon") %>
-                            <span class="ml-2 sidebar-text">Artículos</span>
-                    </a>
-                </li>
-                <li class="mb-4">
-                    <a href="/dashboard/home"
-                        class="flex items-center p-2 text-black hover:bg-white rounded transition duration-300">
-                        <%- include("../icons/dashboard_icon") %>
-                            <span class="ml-2 sidebar-text">Dashboard</span>
-                    </a>
-                </li>
-                <li class="mb-4">
-                    <a href="/users/home"
-                        class="flex items-center p-2 text-black hover:bg-white rounded transition duration-300">
-                        <%- include("../icons/user_group") %>
-                            <span class="ml-2 sidebar-text">Usuarios</span>
-                    </a>
-                </li>
-                <li class="mb-4">
-                    <a href="/help/home" class="flex items-center p-2 text-black hover:bg-white rounded transition duration-300">
-                        <%- include("../icons/ayuda_icon") %>
-                            <span class="ml-2 sidebar-text">Ayuda</span>
-                    </a>
-                </li>
-            </ul>
-        </nav>
-    </aside>
+    <!-- Menú -->
+    <nav class="w-full">
+        <ul id="menu">
+            <% secciones.forEach(seccion => { %>
+                <% if (tieneAcceso(seccion.tipos, tipo_usuario)) { %>
+                    <li class="mb-4">
+                        <a href="<%= seccion.link %>" class="flex items-center p-2 text-black hover:bg-white rounded transition duration-300">
+                            <%- include(seccion.icon) %>
+                            <span class="ml-2 sidebar-text"><%= seccion.label %></span>
+                        </a>
+                    </li>
+                <% } %>
+            <% }) %>
+        </ul>
+    </nav>
+</aside>
 
     <!-- Menu Mobile -->
-    <nav style="z-index: 9999;" id="menuMobile"
-        class="hidden bg-[#CFE2FF] text-lg absolute r-0 h-screen w-screen w-full rounded transition duration-500">
+    <nav style="z-index: 9999;" id="menuMobile" class="hidden bg-[#CFE2FF] text-lg absolute r-0 h-screen w-screen w-full rounded transition duration-500">
         <ul id="menu" class="flex flex-col items-center mt-4">
-            <li class="mb-2 w-full flex justify-center">
-                <a href="#" class="flex items-center p-2 text-black hover:bg-white py-4 rounded transition duration-300">
-                    <%- include("../icons/hospital_logo_small") %>
-                </a>
-            </li>
-            <li class="mb-4 w-full flex justify-center">
-                <a href="/reports/home"
-                    class="flex items-center p-2 text-black hover:bg-white rounded transition duration-300">
-                    <%- include("../icons/reportes_icon") %>
-                        <span class="ml-2 sidebar-text">Reportes</span>
-                </a>
-            </li>
-            <li class="mb-4 w-full flex justify-center">
-                <a href="/clothes/home"
-                    class="flex items-center p-2 text-black hover:bg-white rounded transition duration-300">
-                    <%- include("../icons/articulos_icon") %>
-                        <span class="ml-2 sidebar-text">Artículos</span>
-                </a>
-            </li>
-            <li class="mb-4 w-full flex justify-center">
-                <a href="/dashboard/home"
-                    class="flex items-center p-2 text-black hover:bg-white rounded transition duration-300">
-                    <%- include("../icons/dashboard_icon") %>
-                        <span class="ml-2 sidebar-text">Dashboard</span>
-                </a>
-            </li>
-            <li class="mb-4 w-full flex justify-center">
-                <a href="/users/home"
-                    class="flex items-center p-2 text-black hover:bg-white rounded transition duration-300">
-                    <%- include("../icons/user_group") %>
-                        <span class="ml-2 sidebar-text">Usuarios</span>
-                </a>
-            </li>
-            <li class="mb-4 w-full flex justify-center">
-                <a href="/help/home" class="flex items-center p-2 text-black hover:bg-white rounded transition duration-300">
-                    <%- include("../icons/ayuda_icon") %>
-                        <span class="ml-2 sidebar-text">Ayuda</span>
-                </a>
-            </li>
-            <li class="mb-4 w-full flex justify-center">
-                <button id="btn-logout-mobile'"
-                    class="hidden lg:flex bg-transparent text-black px-6 py-2 rounded hover:bg-gray-400 hover:text-white transition duration-300 items-center">
-                    <%- include("../icons/logout_icon") %>
-                        <span>Cerrar Sesión</span>
-                </button>
-            </li>
-
-            <!-- Cerrar Menu Icon (X) -->
-            <li class="absolute top-4 right-4">
-                <button id="closeMenuMobile"
-                    class="flex items-center p-2 text-black hover:bg-white rounded transition duration-300">
-                    <!-- Simple X Icon using text -->
-                    <span class="text-2xl">×</span>
-                </button>
-            </li>
+            <% secciones.forEach(seccion => { %>
+                <% if (tieneAcceso(seccion.tipos, tipo_usuario)) { %>
+                    <li class="mb-4 w-full flex justify-center">
+                        <a href="<%= seccion.link %>" class="flex items-center p-2 text-black hover:bg-white rounded transition duration-300">
+                            <%- include(seccion.icon) %>
+                            <span class="ml-2 sidebar-text"><%= seccion.label %></span>
+                        </a>
+                    </li>
+                <% } %>
+            <% }) %>
         </ul>
     </nav>
 
@@ -124,7 +69,7 @@
                 <%- include("../icons/menu_icon") %>
             </button>
 
-            <h1 class="text-center text-lg flex-1 md:text-xl lg:text-2xl">SISTEMA DE CONTROL DE LAVANDERÍA</h1>
+            <h1 class="text-center text-lg flex-1 md:text-xl lg:text-2xl">SISTEMA DE CONTROL DE LAVANDERÍA </h1>
 
             <button id="toggleSidebarMobile"
                 class="md:hidden bg-transparent text-black px-4 py-2 rounded transition duration-300 flex items-center">
