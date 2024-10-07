@@ -37,10 +37,13 @@ form.addEventListener("submit", async (e) => {
         icon: "success",
         title: "Inicio de sesión exitoso",
         text: data.message,
-        confirmButtonText: "Ingresar",
+        timer: 1000, // La alerta se mostrará durante 3 segundos
+        timerProgressBar: true,
         toast: true,
-        position: 'top-end'
-    }).then(() => {
-        window.location.href = "/help/home";
-    });
+        position: 'top-end',
+        showConfirmButton: false, // No mostrar botón de confirmación
+        willClose: () => {
+            window.location.href = "/dashboard/home"; // Redirigir cuando la alerta se cierre
+        }
+    });    
 });
