@@ -8,4 +8,6 @@ router.get('/recuperar_pwd_form', authController.renderRecuperarContrasenaForm);
 router.get('/recuperar_pwd_info', authController.renderRecuperarContrasenaInfo);
 router.post('/login', authController.login);
 
+router.post('/logout', authController.logout);
+
 module.exports = router;
