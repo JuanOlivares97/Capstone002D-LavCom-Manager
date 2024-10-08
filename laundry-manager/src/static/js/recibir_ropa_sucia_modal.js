@@ -34,7 +34,7 @@ async function addArticuloRecibirRopaSucia() {
         selectArticulo.appendChild(option);
     });
 
-    newRow.querySelector('.remove-articulo-recibir-sucio').addEventListener('click', function() {
+    newRow.querySelector('.remove-articulo-recibir-sucio').addEventListener('click', function () {
         newRow.remove();
         rowIdRecibirSucio--;
         updateRowNumbersRecibirSucio();
@@ -50,11 +50,13 @@ function updateRowNumbersRecibirSucio() {
 
 document.addEventListener('DOMContentLoaded', async () => {
     const recibir_ropa_sucia_form = document.getElementById('recibir_ropa_sucia_form');
-    recibir_ropa_sucia_form.addEventListener('submit', function (e) {
+
+    recibir_ropa_sucia_form.addEventListener('submit', async function (e) {
         e.preventDefault();
+
         const articulosData = [];
         const filas = document.querySelectorAll('#recibir_ropa_sucia_container > div');
-    
+
         filas.forEach((fila, index) => {
             const select = fila.querySelector('select');
             const input = fila.querySelector('input');
@@ -70,31 +72,68 @@ document.addEventListener('DOMContentLoaded', async () => {
         let data = {
             rut_usuario_1: recibir_ropa_sucia_form.querySelector("input[name='rut_usuario_1']").value,
             rut_usuario_2: recibir_ropa_sucia_form.querySelector("select[name='rut_usuario_2']").value,
-            servicio: recibir_ropa_sucia_form.querySelector("select[name='servicio']").value,
+            servicio: recibir_ropa_sucia_form.querySelector("select[name='unidad_sigcom']").value,
             articulos: articulosData
-        }
+        };
 
         if (articulosData.length !== 0) {
-            alert(JSON.stringify(data));
+            try {
+                console.log(data); // Add this line to inspect the data object
+                const response = await fetch('http://localhost:3000/clothes/recibir-sucia-unidad-sigcom', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const result = await response.json(); // Added await here to process the response
+                console.log('Registro creado exitosamente:', result);
+            } catch (error) {
+                console.error('Error al crear el registro:', error);
+            }
         }
     });
-    
-    
+
     const modal = document.querySelector('#recibir_ropa_sucia_modal');
     const closeModal = document.querySelector('#closeRecibirRopaSucia');
-    
+
     closeModal.addEventListener('click', () => {
         modal.classList.add('opacity-0');
         modal.querySelector('.transform').classList.add('scale-95');
         setTimeout(() => {
             modal.classList.add('hidden');
         }, 300); // Duration should match the CSS transition duration
-        // clear all articles
+
+        // Clear all articles
         const container = document.getElementById('recibir_ropa_sucia_container');
         while (container.firstChild) {
             container.removeChild(container.firstChild);
         }
         rowIdRecibirSucio = 0;
     });
-})
+});
+
+
+const modal = document.querySelector('#recibir_ropa_sucia_modal');
+const closeModal = document.querySelector('#closeRecibirRopaSucia');
+
+closeModal.addEventListener('click', () => {
+    modal.classList.add('opacity-0');
+    modal.querySelector('.transform').classList.add('scale-95');
+    setTimeout(() => {
+        modal.classList.add('hidden');
+    }, 300); // Duration should match the CSS transition duration
+    // clear all articles
+    const container = document.getElementById('recibir_ropa_sucia_container');
+    while (container.firstChild) {
+        container.removeChild(container.firstChild);
+    }
+    rowIdRecibirSucio = 0;
+});
+
 

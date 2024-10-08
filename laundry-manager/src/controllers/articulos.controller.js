@@ -3,6 +3,7 @@ const tempo = require("@formkit/tempo");
 
 async function renderHome(req, res) {
     try {
+        const rutLogueado = req.cookies["rutLogueado"] + "-" + req.cookies["dvLogueado"];
         const usuarios = await prisma.usuarios.findMany({
             where: {
                 borrado: false,
@@ -10,7 +11,7 @@ async function renderHome(req, res) {
         });
         const unidades_sigcom = await prisma.unidad_sigcom.findMany();
         const tipo_user = req.cookies["tipo_usuario"];
-        res.render("clothes/home", { usuarios, unidades_sigcom, tipo_usuario: parseInt(tipo_user) });
+        res.render("clothes/home", { usuarios, unidades_sigcom, tipo_usuario: parseInt(tipo_user), rutLogueado });
     } catch (error) {
         return res.status(500).json({ message: "Internal server error" });
     }
@@ -22,13 +23,22 @@ async function getArticulos(req, res) {
             where: {
                 borrado: false,
             },
-            include: {
-                subgrupo_ropa: true,
-            },
         });
-        return res.status(200).json(articulos);
+        
+        const articulosConSubgrupo = await Promise.all(
+            articulos.map(async (articulo) => {
+                const subgrupo = await prisma.subgrupo_ropa.findUnique({
+                    where: {
+                        id_subgrupo_ropa: articulo.id_subgrupo_ropa,
+                    },
+                });
+                return { ...articulo, subgrupo_ropa: subgrupo };
+            })
+        );
+        
+        return res.status(200).json(articulosConSubgrupo);
     } catch (error) {
-        return res.status(500).json({ message: "Internal server error" });
+        return res.status(500).json({ message: "Internal server error" + error });
     }
 }
 
@@ -235,6 +245,74 @@ async function declararPerdida(req, res) {
     }
 }
 
+async function recibirSuciaUnidadSigcom(req, res) {
+    try {
+        var fecha = new Date();
+        fecha = tempo.format(fecha, "YYYY-MM-DD HH:mm:ss A", "cl");
+        const data = req.body;
+        const result = await prisma.registro.create({
+            data: {
+                rut_usuario_1: parseInt(data.rut_usuario_1),
+                rut_usuario_2: parseInt(data.rut_usuario_2),
+                id_unidad_sigcom: parseInt(data.id_unidad_sigcom),
+                id_tipo_registro: 2,
+                detalle_registro: {
+                    create: data.articulos.map(a => {
+                        return {
+                            cantidad: parseInt(a.cantidad),
+                            id_articulo: parseInt(a.id_articulo),
+                        };
+                    })
+                },
+                cantidad_total: data.articulos.reduce((acc, a) => acc + parseInt(a.cantidad), 0),
+                fecha: fecha,
+            },
+        })
+
+        if (!result) {
+            return res.status(400).json({ message: "Error creating registro" });
+        }   
+
+        return res.status(200).json({ message: "Registro creado exitosamente" });
+    } catch (error) {
+        return res.status(500).json({ message: "Internal server error "+error });
+    }
+}
+
+async function remesaRopaSucia(req, res) {
+    try {
+        var fecha = new Date();
+        fecha = tempo.format(fecha, "YYYY-MM-DD HH:mm:ss A", "cl");
+        const data = req.body;
+        const result = await prisma.registro.create({
+            data: {
+                rut_usuario_1: parseInt(data.rut_usuario_1),
+                rut_usuario_2: parseInt(data.rut_usuario_2),
+                id_unidad_sigcom: parseInt(data.id_unidad_sigcom),
+                id_tipo_registro: 3,
+                detalle_registro: {
+                    create: data.articulos.map(a => {
+                        return {
+                            cantidad: parseInt(a.cantidad),
+                            id_articulo: parseInt(a.id_articulo),
+                        };
+                    })
+                },
+                cantidad_total: data.articulos.reduce((acc, a) => acc + parseInt(a.cantidad), 0),
+                fecha: fecha,
+            },
+        })
+
+        if (!result) {
+            return res.status(400).json({ message: "Error creating registro" });
+        }   
+
+        return res.status(200).json({ message: "Registro creado exitosamente" });
+    } catch (error) {
+        return res.status(500).json({ message: "Internal server error" });
+    }
+}
+
 module.exports = {
     getArticulos,
     renderHome,
@@ -243,5 +321,7 @@ module.exports = {
     deleteArticulo,
     entregarUnidadSigcom,
     darRopaDeBaja,
-    declararPerdida
+    declararPerdida,
+    recibirSuciaUnidadSigcom,
+    remesaRopaSucia
 };

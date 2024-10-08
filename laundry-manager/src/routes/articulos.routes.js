@@ -12,5 +12,7 @@ router.delete("/delete-clothes", articulosController.deleteArticulo);
 router.post("/entregar-unidad-sigcom", articulosController.entregarUnidadSigcom);
 router.post("/dar-ropa-baja", articulosController.darRopaDeBaja);
 router.post("/declarar-perdida", articulosController.declararPerdida);
+router.post("/recibir-sucia-unidad-sigcom", articulosController.recibirSuciaUnidadSigcom);
+router.post("/remesa-ropa-sucia", articulosController.remesaRopaSucia);
 
 module.exports = router;
