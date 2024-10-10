@@ -2,7 +2,7 @@ import {AG_GRID_LOCALE_ES} from './utils.js'
 document.addEventListener('DOMContentLoaded', async function () {
     let gridApi;
 
-    const response = await fetch('/clothes/get-clothes');
+    const response = await fetch('/clothes/get-employees');
     const articulos = await response.json();
 
     const gridOptions = {

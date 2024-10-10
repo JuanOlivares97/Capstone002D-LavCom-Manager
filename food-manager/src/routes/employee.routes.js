@@ -4,4 +4,5 @@ const router = Router();
 
 router.get('/home', employeeController.renderHome)
 
+
 module.exports = router;
