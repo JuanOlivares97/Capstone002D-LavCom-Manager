@@ -3,3 +3,6 @@
 
 # Ignorar todos los archivos .env
 **/.env
+laundry-manager/prisma/schema.prisma
+laundry-manager/src/controllers/prisma/schema.prisma
+laundry-manager/prisma/schema.prisma
