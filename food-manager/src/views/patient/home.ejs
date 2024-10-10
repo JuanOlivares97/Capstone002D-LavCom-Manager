@@ -10,3 +10,115 @@
         </button>
     </form>
 </div>
+<div class="bg-gray-200 dark:bg-gray-800 p-4">
+    <h1 class="text-center text-xl font-bold">Alimentación Hospitalizados</h1>
+</div>
+
+<!-- Secciones de navegación -->
+<div class="flex justify-center bg-gray-300 dark:bg-gray-700 py-2">
+    <a href="#" class="px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-green-300 rounded">Medicina</a>
+    <a href="#" class="px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-green-300 rounded">Cirugía</a>
+    <a href="#" class="px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-green-300 rounded">Upc</a>
+    <a href="#" class="px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-green-300 rounded">Pediatría</a>
+    <a href="#" class="px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-green-300 rounded">Pensionado</a>
+    <a href="#" class="px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-green-300 rounded">GineObstetricia</a>
+    <a href="#" class="px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-green-300 rounded">Urgencia</a>
+    <a href="#" class="px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-green-300 rounded">CMA</a>
+</div>
+
+<!-- Barra de búsqueda y agregar paciente -->
+<div class="flex justify-between items-center p-4 bg-gray-200 dark:bg-gray-800">
+    <div class="flex items-center space-x-2">
+        <button class="p-2 bg-black text-white rounded-full">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                class="w-5 h-5">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+            </svg>
+        </button>
+        <span class="text-lg">Ingresar Paciente</span>
+    </div>
+    <div class="flex items-center space-x-2">
+        <input type="text" placeholder="11111111-1"
+            class="px-4 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+        <button class="p-2 bg-gray-300 rounded-full">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M8 12h.01M12 12h.01M16 12h.01M9 16h6M9 8h6M12 5v14m8-7H4" />
+            </svg>
+        </button>
+    </div>
+</div>
+
+<!-- Tabla de pacientes -->
+<div class="container mx-auto my-6">
+    <table class="min-w-full bg-white dark:bg-gray-700">
+        <thead class="bg-gray-100 dark:bg-gray-800">
+            <tr>
+                <th class="py-2 px-4">CAMA</th>
+                <th class="py-2 px-4">RUT</th>
+                <th class="py-2 px-4">NOMBRE</th>
+                <th class="py-2 px-4">EDAD</th>
+                <th class="py-2 px-4">DG DE INGRESO</th>
+                <th class="py-2 px-4">REGIMEN</th>
+                <th class="py-2 px-4">VÍA</th>
+                <th class="py-2 px-4">OBSERVACIONES NUTRICIONISTA</th>
+                <th class="py-2 px-4">OBSERVACION SALA</th>
+                <th class="py-2 px-4">OPCIONES</th>
+                <th class="py-2 px-4">INDICAR AYUNO</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr class="border-t">
+                <td class="py-2 px-4">2</td>
+                <td class="py-2 px-4">11111111-1</td>
+                <td class="py-2 px-4">JUAN</td>
+                <td class="py-2 px-4">42</td>
+                <td class="py-2 px-4">ACV</td>
+                <td class="py-2 px-4">HIPOSÓDICO</td>
+                <td class="py-2 px-4">Oral</td>
+                <td class="py-2 px-4">Hiposódico</td>
+                <td class="py-2 px-4">N/A</td>
+                <td class="py-2 px-4 flex space-x-2">
+                    <button class="p-2 bg-gray-300 rounded-full">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                            stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M15.232 6.232a3 3 0 010 4.243L9.414 16.293a3 3 0 01-4.243 0l-.707-.707a3 3 0 010-4.243l6.122-6.121a3 3 0 014.243 0z" />
+                        </svg>
+                    </button>
+                    <button class="p-2 bg-gray-300 rounded-full">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                            stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                        </svg>
+                    </button>
+                </td>
+                <td class="py-2 px-4">
+                    <button class="p-2 bg-purple-500 text-white rounded-full">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24"
+                            stroke="currentColor" fill="none">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                        </svg>
+                    </button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+<div class="bg-gray-200 rounded-lg p-8 shadow-lg w-96">
+    <h2 class="text-2xl text-center font-semibold mb-6">Registro</h2>
+
+    <!-- Formulario de observación -->
+    <form>
+        <label for="observacion" class="block mb-2">Ingresar observación</label>
+        <textarea id="observacion"
+            class="w-full h-32 p-2 rounded-md border border-gray-300 focus:ring-2 focus:ring-green-400 focus:outline-none mb-6"></textarea>
+
+        <!-- Botón de confirmar -->
+        <div class="text-center">
+            <button type="submit"
+                class="bg-green-400 hover:bg-green-500 text-white font-bold py-2 px-4 rounded-full shadow-md">
+                Confirmar
+            </button>
+        </div>
