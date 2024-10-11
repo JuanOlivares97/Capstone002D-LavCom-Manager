@@ -1,17 +1,17 @@
-<div class="flex justify-between items-center p-4 bg-gray-200 dark:bg-gray-800">
+<div class="flex justify-between items-center p-4 bg-gray-200">
     <div class="flex items-center space-x-2">
-        <button class="p-2 bg-black text-white rounded-full">
+        <button class="p-2 bg-indigo-500 text-white rounded-full flex items items-center">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
                 class="w-5 h-5">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
             </svg>
+            <span class="text-lg">Ingresar funcionario</span>
         </button>
-        <span class="text-lg">Ingresar funcionario</span>
     </div>
     <div class="flex items-center space-x-2">
         <input type="text" placeholder="11111111-1"
             class="px-4 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500" />
-        <button class="p-2 bg-gray-300 rounded-full">
+        <button class="p-2 bg-indigo-500 rounded-full">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
                 stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -19,68 +19,7 @@
             </svg>
         </button>
     </div>
-    <div class="flex items-center space-x-2">
-        <span>Modo oscuro</span>
-        <input type="checkbox" id="dark-mode-toggle" class="toggle-checkbox" />
-    </div>
 </div>
 
-<!-- Tabla de funcionarios -->
-<div class="container mx-auto my-6">
-    <table class="min-w-full bg-white dark:bg-gray-700">
-        <thead class="bg-gray-100 dark:bg-gray-800">
-            <tr>
-                <th class="py-2 px-4">RUT</th>
-                <th class="py-2 px-4">NOMBRE</th>
-                <th class="py-2 px-4">TIPO CONTRATO</th>
-                <th class="py-2 px-4">ESTAMENTO</th>
-                <th class="py-2 px-4">SERVICIO</th>
-                <th class="py-2 px-4">UNIDAD SIGNOM</th>
-                <th class="py-2 px-4">FECHA INICIO</th>
-                <th class="py-2 px-4">TERMINO CONTRATO</th>
-                <th class="py-2 px-4">TIPO REGIMEN</th>
-                <th class="py-2 px-4">ESTADO</th>
-                <th class="py-2 px-4">OPCIONES</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr class="border-t">
-                <td class="py-2 px-4">11111111-1</td>
-                <td class="py-2 px-4">Juan</td>
-                <td class="py-2 px-4">Contrata</td>
-                <td class="py-2 px-4">Profesional</td>
-                <td class="py-2 px-4">Apoyo clínico</td>
-                <td class="py-2 px-4">Laboratorio</td>
-                <td class="py-2 px-4">01-10-1980</td>
-                <td class="py-2 px-4">31-12-2023</td>
-                <td class="py-2 px-4">Fijo</td>
-                <td class="py-2 px-4">
-                    <span class="text-green-600">✔️</span>
-                    <span class="text-red-600">❌</span>
-                </td>
-                <td class="py-2 px-4 flex space-x-2">
-                    <button class="p-2 bg-gray-300 rounded-full">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24"
-                            stroke="currentColor" fill="none">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-                        </svg>
-                    </button>
-                    <button class="p-2 bg-gray-300 rounded-full">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
-                            stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M15.232 6.232a3 3 0 010 4.243L9.414 16.293a3 3 0 01-4.243 0l-.707-.707a3 3 0 010-4.243l6.122-6.121a3 3 0 014.243 0z" />
-                        </svg>
-                    </button>
-                </td>
-            </tr>
-        </tbody>
-    </table>
-</div>
-<script>
-    const toggle = document.getElementById('dark-mode-toggle');
-    toggle.addEventListener('change', function () {
-        document.body.classList.toggle('dark');
-    });
-</script>
-<scripts src="/js/empleados_gris.js"></scripts>
+<div id="gridFuncionarios" class="ag-theme-quartz h-96 w-full p-4"></div>
+<script type="module" src="/js/employee/empleados_grid.js" ></script>
