@@ -12,10 +12,14 @@ app.set('view engine', 'ejs');
 app.set('views', './src/views');
 
 // Servir archivos estáticos
-app.use(express.static(path.join(__dirname, "static")));
-
+app.use(express.static(path.join(__dirname, "static")))
 // Middleware de autenticación global (si es necesario)
 // app.use(authMiddleware);
+
+//Redireccionar a la página de dashboard
+app.get('/', (req, res) => {
+    res.redirect('/dashboard/home');
+});
 
 // Cargar rutas dinámicamente
 const routeFiles = fs.readdirSync(path.join(__dirname, './routes'));
