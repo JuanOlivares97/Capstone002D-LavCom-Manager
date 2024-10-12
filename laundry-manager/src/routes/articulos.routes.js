@@ -14,5 +14,6 @@ router.post("/dar-ropa-baja", articulosController.darRopaDeBaja);
 router.post("/declarar-perdida", articulosController.declararPerdida);
 router.post("/recibir-sucia-unidad-sigcom", articulosController.recibirSuciaUnidadSigcom);
 router.post("/remesa-ropa-sucia", articulosController.remesaRopaSucia);
+router.post("/recibir-ropa-limpia", articulosController.recibirRopaLimpia);
 
 module.exports = router;
