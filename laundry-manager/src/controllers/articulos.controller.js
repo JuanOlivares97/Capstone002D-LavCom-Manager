@@ -313,6 +313,38 @@ async function remesaRopaSucia(req, res) {
     }
 }
 
+async function recibirRopaLimpia(req, res) {
+    try {
+        var fecha = new Date();
+        fecha = tempo.format(fecha, "YYYY-MM-DD HH:mm:ss A", "cl");
+        const data = req.body;
+        const result = await prisma.registro.create({
+            data: {
+                rut_usuario_1: parseInt(data.rut_usuario_1),
+                id_tipo_registro: 4,
+                detalle_registro: {
+                    create: data.articulos.map(a => {
+                        return {
+                            cantidad: parseInt(a.cantidad),
+                            id_articulo: parseInt(a.id_articulo),
+                        };
+                    })
+                },
+                cantidad_total: data.articulos.reduce((acc, a) => acc + parseInt(a.cantidad), 0),
+                fecha: fecha,
+            },
+        })
+
+        if (!result) {
+            return res.status(400).json({ message: "Error creating registro" });
+        }   
+
+        return res.status(200).json({ message: "Registro creado exitosamente" });
+    } catch (error) {
+        return res.status(500).json({ message: "Internal server error" });
+    }
+}
+
 module.exports = {
     getArticulos,
     renderHome,
@@ -323,5 +355,6 @@ module.exports = {
     darRopaDeBaja,
     declararPerdida,
     recibirSuciaUnidadSigcom,
-    remesaRopaSucia
+    remesaRopaSucia,
+    recibirRopaLimpia
 };
