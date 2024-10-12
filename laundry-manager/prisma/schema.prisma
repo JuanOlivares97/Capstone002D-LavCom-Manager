@@ -109,6 +109,7 @@ model usuarios {
   username                                  String        @unique(map: "username_UNIQUE") @db.VarChar(255)
   pwd                                       String        @db.VarChar(255)
   borrado                                   Boolean
+  email                                     String?       @unique(map: "email_UNIQUE") @db.VarChar(255)
   registro_registro_rut_usuario_1Tousuarios registro[]    @relation("registro_rut_usuario_1Tousuarios")
   registro_registro_rut_usuario_2Tousuarios registro[]    @relation("registro_rut_usuario_2Tousuarios")
   tipo_usuario                              tipo_usuario  @relation(fields: [id_tipo_usuario], references: [id_tipo_usuario], onDelete: NoAction, onUpdate: NoAction, map: "fk_tipo_usuario")
