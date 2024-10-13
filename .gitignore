@@ -1,2 +1,5 @@
+# Ignorar todas las carpetas node_modules
 **/node_modules
+
+# Ignorar todos los archivos .env
 **/.env
