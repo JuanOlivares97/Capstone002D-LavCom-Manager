@@ -1,5 +1,2 @@
-laundry-manager/node_modules
-laundry-manager/.env
-
-food-manager/node_modules
-food-manager/.env
+**/node_modules
+**/.env
