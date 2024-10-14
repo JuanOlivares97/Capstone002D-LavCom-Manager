@@ -1,56 +1,87 @@
-<div class="hidden fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden opacity-0 transition-opacity duration-300" id="agregar_empleado_modal">
-    <div class="bg-white rounded-lg shadow-lg p-8 max-w-sm w-full transform scale-95 transition-transform duration-300">
-        <h2 class="text-2xl font-bold mb-6 text-center">Agregar Empleado</h2>
+<div style="z-index: 9999;" id="modal_crear_usuario" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden opacity-0 transition-opacity duration-300">
+    <div class="bg-white rounded-lg shadow-2xl p-8 max-w-3xl w-full">
+        <h2 class="text-2xl font-bold mb-6 text-center text-black">Crear Usuario</h2>
         <form>
-            <div class="mb-4">
-                <label for="nombre" class="block text-black-700 mb-2">Nombre</label>
-                <input type="text" name="nombre" class="w-full p-2 border rounded" placeholder="Ingrese su Nombre" required />
-
+            <div class="mb-4 flex">
+                <div class="flex-1 mr-2">
+                    <label for="rut_usuario" class="block text-black mb-2">RUT Usuario</label>
+                    <input type="text" id="rut_usuario" class="w-full p-2 border rounded" placeholder="Ingrese RUT"
+                        required>
+                </div>
+                <div class="flex-none">
+                    <label for="dv_usuario" class="block text-black mb-2">DV</label>
+                    <input type="text" id="dv_usuario" class="w-16 p-2 border rounded" placeholder="DV" maxlength="1"
+                        required>
+                </div>
             </div>
             <div class="mb-4">
-                <label for="stock" class="block text-black-700 mb-2">Rut</label>
-                <input type="number" name="stock" class="w-full p-2 border rounded" placeholder="Ingrese su Rut" required />
+                <label for="nombre" class="block text-black mb-2">Nombre</label>
+                <input type="text" id="nombre" class="w-full p-2 border rounded" placeholder="Ingrese Nombre" required>
+            </div>
+            <div class="mb-4 grid grid-cols-3 gap-2">
+                <div>
+                    <label class="block text-black mb-2">Servicio</label>
+                    <select class="w-full p-2 border rounded" required>
+                        <option value="">Seleccione un servicio</option>
+                        <option value="1">Servicio 1</option>
+                        <option value="2">Servicio 2</option>
+                        <option value="3">Servicio 3</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-black mb-2">Tipo Contrato</label>
+                    <select class="w-full p-2 border rounded" required>
+                        <option value="">Seleccione un tipo de contrato</option>
+                        <option value="1">Contrato 1</option>
+                        <option value="2">Contrato 2</option>
+                        <option value="3">Contrato 3</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-black mb-2">Unidad SIGCOM</label>
+                    <select class="w-full p-2 border rounded" required>
+                        <option value="">Seleccione una unidad</option>
+                        <option value="1">Unidad 1</option>
+                        <option value="2">Unidad 2</option>
+                        <option value="3">Unidad 3</option>
+                    </select>
+                </div>
+            </div>
+            <div class="mb-4 grid grid-cols-2 gap-2">
+                <div>
+                    <label class="block text-black mb-2">Estamento</label>
+                    <select class="w-full p-2 border rounded" required>
+                        <option value="">Seleccione un estamento</option>
+                        <option value="1">Estamento 1</option>
+                        <option value="2">Estamento 2</option>
+                        <option value="3">Estamento 3</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-black mb-2">Tipo Usuario</label>
+                    <select class="w-full p-2 border rounded" required>
+                        <option value="">Seleccione un tipo de usuario</option>
+                        <option value="1">Tipo 1</option>
+                        <option value="2">Tipo 2</option>
+                        <option value="3">Tipo 3</option>
+                    </select>
+                </div>
             </div>
             <div class="mb-4">
-                <label for="subgrupo" class="block text-black-700 mb-2">Tipo de Contrato</label>
-                <select id="subgrupo" class="w-full p-2 border rounded" required>
-                    <option value="" disabled selected>Seleccione</option>
-                    <option value="subgrupo1">Subgrupo 1</option>
-                    <option value="subgrupo2">Subgrupo 2</option>
-                    <option value="subgrupo3">Subgrupo 3</option>
-                </select>
+                <label for="username" class="block text-black mb-2">Username</label>
+                <input type="text" id="username" class="w-full p-2 border rounded" placeholder="Ingrese Username"
+                    required>
             </div>
-            <div class="mb-4">
-                <label for="subgrupo" class="block text-black-700 mb-2">Estamento</label>
-                <select id="subgrupo" class="w-full p-2 border rounded" required>
-                    <option value="" disabled selected>Seleccione</option>
-                    <option value="subgrupo1">Subgrupo 1</option>
-                    <option value="subgrupo2">Subgrupo 2</option>
-                    <option value="subgrupo3">Subgrupo 3</option>
-                </select>
+            <div class="mb-6">
+                <label for="pwd" class="block text-black mb-2">Contraseña</label>
+                <input type="password" id="pwd" class="w-full p-2 border rounded" placeholder="Ingrese Contraseña"
+                    required>
             </div>
-            <div class="mb-4">
-                <label for="subgrupo" class="block text-black-700 mb-2">Servicio</label>
-                <select id="subgrupo" class="w-full p-2 border rounded" required>
-                    <option value="" disabled selected>Seleccione</option>
-                    <option value="subgrupo1">Subgrupo 1</option>
-                    <option value="subgrupo2">Subgrupo 2</option>
-                    <option value="subgrupo3">Subgrupo 3</option>
-                </select>
-            </div>
-            <div class="mb-4">
-                <label for="subgrupo" class="block text-black-700 mb-2">Unidad SIGCOM</label>
-                <select id="subgrupo" class="w-full p-2 border rounded" required>
-                    <option value="" disabled selected>Seleccione</option>
-                    <option value="subgrupo1">Subgrupo 1</option>
-                    <option value="subgrupo2">Subgrupo 2</option>
-                    <option value="subgrupo3">Subgrupo 3</option>
-                </select>
-            </div>
-            <div class="flex justify-between mt-6">
-                <button type="button" class="bg-red-500 text-white p-2 rounded hover:bg-red-800" id="closeModal">Cancelar</button>
-                <button type="submit" class="bg-green-500 text-white p-2 rounded hover:bg-green-800">Agregar Empleado</button>
-            </div>
+            <button type="submit" class="w-full bg-green-500 text-white p-2 rounded hover:bg-green-400">Crear
+                Usuario</button>
         </form>
+        <div class="mt-4 text-center">
+            <button id="closeModalAddUser" class="w-full bg-red-500 text-white p-2 rounded hover:bg-red-400">Cancelar</button>
+        </div>
     </div>
 </div>
