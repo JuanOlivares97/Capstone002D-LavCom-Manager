@@ -1,0 +1,100 @@
+<div id="addPatientModal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center">
+    <div class="bg-white rounded-lg shadow-xl max-w-6xl w-full p-6 relative">
+
+        <!-- Título del modal -->
+        <h2 id="modalNombre" class="text-2xl font-bold text-gray-800 mb-6 text-center m-4">Ingresar Paciente</h2>
+
+        <!-- Contenido del modal -->
+        <div class="grid grid-cols-3 gap-6">
+            <div>
+                <label class="block font-medium text-gray-700 mt-1">Numero de Cama</label>
+                <input type="text" id="cama" name="cama" class=" my-2 w-full p-2 border rounded" required>
+
+                <label class="block font-medium text-gray-700 mt-1">Nombres</label>
+                <input type="text" id="nombre" name="nombre" class=" my-2 w-full p-2 border rounded" required>
+
+                <label class="block font-medium text-gray-700 mt-1">Apellido Paterno</label>
+                <input type="text" id="apellidop" name="apellidop" class=" my-2 w-full p-2 border rounded" required>
+
+                <label class="block font-medium text-gray-700 mt-1">Apellido Materno</label>
+                <input type="text" id="apellidom" name="apellidom" class=" my-2 w-full p-2 border rounded" required>
+
+                <label class="block font-medium text-gray-700 mt-1">Fecha de Nacimiento</label>
+                <input type="text" id="FechaNacimiento" name="FechaNacimiento" class=" my-2 w-full p-2 border rounded" required>
+
+                <label class="block font-medium text-gray-700 mt-1">Observaciones Generales</label>
+                <textarea type="text" id="observacionesgenerales" name="observacionesgenerales" class=" my-2 w-full p-2 border rounded h-48 " required></textarea>
+            </div>
+
+            <div>
+                
+                <label class="block font-medium text-gray-700 mt-1">Fecha de Ingreso</label>
+                <input type="text" id="fechaIngreso" name="fechaIngreso" class=" my-2 w-full p-2 border rounded" required>
+
+                <label class="block font-medium text-gray-700 mt-1">Rut</label>
+                <input type="text" id="rut" name="rut" class=" my-2 w-full p-2 border rounded" required>
+                
+                <label class="block font-medium text-gray-700 mt-1">Telefono</label>
+                <input type="text" id="Telefonos" name="Telefonos" class=" my-2 w-full p-2 border rounded" required>
+
+                <label class="block font-medium text-gray-700 mt-1">Dirección</label>
+                <input type="text" id="Direccion" name="Direccion" class=" my-2 w-full p-2 border rounded" required>
+
+
+                <label class="block font-medium text-gray-700 mt-1">Correo</label>
+                <input type="text" id="Correo" name="Correo" class=" my-2 w-full p-2 border rounded" required>
+
+                <label class="block font-medium text-gray-700 mt-1">Observaciones Nutricionista</label>
+                <textarea type="text" id="observacionesnutricionista" name="observacionesnutricionista" class=" my-2 w-full p-2 border rounded h-48" required></textarea>
+            </div>
+
+            <div>
+                <label for="subgrupo" class="block font-medium text-gray-700 mt-1">Tipo de Servicio</label>
+                <select id="Servicio" name="Servicio" class="my-2 w-full p-2 border rounded" required>
+                    <option value="" disabled selected>Seleccione</option>
+                    <option value="subgrupo1">Subgrupo 1</option>
+                    <option value="subgrupo2">Subgrupo 2</option>
+                    <option value="subgrupo3">Subgrupo 3</option>
+                </select>
+
+                <label for="subgrupo" class="block font-medium text-gray-700 mt-1">Tipo de Unidad</label>
+                <select id="Unidad" name="Unidad" class="my-2 w-full p-2 border rounded" required>
+                    <option value="" disabled selected>Seleccione</option>
+                    <option value="subgrupo1">Subgrupo 1</option>
+                    <option value="subgrupo2">Subgrupo 2</option>
+                    <option value="subgrupo3">Subgrupo 3</option>
+                </select>
+
+                <label for="subgrupo" class="block font-medium text-gray-700 mt-1">Tipo de Via</label>
+                <select id="Via" name="Via" class="my-2 w-full p-2 border rounded" required>
+                    <option value="" disabled selected>Seleccione</option>
+                    <option value="subgrupo1">Subgrupo 1</option>
+                    <option value="subgrupo2">Subgrupo 2</option>
+                    <option value="subgrupo3">Subgrupo 3</option>
+                </select>
+
+                <label for="subgrupo" class="block font-medium text-gray-700 mt-1">Tipo de Regimen</label>
+                <select id="Regimen" name="Regimen" class="my-2 w-full p-2 border rounded" required>
+                    <option value="" disabled selected>Seleccione</option>
+                    <option value="subgrupo1">Subgrupo 1</option>
+                    <option value="subgrupo2">Subgrupo 2</option>
+                    <option value="subgrupo3">Subgrupo 3</option>
+                </select>
+            </div>
+
+        </div>
+
+        <!-- Botones -->
+        <div class="flex gap-4 justify-center">
+            <div class="my-3 flex justify-end">
+                <button id="closeModalAddPatient"  class="px-4 py-2 bg-gray-200 text-gray-800 rounded-md shadow-sm hover:bg-gray-300">Cerrar</button>
+            </div>
+            <div class="my-3 flex justify-end">
+                <button  class="px-4 py-2 bg-blue-200 text-gray-800 rounded-md shadow-sm hover:bg-gray-300">Editar</button>
+            </div>
+            <div class="my-3 flex justify-end">
+                <button  class="px-4 py-2 bg-red-200 text-gray-800 rounded-md shadow-sm hover:bg-gray-300">Ver Logs</button>
+            </div>
+        </div>
+    </div>
+</div>
