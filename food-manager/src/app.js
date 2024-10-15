@@ -11,6 +11,9 @@ app.set('layout', '_template');
 app.set('view engine', 'ejs');
 app.set('views', './src/views');
 
+
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 // Servir archivos estáticos
 app.use(express.static(path.join(__dirname, "static")))
 // Middleware de autenticación global (si es necesario)

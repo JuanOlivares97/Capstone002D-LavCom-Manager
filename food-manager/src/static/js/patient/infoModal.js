@@ -1,25 +1,25 @@
 function openModal(paciente) {
     // Llenar los campos con los datos del paciente
-    document.getElementById('infoCama').textContent = paciente.nroCama;
-    document.getElementById('infoNombre').value = paciente.nombre || '';
-    document.getElementById('InfoApellido1').value = paciente.apellido1 || '';
-    document.getElementById('infoApellido2').value = paciente.apellido2 || '';
-    document.getElementById('infoFechaNacimiento').value = paciente.fecha_nacimiento || '';
-    document.getElementById('infoObservacionesGenerales').value = paciente.observacion_sala || '';
-    document.getElementById('infoFechaIngreso').value = paciente.fecha_ingreso || '';
-    document.getElementById('infoRut').value = paciente.rut || '';
-    document.getElementById('infoTelefonos').value = paciente.telefonos || '';
-    document.getElementById('infoDireccion').value = paciente.direccion || '';
-    document.getElementById('infoCorreo').value = paciente.correo || '';
-    document.getElementById('infoObservacionesNutricionista').value = paciente.observaciones_nutri || '';
-    document.getElementById('infoFechaAlta').value = paciente.fecha_alta || '';
-    document.getElementById('infoServicioAlta').value = paciente.servicioalta || ''; 
-    document.getElementById('infoNroCama').value = paciente.camaAlta || '';
-    document.getElementById('infoObservacionesAlta').value = paciente.observacion_alta || '';
-    document.getElementById('infoUnidad').value = paciente.unidad || '';
-    document.getElementById('infoServicio').value = paciente.Servicio || '';
-    document.getElementById('infoVia').value = paciente.Via || '';
-    document.getElementById('infoRegimen').value = paciente.Regimen || '';
+    document.getElementById('infoCama').textContent = paciente.CodigoCama;
+    document.getElementById('infoNombre').value = paciente.NombreHospitalizado || '';
+    document.getElementById('InfoApellido1').value = paciente.ApellidoP || '';
+    document.getElementById('infoApellido2').value = paciente.ApellidoM || '';
+    document.getElementById('infoFechaNacimiento').value = paciente.FechaNacimiento || '';
+    document.getElementById('infoObservacionesGenerales').value = paciente.ObservacionesSala || '';
+    document.getElementById('infoFechaIngreso').value = paciente.FechaIngreso || '';
+    document.getElementById('infoRut').value = (paciente.RutHospitalizado + '-' + paciente.DvHospitalizado) || '';
+    document.getElementById('infoTelefonos').value = paciente.Telefono || '';
+    document.getElementById('infoDireccion').value = paciente.Direccion || '';
+    document.getElementById('infoCorreo').value = paciente.Correo || '';
+    document.getElementById('infoObservacionesNutricionista').value = paciente.ObservacionesNutricionista || '';
+    document.getElementById('infoFechaAlta').value = paciente.FechaAlta || '';
+    document.getElementById('infoServicioAlta').value = paciente.ServicioAlta || ''; 
+    document.getElementById('infoNroCama').value = paciente.CodigoCamaAlta || '';
+    document.getElementById('infoObservacionesAlta').value = paciente.ObservacionesAlta || '';
+    document.getElementById('infoUnidad').value = paciente.IdTipoUnidad || '';
+    document.getElementById('infoServicio').value = paciente.IdTipoServicio || '';
+    document.getElementById('infoVia').value = paciente.IdTipoVia || '';
+    document.getElementById('infoRegimen').value = paciente.IdTipoRegimen || '';
 
     // Mostrar el modal
     document.getElementById('patientModal').classList.remove('hidden');
