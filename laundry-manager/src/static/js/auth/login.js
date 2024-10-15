@@ -16,7 +16,7 @@ form.addEventListener("submit", async (e) => {
     const data = await response.json();
 
     if (!data.success) {
-        Swal .fire({
+        Swal.fire({
             icon: "error",
             title: "Error",
             text: data.message,
@@ -33,11 +33,43 @@ form.addEventListener("submit", async (e) => {
         element.disabled = true;
     });
 
+    if (data.user.email == null) {
+        const { value: email } = await Swal.fire({
+            title: "No tiene registrado un correo electrónico, ingrese uno",
+            input: "email",
+            icon: "info",
+            inputPlaceholder: "ejemplo@mail.com",
+            toast: true,
+            position: 'top-end',
+        });
+        if (email) {
+            const response_email = await fetch("/auth/set-email", {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ email, id_usuario: data.user.id_usuario })
+            });
+            const data_email = await response_email.json();
+            if (!data_email.success) {
+                Swal.fire({
+                    icon: "error",
+                    title: "Error",
+                    text: data_email.message,
+                    confirmButtonText: "Reintentar",
+                    toast: true,
+                    position: 'top-end'
+                });
+                return;
+            }
+            console.log(data_email.message)
+        }
+    }
     Swal.fire({
         icon: "success",
         title: "Inicio de sesión exitoso",
         text: data.message,
-        timer: 1000, // La alerta se mostrará durante 3 segundos
+        timer: 5000, // La alerta se mostrará durante 3 segundos
         timerProgressBar: true,
         toast: true,
         position: 'top-end',
@@ -45,5 +77,5 @@ form.addEventListener("submit", async (e) => {
         willClose: () => {
             window.location.href = "/dashboard/home"; // Redirigir cuando la alerta se cierre
         }
-    });    
+    });
 });
