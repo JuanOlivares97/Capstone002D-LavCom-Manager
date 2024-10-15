@@ -54,10 +54,38 @@ async function login(req, res) {
         res.cookie("tipo_usuario", user.id_tipo_usuario, { path: "/" });
         res.cookie("rutLogueado", user.rut_usuario, { path: "/" });
         res.cookie("dvLogueado", user.dv_usuario, { path: "/" });
-        return res.status(200).json({ message: "Has iniciado sesión, bienvenido", success: true });
+        return res.status(200).json({ message: "Has iniciado sesión, bienvenido", success: true, user });
     } catch (error) {
         return res.status(500).json({ message: "Internal server error", success: false });
     } 
+}
+
+async function setEmail(req, res) {
+    try {
+        const email = req.body.email;
+        const user = await prisma.usuarios.findUnique({ where: { id_usuario: req.body.id_usuario } });
+
+        console.log(user);
+
+        if (!user) {
+            return res.status(401).json({ message: "Usuario no encontrado", success: false });
+        }
+
+        const updatedUser = await prisma.usuarios.update({
+            where: { id_usuario: req.body.id_usuario },
+            data: {
+                email: email
+            }
+        });
+
+        if (!updatedUser) {
+            return res.status(500).json({ message: "Error al actualizar el correo electrónico", success: false });
+        }
+
+        return res.status(200).json({ message: "Correo electrónico establecido", success: true });
+    } catch (error) {
+        return res.status(500).json({ message: "Internal server error", success: false });
+    }
 }
 
 async function logout(req, res) {
@@ -75,5 +103,6 @@ module.exports = {
     renderRecuperarContrasenaForm,
     renderRecuperarContrasenaInfo,
     login,
-    logout
+    logout,
+    setEmail
 }
