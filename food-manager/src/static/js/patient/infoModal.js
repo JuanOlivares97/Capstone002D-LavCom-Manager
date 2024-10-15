@@ -1,13 +1,25 @@
 function openModal(paciente) {
     // Llenar los campos con los datos del paciente
-    document.getElementById('modalNombre').textContent = paciente.nombre;
-    document.getElementById('modalApellido1').value = paciente.apellido1 || '';
-    document.getElementById('modalApellido2').value = paciente.apellido2 || '';
-    document.getElementById('modalFechaNacimiento').value = paciente.fecha_nacimiento || '';
-    document.getElementById('modalTelefonos').value = paciente.telefonos || '';
-    document.getElementById('modalDireccion').value = paciente.direccion || '';
-    document.getElementById('modalDNI').value = paciente.dni || '';
-    document.getElementById('modalCorreo').value = paciente.correo || '';
+    document.getElementById('infoCama').textContent = paciente.nroCama;
+    document.getElementById('infoNombre').value = paciente.nombre || '';
+    document.getElementById('InfoApellido1').value = paciente.apellido1 || '';
+    document.getElementById('infoApellido2').value = paciente.apellido2 || '';
+    document.getElementById('infoFechaNacimiento').value = paciente.fecha_nacimiento || '';
+    document.getElementById('infoObservacionesGenerales').value = paciente.observacion_sala || '';
+    document.getElementById('infoFechaIngreso').value = paciente.fecha_ingreso || '';
+    document.getElementById('infoRut').value = paciente.rut || '';
+    document.getElementById('infoTelefonos').value = paciente.telefonos || '';
+    document.getElementById('infoDireccion').value = paciente.direccion || '';
+    document.getElementById('infoCorreo').value = paciente.correo || '';
+    document.getElementById('infoObservacionesNutricionista').value = paciente.observaciones_nutri || '';
+    document.getElementById('infoFechaAlta').value = paciente.fecha_alta || '';
+    document.getElementById('infoServicioAlta').value = paciente.servicioalta || ''; 
+    document.getElementById('infoNroCama').value = paciente.camaAlta || '';
+    document.getElementById('infoObservacionesAlta').value = paciente.observacion_alta || '';
+    document.getElementById('infoUnidad').value = paciente.unidad || '';
+    document.getElementById('infoServicio').value = paciente.Servicio || '';
+    document.getElementById('infoVia').value = paciente.Via || '';
+    document.getElementById('infoRegimen').value = paciente.Regimen || '';
 
     // Mostrar el modal
     document.getElementById('patientModal').classList.remove('hidden');
