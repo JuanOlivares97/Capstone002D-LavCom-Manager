@@ -1,39 +1,119 @@
-<div class="p-10">
-    <div class="flex gap-2 my-2">
-        <div class="bg-white rounded-lg shadow-md p-6 flex-1 mx-auto">
-            <div class="flex justify-between items-center mb-4">
-                <h2 class="text-xl font-semibold text-gray-800">Total Revenue</h2> 
-            </div>
-            <div class="text-3xl font-bold text-gray-900 mb-2">$24,560</div>
+<div class="container mx-auto px-4 py-8">
+    <h1 class="text-3xl font-bold text-center text-gray-800 mb-8">Dashboard de Colaciones - Hospital de Melipilla</h1>
+    
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <!-- KPI: Colaciones Entregadas (Funcionarios) -->
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <h2 class="text-xl font-semibold text-gray-800 mb-2">Colaciones Funcionarios</h2>
+            <p class="text-3xl font-bold text-blue-600">800</p>
+            <p class="text-sm text-gray-600">Entregadas hoy</p>
         </div>
 
-        <div class="bg-white rounded-lg shadow-md p-6 flex-1 mx-auto">
-            <div class="flex justify-between items-center mb-4">
-                <h2 class="text-xl font-semibold text-gray-800">Total Revenue</h2>
-            </div>
-            <div class="text-3xl font-bold text-gray-900 mb-2">$24,560</div>
+        <!-- KPI: Colaciones Entregadas (Pacientes) -->
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <h2 class="text-xl font-semibold text-gray-800 mb-2">Colaciones Pacientes</h2>
+            <p class="text-3xl font-bold text-green-600">1000</p>
+            <p class="text-sm text-gray-600">Entregadas hoy</p>
         </div>
 
-        <div class="bg-white rounded-lg shadow-md p-6 flex-1 mx-auto">
-            <div class="flex justify-between items-center mb-4">
-                <h2 class="text-xl font-semibold text-gray-800">Total Revenue</h2>
-            </div>
-            <div class="text-3xl font-bold text-gray-900 mb-2">$24,560</div>
+        <!-- KPI: Satisfacción Promedio -->
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <h2 class="text-xl font-semibold text-gray-800 mb-2">Satisfacción Promedio</h2>
+            <p class="text-3xl font-bold text-yellow-600">5</p>
+            <p class="text-sm text-gray-600">Basado en encuestas</p>
         </div>
 
-        <div class="bg-white rounded-lg shadow-md p-6 flex-1 mx-auto">
-            <div class="flex justify-between items-center mb-4">
-                <h2 class="text-xl font-semibold text-gray-800">Total Revenue</h2>
-            </div>
-            <div class="text-3xl font-bold text-gray-900 mb-2">$24,560</div>
+        <!-- KPI: Eficiencia de Entrega -->
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <h2 class="text-xl font-semibold text-gray-800 mb-2">Eficiencia de Entrega</h2>
+            <p class="text-3xl font-bold text-purple-600">100</p>
+            <p class="text-sm text-gray-600">Tiempo promedio de entrega</p>
         </div>
     </div>
-    <div class="flex gap-2 my-2">
-        <div class="bg-white rounded-lg shadow-md p-6 mx-auto flex-1">
-            <div id="chartForLines"></div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <!-- Gráfico de Líneas: Tendencia de Colaciones -->
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <h2 class="text-xl font-semibold text-gray-800 mb-4">Tendencia de Colaciones</h2>
+            <canvas id="tendenciaColaciones"></canvas>
         </div>
-        <div class="bg-white rounded-lg shadow-md p-6 mx-auto flex-1">
-            <div id="chartForPie"></div>
+
+        <!-- Gráfico de Pastel: Distribución de Tipos de Colaciones -->
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <h2 class="text-xl font-semibold text-gray-800 mb-4">Distribución de Tipos de Colaciones</h2>
+            <canvas id="distribucionColaciones"></canvas>
         </div>
     </div>
 </div>
+
+<script>
+    // Datos para el gráfico de tendencia (ejemplo)
+    const dataTendencia = {
+        labels: ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'],
+        datasets: [{
+            label: 'Funcionarios',
+            data: [120, 135, 130, 125, 140, 110, 105],
+            borderColor: 'rgb(59, 130, 246)',
+            tension: 0.1
+        }, {
+            label: 'Pacientes',
+            data: [200, 210, 205, 215, 220, 200, 195],
+            borderColor: 'rgb(16, 185, 129)',
+            tension: 0.1
+        }]
+    };
+
+    // Datos para el gráfico de distribución (ejemplo)
+    const dataDistribucion = {
+        labels: ['Normal', 'Vegetariana', 'Sin Gluten', 'Baja en Sodio'],
+        datasets: [{
+            data: [50, 20, 15, 15],
+            backgroundColor: [
+                'rgb(59, 130, 246)',
+                'rgb(16, 185, 129)',
+                'rgb(251, 191, 36)',
+                'rgb(236, 72, 153)'
+            ]
+        }]
+    };
+
+    // Configuración y renderizado de gráficos
+    window.onload = function() {
+        const ctxTendencia = document.getElementById('tendenciaColaciones').getContext('2d');
+        new Chart(ctxTendencia, {
+            type: 'line',
+            data: dataTendencia,
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    },
+                    title: {
+                        display: true,
+                        text: 'Colaciones por Día'
+                    }
+                }
+            }
+        });
+
+        const ctxDistribucion = document.getElementById('distribucionColaciones').getContext('2d');
+        new Chart(ctxDistribucion, {
+            type: 'pie',
+            data: dataDistribucion,
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    },
+                    title: {
+                        display: true,
+                        text: 'Tipos de Colaciones'
+                    }
+                }
+            }
+        });
+    };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
