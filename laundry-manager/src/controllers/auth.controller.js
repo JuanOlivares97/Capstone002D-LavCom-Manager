@@ -1,6 +1,7 @@
 const prisma = require("../server/prisma");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const mailer = require("../server/mailer")
 
 function renderLogin(req, res) {
     try {
@@ -88,6 +89,34 @@ async function setEmail(req, res) {
     }
 }
 
+async function sendPwdEmail(req, res) {
+    try {
+        const email = req.body.email
+        const username = req.body.username
+
+        const user = await prisma.usuarios.findUnique({
+            where: {
+                username: username,
+                email: email
+            }
+        })
+
+        if (!user) {
+            return res.status(500).json({message: "Usuario no encontrado"})
+        }
+
+        const code = Math.floor(Math.random() * (9999 - 1000 + 1)) + 1000;
+
+        res.cookie("pwdcode", bcrypt.hashSync(code.toString(), 10), {path: "/"})
+
+        await mailer.enviarCorreo(email, code.toString())
+
+        return res.redirect("/auth/recuperar-pwd-info")
+    } catch (error) {
+        return res.status(500).json({ message: "Internal server error", error})
+    }
+}
+
 async function logout(req, res) {
     try {
         res.clearCookie("token");
@@ -104,5 +133,6 @@ module.exports = {
     renderRecuperarContrasenaInfo,
     login,
     logout,
-    setEmail
+    setEmail,
+    sendPwdEmail
 }
