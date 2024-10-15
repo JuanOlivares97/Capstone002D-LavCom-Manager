@@ -8,7 +8,7 @@ const enviarCorreo = async (formulario) => {
         port: 587,
         auth: {
             user: "lav.test2023@gmail.com",
-            pass: "ihzv ykdz xbgn mwts"
+            pass: process.env.EMAIL_PWD
         }
     }
     // configuración del mensaje
