@@ -4,8 +4,9 @@ const authController = require('../controllers/auth.controller');
 const router = Router();
 
 router.get('/login', authController.renderLogin); 
-router.get('/recuperar_pwd_form', authController.renderRecuperarContrasenaForm);
-router.get('/recuperar_pwd_info', authController.renderRecuperarContrasenaInfo);
+router.get('/recuperar-pwd-form', authController.renderRecuperarContrasenaForm);
+router.post('/send-pwd-mail', authController.sendPwdEmail)
+router.get('/recuperar-pwd-info', authController.renderRecuperarContrasenaInfo);
 router.post('/login', authController.login);
 router.put('/set-email', authController.setEmail);
 
