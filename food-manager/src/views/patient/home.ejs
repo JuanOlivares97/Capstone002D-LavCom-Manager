@@ -1,3 +1,4 @@
+<%- include('../components/modals/patients/addPatientModal') %>
 <!-- Secciones de navegación -->
 <div class="flex justify-center bg-gray-300 py-2">
     <a href="#" class="px-4 py-2 text-gray-700 hover:bg-indigo-500 hover:text-white  rounded"
@@ -18,7 +19,7 @@
 <!-- Barra de búsqueda y agregar paciente -->
 <div class="flex justify-around items-center p-4 bg-gray-200 ">
     <div class="flex items-center space-x-2">
-        <button class="p-2 bg-indigo-500 text-white rounded-full hover:shadow-lg flex items-center gap-2">
+        <button id="addPatient" class="p-2 bg-indigo-500 text-white rounded-full hover:shadow-lg flex items-center gap-2">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
                 class="w-5 h-5">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
@@ -72,4 +73,7 @@
 
 <!-- Modal para mostrar información del paciente -->
 <%- include('../components/modals/patients/infoPatientModal') %>
-    <script src="/js/patient/infoModal.js" defer></script>
+
+
+<script src="/js/patient/infoModal.js" defer></script>
+<script src="/js/patient/openModal.js" defer></script>
