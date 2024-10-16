@@ -1,19 +1,26 @@
 <%- include('../components/modals/patients/addPatientModal') %>
 <!-- Secciones de navegación -->
-<div class="flex justify-center bg-gray-300 py-2">
-    <a href="#" class="px-4 py-2 text-gray-700 hover:bg-indigo-500 hover:text-white  rounded"
-        onclick="filterByUnit('Medicina')">Medicina</a>
-        <a href="#" class="px-4 py-2 text-gray-700 hover:bg-indigo-500 hover:text-white rounded" onclick="filterByUnit('Cirugía')">Cirugía</a>
-        <a href="#" class="px-4 py-2 text-gray-700 hover:bg-indigo-500 hover:text-white rounded" onclick="filterByUnit('UPC')">UPC</a>
-        <a href="#" class="px-4 py-2 text-gray-700 hover:bg-indigo-500 hover:text-white rounded"
-            onclick="filterByUnit('Pediatría')">Pediatría</a>
-        <a href="#" class="px-4 py-2 text-gray-700 hover:bg-indigo-500 hover:text-white rounded"
-            onclick="filterByUnit('Pensionado')">Pensionado</a>
-        <a href="#" class="px-4 py-2 text-gray-700 hover:bg-indigo-500 hover:text-white rounded"
-            onclick="filterByUnit('GineObstetricia')">GineObstetricia</a>
-        <a href="#" class="px-4 py-2 text-gray-700 hover:bg-indigo-500 hover:text-white rounded"
-            onclick="filterByUnit('Urgencia')">Urgencia</a>
-        <a href="#" class="px-4 py-2 text-gray-700 hover:bg-indigo-500 hover:text-white rounded" onclick="filterByUnit('CMA')">CMA</a>
+<!-- Botón para alternar la visibilidad de las unidades -->
+<!-- Contenedor del overlay (cubrirá toda la pantalla) -->
+<div id="overlay" class="fixed inset-0 bg-black bg-opacity-50 hidden z-40" onclick="closeSidebar()"></div>
+
+<!-- Contenedor del sidebar -->
+<div id="sidebarUnits" class="fixed right-0 top-0 w-80 h-full bg-white shadow-xl transform translate-x-full transition-transform duration-300 ease-in-out z-50">
+    <div class="p-4 border-b flex justify-between items-center">
+        <h2 class="text-lg font-bold text-gray-700">Unidades</h2>
+        <button onclick="closeSidebar()" class="text-gray-700 hover:text-red-600">
+            &times; <!-- Icono de cerrar -->
+        </button>
+    </div>
+    <!-- Contenedor de las unidades con scroll -->
+    <div class="p-4 overflow-y-auto h-[calc(100%-4rem)]">
+        <% unidades.forEach(unidad => { %>
+            <label class="block px-4 py-2 text-gray-700 hover:bg-indigo-500 hover:text-white rounded my-1"
+               onclick="filterByUnit('<%= unidad.IdTipoUnidad %>')">
+               <%= unidad.DescTipoUnidad %>
+        </label>
+        <% }) %>
+    </div>
 </div>
 
 <!-- Barra de búsqueda y agregar paciente -->
@@ -54,10 +61,15 @@
         </button>
     </div>
 </div>
+<div class="flex justify-end items-center p-4 mr-8">
+    <button onclick="openSidebar()" class="bg-blue-600 text-white px-4 py-2 rounded">
+        Filtrar por Unidades
+    </button>
+</div>
 <!-- Contenedor de pacientes -->
 <div id="cardGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-5 p-6">
     <% pacientes.forEach(paciente => { %>
-        <div class="bg-white rounded-lg shadow-lg p-5 cursor-pointer transition-transform duration-300 ease-in-out hover:transform hover:-translate-y-1" data-unidad="<%= paciente.unidad %>"
+        <div class="bg-white rounded-lg shadow-lg p-5 cursor-pointer transition-transform duration-300 ease-in-out hover:transform hover:-translate-y-1" data-unidad="<%= paciente.IdTipoUnidad %>"
             onclick='openModal(<%= JSON.stringify(paciente) %>)'>
             <h2 class="text-gray-800 font-bold text-xl mb-2">
                 <%= paciente.NombreHospitalizado %>
@@ -77,3 +89,25 @@
 
 <script src="/js/patient/infoModal.js" defer></script>
 <script src="/js/patient/openModal.js" defer></script>
+
+<script>
+function openSidebar() {
+    const sidebar = document.getElementById('sidebarUnits');
+    const overlay = document.getElementById('overlay');
+    sidebar.classList.remove('translate-x-full');
+    sidebar.classList.add('translate-x-0');
+    overlay.classList.remove('hidden');
+    overlay.classList.add('block');
+}
+
+function closeSidebar() {
+    const sidebar = document.getElementById('sidebarUnits');
+    const overlay = document.getElementById('overlay');
+    sidebar.classList.remove('translate-x-0');
+    sidebar.classList.add('translate-x-full');
+    overlay.classList.remove('block');
+    overlay.classList.add('hidden');
+}
+
+
+</script>
