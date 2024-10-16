@@ -4,7 +4,7 @@ async function renderHome(req, res) {
     res.render('maintainer/home', { tipoUsuario: 1 });
 }
 
-async function getEstamento(req, res) {
+async function getEstamento() {
     try {
         const Estamento = await prisma.TipoEstamento.findMany({
             where: {
@@ -14,7 +14,7 @@ async function getEstamento(req, res) {
         });
         return Estamento;
     } catch (error) {
-        return res.status(500).json({ message: "Internal server error" });
+        throw new Error("Error al obtener los Estamento: " + error.message);
     }
 }
 
@@ -31,7 +31,7 @@ async function getServicio() {
     }
 }
 
-async function getUnidad(req, res) {
+async function getUnidad() {
     try {
         const Unidad = await prisma.TipoUnidad.findMany({
             where: {
@@ -41,25 +41,20 @@ async function getUnidad(req, res) {
         });
         return Unidad;
     } catch (error) {
-        return res.status(500).json({ message: "Internal server error" });
+        throw new Error("Error al obtener los Unidad: " + error.message);
     }
 }
 
-async function getVia(req, res) {
+async function getVia() {
     try {
-        const Via = await prisma.TipoVia.findMany({
-            where: {
-                Habilitado: 'S'
-            },
-            
-        });
+        const Via = await prisma.TipoVia.findMany();
         return Via;
     } catch (error) {
-        return res.status(500).json({ message: "Internal server error" });
+        throw new Error("Error al obtener los Via: " + error.message);
     }
 }
 
-async function getRegimen(req, res) {
+async function getRegimen() {
     try {
         const Regimen = await prisma.TipoRegimen.findMany({
             where: {
@@ -69,7 +64,7 @@ async function getRegimen(req, res) {
         });
         return Regimen;
     } catch (error) {
-        return res.status(500).json({ message: "Internal server error" });
+        throw new Error("Error al obtener los Regimen: " + error.message);
     }
 }
 
