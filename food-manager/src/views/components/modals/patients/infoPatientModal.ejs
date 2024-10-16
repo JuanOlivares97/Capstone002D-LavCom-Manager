@@ -15,7 +15,7 @@
         <div class="grid grid-cols-4 gap-4">
             <div>
                 <label class="block font-medium text-gray-700 my-2">Numero de Cama</label>
-                <input type="text" id="infoCama" name="infoCama" class="my-2 w-full p-2 border rounded">
+                <input type="number" id="infoCama" name="infoCama" class="my-2 w-full p-2 border rounded">
 
                 <label class="block font-medium text-gray-700 my-2">Nombres</label>
                 <input type="text" id="infoNombre" name="infoNombre" class="my-2 w-full p-2 border rounded" readonly>
@@ -29,7 +29,7 @@
                     readonly>
 
                 <label class="block font-medium text-gray-700 my-2">Fecha de Nacimiento</label>
-                <input type="text" id="infoFechaNacimiento" name="infoFechaNacimiento"
+                <input type="date" id="infoFechaNacimiento" name="infoFechaNacimiento"
                     class="my-2 w-full p-2 border rounded" readonly>
 
                 <label class="block font-medium text-gray-700 my-2">Observaciones Generales</label>
@@ -40,14 +40,14 @@
             <div>
 
                 <label class="block font-medium text-gray-700 my-2">Fecha de Ingreso</label>
-                <input type="text" id="infoFechaIngreso" name="infoFechaIngreso" class="my-2 w-full p-2 border rounded"
+                <input type="date" id="infoFechaIngreso" name="infoFechaIngreso" class="my-2 w-full p-2 border rounded"
                     readonly>
 
                 <label class="block font-medium text-gray-700 my-2">Rut</label>
                 <input type="text" id="infoRut" name="infoRut" class="my-2 w-full p-2 border rounded" readonly>
 
                 <label class="block font-medium text-gray-700 my-2">Telefono</label>
-                <input type="text" id="infoTelefonos" name="infoTelefonos" class="my-2 w-full p-2 border rounded"
+                <input type="number" id="infoTelefonos" name="infoTelefonos" class="my-2 w-full p-2 border rounded"
                     readonly>
 
                 <label class="block font-medium text-gray-700 my-2">Dirección</label>
@@ -56,7 +56,7 @@
 
 
                 <label class="block font-medium text-gray-700 my-2">Correo</label>
-                <input type="text" id="infoCorreo" name="infoCorreo" class="my-2 w-full p-2 border rounded" readonly>
+                <input type="email" id="infoCorreo" name="infoCorreo" class="my-2 w-full p-2 border rounded" readonly>
 
                 <label class="block font-medium text-gray-700 my-2">Observaciones Nutricionista</label>
                 <textarea type="text" id="infoObservacionesNutricionista" name="infoObservacionesNutricionista"
@@ -65,15 +65,21 @@
 
             <div>
                 <label class="block font-medium text-gray-700 my-2">Fecha de Alta</label>
-                <input type="text" id="infoFechaAlta" name="infoFechaAlta" class="my-2 w-full p-2 border rounded"
+                <input type="date" id="infoFechaAlta" name="infoFechaAlta" class="my-2 w-full p-2 border rounded"
                     readonly>
 
                 <label class="block font-medium text-gray-700 my-2">Nro Cama de Alta</label>
-                <input type="text" id="infoNroCama" name="infoNroCama" class="my-2 w-full p-2 border rounded" readonly>
+                <input type="number" id="infoNroCama" name="infoNroCama" class="my-2 w-full p-2 border rounded" readonly>
 
                 <label class="block font-medium text-gray-700 my-2">Servicio de Alta</label>
-                <input type="text" id="infoServicioAlta" name="infoServicioAlta" class="my-2 w-full p-2 border rounded"
-                    readonly>
+                <select id="infoServicioAlta" name="infoServicioAlta" class="my-2 w-full p-2 border rounded" required>
+                    <option value="" disabled selected>Seleccione</option>
+                    <% servicios.forEach(servicio=> { %>
+                        <option value="<%= servicio.IdTipoServicio %>">
+                            <%= servicio.DescTipoServicio %>
+                        </option>
+                        <% }) %>
+                </select>
 
                 <label class="block font-medium text-gray-700 my-2">Observaciones de Alta</label>
                 <textarea type="text" id="infoObservacionesAlta" name="infoObservacionesAlta"
@@ -95,25 +101,25 @@
                 <label for="infoUnidad" class="block font-medium text-gray-700 my-2">Tipo de Unidad</label>
                 <select id="infoUnidad" name="infoUnidad" class="my-2 w-full p-2 border rounded" required>
                     <option value="" disabled selected>Seleccione</option>
-                    <option value="1">Medicina</option>
-                    <option value="subgrupo2">Subgrupo 2</option>
-                    <option value="subgrupo3">Subgrupo 3</option>
+                    <% unidades.forEach(unidad=> { %>
+                    <option value="<%= unidad.IdTipoUnidad %>"><%= unidad.DescTipoUnidad %></option>
+                    <% }) %>
                 </select>
 
                 <label for="infoVia" class="block font-medium text-gray-700 my-2">Tipo de Via</label>
                 <select id="infoVia" name="infoVia" class="my-2 w-full p-2 border rounded" required>
                     <option value="" disabled selected>Seleccione</option>
-                    <option value="subgrupo1">Subgrupo 1</option>
-                    <option value="subgrupo2">Subgrupo 2</option>
-                    <option value="subgrupo3">Subgrupo 3</option>
+                    <% vias.forEach(via=> { %>
+                    <option  value="<%= via.IdTipoVia %>"><%= via.DescTipoVia %></option>
+                    <% }) %>
                 </select>
 
                 <label for="infoRegimen" class="block font-medium text-gray-700 my-2">Tipo de Regimen</label>
                 <select id="infoRegimen" name="infoRegimen" class="my-2 w-full p-2 border rounded" required>
                     <option value="" disabled selected>Seleccione</option>
-                    <option value="1">Regimen</option>
-                    <option value="subgrupo2">Subgrupo 2</option>
-                    <option value="subgrupo3">Subgrupo 3</option>
+                    <% regimen.forEach(reg=> { %>
+                    <option  value="<%= reg.IdTipoRegimen %>"><%= reg.DescTipoRegimen%></option>
+                    <% }) %>
                 </select>
             </div>
         </div>
