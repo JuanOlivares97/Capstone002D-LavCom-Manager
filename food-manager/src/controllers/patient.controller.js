@@ -1,11 +1,17 @@
 const prisma = require('../server/prisma');
-const { getServicio } = require('./maintainer.controller');
+const {
+    getServicio,
+    getUnidad,
+    getVia,
+    getRegimen } = require('./maintainer.controller');
 
 async function renderHome(req, res) {
     try {
         // Obtener los servicios
         const servicios = await getServicio();
-
+        const unidades = await getUnidad();
+        const vias = await getVia();
+        const regimen = await getRegimen();
         // Obtener los pacientes
         const pacientes = await prisma.Hospitalizado.findMany({
             where: {
@@ -31,7 +37,7 @@ async function renderHome(req, res) {
         });
 
         // Renderizar la vista y pasar los servicios y pacientes
-        res.render('patient/home', { tipoUsuario: 1, pacientes: pacientesConEdad, servicios });
+        res.render('patient/home', { tipoUsuario: 1, pacientes: pacientesConEdad, servicios, unidades,vias,regimen });
     } catch (error) {
         return res.status(500).json({ message: "Internal server error " + error });
     }
