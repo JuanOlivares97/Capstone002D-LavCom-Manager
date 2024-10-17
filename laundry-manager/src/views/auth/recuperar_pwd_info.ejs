@@ -19,9 +19,25 @@
             <%- include("../icons/logo_hospital") %>
         </div>
         <h1 class="text-2xl mb-4 text-center">Recuperar contraseña</h1>
-        <p class="text-black-700 text-center mb-6">Un mensaje ha sido enviado a tu correo, para reestablecer tu contraseña
-            sigue los pasos escritos en ese correo.</p>
-        <button class="w-full bg-black text-white p-2 rounded hover:bg-gray-800 transition duration-300">Regresar</button>
+        <p class="text-black-700 text-center mb-6">
+            Hemos enviado un código de recuperación a tu correo electrónico. Por favor, ingresalo junto con tu nueva contraseña.
+        </p>
+        <form id="form_nueva_pwd">
+            <div class="flex justify-center space-x-2 mb-4">
+                <input type="text" maxlength="1" class="w-12 h-12 text-center border-2 border-gray-300 rounded focus:outline-none focus:border-black" required/>
+                <input type="text" maxlength="1" class="w-12 h-12 text-center border-2 border-gray-300 rounded focus:outline-none focus:border-black" required/>
+                <input type="text" maxlength="1" class="w-12 h-12 text-center border-2 border-gray-300 rounded focus:outline-none focus:border-black" required/>
+                <input type="text" maxlength="1" class="w-12 h-12 text-center border-2 border-gray-300 rounded focus:outline-none focus:border-black" required/>
+            </div>
+            <div class="mb-4">
+                <input type="password" name="pwd1" class="w-full p-2 border rounded-lg" placeholder="Nueva contraseña" required>
+            </div>
+            <div class="mb-4">
+                <input type="password" name="pwd2" class="w-full p-2 border rounded-lg" placeholder="Confirme nueva contraseña" required>
+            </div>
+            <button type="submit" class="w-full bg-black text-white p-2 rounded hover:bg-gray-800 transition duration-300">Confirmar</button>
+        </form>
     </div>
+    <script src="/js/auth/change_pwd.js"></script>
 </body>
 </html>
