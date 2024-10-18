@@ -1,6 +1,7 @@
 function openModal(paciente) {
     // Llenar los campos con los datos del paciente
-    document.getElementById('infoCama').textContent = paciente.CodigoCama;
+    document.getElementById('idPaciente').value = paciente.IdHospitalizado;  // Asignar el ID al campo de input
+    document.getElementById('infoCama').value = paciente.CodigoCama || ''; // Asignar el valor al campo de input
     document.getElementById('infoNombre').value = paciente.NombreHospitalizado || '';
     document.getElementById('InfoApellido1').value = paciente.ApellidoP || '';
     document.getElementById('infoApellido2').value = paciente.ApellidoM || '';
@@ -13,7 +14,7 @@ function openModal(paciente) {
     document.getElementById('infoCorreo').value = paciente.Correo || '';
     document.getElementById('infoObservacionesNutricionista').value = paciente.ObservacionesNutricionista || '';
     document.getElementById('infoFechaAlta').value = paciente.FechaAlta || '';
-    document.getElementById('infoServicioAlta').value = paciente.ServicioAlta || ''; 
+    document.getElementById('infoServicioAlta').value = paciente.ServicioAlta || '';
     document.getElementById('infoNroCama').value = paciente.CodigoCamaAlta || '';
     document.getElementById('infoObservacionesAlta').value = paciente.ObservacionesAlta || '';
     document.getElementById('infoUnidad').value = paciente.IdTipoUnidad || '';
@@ -23,8 +24,56 @@ function openModal(paciente) {
 
     // Mostrar el modal
     document.getElementById('patientModal').classList.remove('hidden');
+
+    const logMovimientosPaciente = document.getElementById('logMovimientosPaciente');
+    const movimientosList = document.getElementById('movimientosList');
+
+    // Reiniciar los datos de los logs
+    movimientosList.innerHTML = '';
+    logMovimientosPaciente.classList.add('hidden');
 }
 
+async function toggleLogs() {
+    const logMovimientosPaciente = document.getElementById('logMovimientosPaciente');
+    const movimientosList = document.getElementById('movimientosList');
+
+    if (logMovimientosPaciente.classList.contains('hidden')) {
+        logMovimientosPaciente.classList.remove('hidden');
+
+        // Aquí se hace la solicitud al servidor para obtener los movimientos del paciente
+        try {
+            const patientId = document.getElementById('idPaciente').value;
+            if (!patientId) {
+                throw new Error('No se ha proporcionado el ID del paciente');
+            }
+            const response = await fetch(`/patient/movements/${patientId}`);
+
+            if (!response.ok) {
+                throw new Error('Error al obtener los movimientos del paciente');
+            }
+
+            const movimientos = await response.json();
+
+            // Llenar los logs con los datos obtenidos
+            movimientosList.innerHTML = ''; // Limpiar la lista primero
+
+            movimientos.forEach(movimiento => {
+                const movimientoItem = document.createElement('li');
+                movimientoItem.classList.add('p-3', 'bg-white', 'rounded-lg', 'shadow');
+                movimientoItem.innerHTML = `
+                    <p class="font-semibold">Fecha: ${new Date(movimiento.fechaLog).toLocaleDateString()}</p>
+                    <p>Descripción: ${movimiento.descripcionLog}</p>
+                `;
+                movimientosList.appendChild(movimientoItem);
+            });
+
+        } catch (error) {
+            console.error('Hubo un problema al cargar los movimientos:', error);
+        }
+    } else {
+        logMovimientosPaciente.classList.add('hidden');
+    }
+}
 function closeModal() {
     // Ocultar el modal
     document.getElementById('patientModal').classList.add('hidden');
@@ -80,3 +129,4 @@ function formatRut(input) {
     }
     input.value = value;
 }
+
