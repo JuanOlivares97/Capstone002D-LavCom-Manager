@@ -6,5 +6,5 @@ router.get('/home', patientController.renderHome)
 router.get('/get-pacientes', patientController.getPacientes)
 
 router.post('/create-paciente', patientController.createPaciente)
-
+router.get('/movements/:id',patientController.getMovimientosPaciente)
 module.exports = router;
