@@ -43,7 +43,6 @@ async function renderHome(req, res) {
     }
 }
 
-
 async function getPacientes(req, res) {
     try {
         const pacientes = await prisma.hospitalizado.findMany({
@@ -67,7 +66,6 @@ async function getPacientes(req, res) {
         return res.status(500).json({ message: "Internal server error " + error });
     }
 }
-
 
 async function createPaciente(req, res) {
     try {
@@ -139,7 +137,6 @@ async function createPaciente(req, res) {
     }
 }
 
-
 function calcularEdad(fechaNacimiento) {
     const hoy = new Date();
     const fechaNac = new Date(fechaNacimiento);
@@ -151,11 +148,25 @@ function calcularEdad(fechaNacimiento) {
     return edad;
 }
 
+async function getMovimientosPaciente(req, res) {
+    const idPaciente = parseInt(req.params.id);
+    try {
+        const movimientos = await prisma.logMovimientosPaciente.findMany({
+            where: {
+                idPaciente: idPaciente
+            }
+        });
+        return res.status(200).json(movimientos);
+    } catch (error) {
+        return res.status(500).json({ message: "Internal server error " + error });
+    }
+}
 
 
 
 module.exports = {
     renderHome,
     getPacientes,
-    createPaciente
+    createPaciente,
+    getMovimientosPaciente
 }
