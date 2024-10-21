@@ -80,12 +80,12 @@ function closeModal() {
 }
 
 function filterByUnit(unit) {
-    const cards = document.querySelectorAll('#cardGrid > div');
+    const cards = document.querySelectorAll('#cardGridPacientes > div');
     cards.forEach(card => {
         if (card.getAttribute('data-unidad') === unit) {
-            card.style.display = 'block';
+            card.classList.remove('hidden');
         } else {
-            card.style.display = 'none';
+            card.classList.add('hidden');
         }
     });
 }
@@ -97,27 +97,28 @@ function removeAccents(str) {
 function searchByName(event) {
     event.preventDefault();
     const query = removeAccents(document.getElementById('searchQuery').value.toLowerCase());
-    const cards = document.querySelectorAll('#cardGrid > div');
+    const cards = document.querySelectorAll('#cardGridPacientes > div');
 
     cards.forEach(card => {
         const nombre = removeAccents(card.querySelector('h2').textContent.toLowerCase());
         if (nombre.includes(query)) {
-            card.style.display = 'block';
+            card.classList.remove('hidden');
         } else {
-            card.style.display = 'none';
+            card.classList.add('hidden');
         }
     });
 }
 
 function searchByRut() {
-    const query = document.getElementById('searchRut').value;
-    const cards = document.querySelectorAll('#cardGrid > div');
+    const query = document.getElementById('rutInput').value.trim();
+    console.log(query);
+    const cards = document.querySelectorAll('#cardGridPacientes > div');
     cards.forEach(card => {
-        const rut = card.querySelector('span').textContent;
+        const rut = card.querySelector('#rutSpan').textContent.trim();
         if (rut === query) {
-            card.style.display = 'block';
+            card.classList.remove('hidden');
         } else {
-            card.style.display = 'none';
+            card.classList.add('hidden');
         }
     });
 }
@@ -125,7 +126,7 @@ function searchByRut() {
 function formatRut(input) {
     let value = input.value.replace(/\./g, '').replace(/-/g, ''); // Eliminar puntos y guión anteriores
     if (value.length > 1) {
-        value = value.slice(0, -1).replace(/\B(?=(\d{3})+(?!\d))/g, '.') + '-' + value.slice(-1);
+        value = value.slice(0, -1).replace() + '-' + value.slice(-1);
     }
     input.value = value;
 }
