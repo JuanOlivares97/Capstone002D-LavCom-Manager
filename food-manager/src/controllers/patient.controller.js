@@ -37,7 +37,7 @@ async function renderHome(req, res) {
         });
 
         // Renderizar la vista y pasar los servicios y pacientes
-        res.render('patient/home', { tipoUsuario: 1, pacientes: pacientesConEdad, servicios, unidades,vias,regimen });
+        res.render('patient/home', { tipoUsuario: 1, pacientes: pacientesConEdad, servicios, unidades, vias, regimen });
     } catch (error) {
         return res.status(500).json({ message: "Internal server error " + error });
     }
@@ -162,11 +162,205 @@ async function getMovimientosPaciente(req, res) {
     }
 }
 
+async function movePatientService(req, res) {
+    // Verificar si el paciente existe en la base de datos
+    try {
+        const paciente = await prisma.Hospitalizado.findFirst({
+            where: {
+                IdHospitalizado: parseInt(req.params.id)
+            },
+            include: {
+                TipoServicio_Hospitalizado_IdTipoServicioToTipoServicio: true
+            }
+        });
+        const oldService = paciente.TipoServicio_Hospitalizado_IdTipoServicioToTipoServicio.IdTipoServicio;
+        const newService = parseInt(req.body.newService);
+
+        const servicios = await getServicio();
+        const newServiceIndex = servicios.findIndex(servicio => servicio.IdTipoServicio === newService);
+
+        if (newServiceIndex === -1) {
+            return res.status(400).json({ message: 'Servicio no válido' });
+        }
+        if (newService === oldService) {
+            return res.status(400).json({ message: 'Servicio no cambiado' });
+        }
+        const strServicio = servicios[newServiceIndex].DescTipoServicio;
+        // Actualizar el servicio del paciente
+        await prisma.Hospitalizado.update({
+            where: {
+                IdHospitalizado: paciente.IdHospitalizado
+            },
+            data: {
+                IdTipoServicio: newService
+            }
+        });
+        const movimiento = await prisma.logMovimientosPaciente.create({
+            data: {
+                idPaciente: paciente.IdHospitalizado,
+                fechaLog: new Date(),
+                descripcionLog: `Movimiento del Servicio ${oldService} al ${strServicio}`
+            }
+        });
+        return res.status(200).json({ message: 'Movimiento al Servicio', movimiento });
+    } catch (error) {
+        return res.status(500).json({ message: "Internal server error " + error });
+    }
+}
+
+async function changeRegimen(req, res) {
+    // Verificar si el paciente existe en la base de datos
+    try {
+        const paciente = await prisma.Hospitalizado.findFirst({
+            where: {
+                IdHospitalizado: parseInt(req.params.id)
+            },
+            include: {
+                TipoRegimen: true
+            }
+        });
+        const oldRegimen = paciente.TipoRegimen.DescTipoRegimen;
+        const newRegimen = parseInt(req.body.newRegimen);
+
+        const regimens = await getRegimen();
+        const newRegimenIndex = regimens.findIndex(regimen => regimen.IdTipoRegimen === newRegimen);
+
+        if (newRegimenIndex === -1) {
+            return res.status(400).json({ message: 'Regimen no válido' });
+        }
+        if (newRegimen === oldRegimen) {
+            return res.status(400).json({ message: 'Regimen no cambiado' });
+        }
+        const strRegimen = regimens[newRegimenIndex].DescTipoRegimen;
+        // Actualizar el servicio del paciente
+        await prisma.Hospitalizado.update({
+            where: {
+                IdHospitalizado: paciente.IdHospitalizado
+            },
+            data: {
+                IdTipoRegimen: newRegimen
+            }
+        });
+        const movimiento = await prisma.logMovimientosPaciente.create({
+            data: {
+                idPaciente: paciente.IdHospitalizado,
+                fechaLog: new Date(),
+                descripcionLog: `Movimiento del Regimen ${oldRegimen} al ${strRegimen}`
+            }
+        });
+        return res.status(200).json({ message: 'Movimiento al Regimen', movimiento });
+    } catch (error) {
+        return res.status(500).json({ message: "Internal server error " + error });
+    }
+}
+
+async function changeObservacionesAlta(req, res) {
+    // Verificar si el paciente existe en la base de datos
+    try {
+        const paciente = await prisma.Hospitalizado.findFirst({
+            where: {
+                IdHospitalizado: parseInt(req.params.id)
+            }
+        });
+        const oldObservacionesAlta = paciente.ObservacionesAlta || 'Sin Observacion';
+        const newObservacionesAlta = req.body.newObservacionesAlta;
+
+        // Actualizar el servicio del paciente
+        await prisma.Hospitalizado.update({
+            where: {
+                IdHospitalizado: paciente.IdHospitalizado
+            },
+            data: {
+                ObservacionesAlta: newObservacionesAlta
+            }
+        });
+        const movimiento = await prisma.logMovimientosPaciente.create({
+            data: {
+                idPaciente: paciente.IdHospitalizado,
+                fechaLog: new Date(),
+                descripcionLog: `Cambio de Observaciones de Alta: ${oldObservacionesAlta} a ${newObservacionesAlta}`
+            }
+        });
+        return res.status(200).json({ message: 'Movimiento al Observaciones de Alta', movimiento });
+    } catch (error) {
+        return res.status(500).json({ message: "Internal server error " + error });
+    }
+}
+
+async function changeObservacionesNutricionista(req, res) {
+    // Verificar si el paciente existe en la base de datos
+    try {
+        const paciente = await prisma.Hospitalizado.findFirst({
+            where: {
+                IdHospitalizado: parseInt(req.params.id)
+            }
+        });
+        const oldObservacionesNutricionista = paciente.ObservacionesNutricionista || 'Sin Observacion';
+        const newObservacionesNutricionista = req.body.newObservacionesNutricionista;
+        // Actualizar el servicio del paciente
+        await prisma.Hospitalizado.update({
+            where: {
+                IdHospitalizado: paciente.IdHospitalizado
+            },
+            data: {
+                ObservacionesNutricionista: newObservacionesNutricionista
+            }
+        });
+        const movimiento = await prisma.logMovimientosPaciente.create({
+            data: {
+                idPaciente: paciente.IdHospitalizado,
+                fechaLog: new Date(),
+                descripcionLog: `Cambio de Observaciones Nutricionista: ${oldObservacionesNutricionista} a ${newObservacionesNutricionista}`
+            }
+        });
+    } catch (error) {
+        return res.status(500).json({ message: "Internal server error " + error });
+    }
+}
+
+async function changeObservacionesGenerales(req, res) {
+    // Verificar si el paciente existe en la base de datos
+    try {
+        const paciente = await prisma.Hospitalizado.findFirst({
+            where: {
+                IdHospitalizado: parseInt(req.params.id)
+            }
+        });
+        const oldObservacionesGenerales = paciente.ObservacionesGenerales || 'Sin Observacion';
+        const newObservacionesGenerales = req.body.newObservacionesGenerales;
+        // Actualizar el servicio del paciente
+        await prisma.Hospitalizado.update({
+            where: {
+                IdHospitalizado: paciente.IdHospitalizado
+            },
+            data: {
+                ObservacionesSala: newObservacionesGenerales
+            }
+        });
+        const movimiento = await prisma.logMovimientosPaciente.create({
+            data: {
+                idPaciente: paciente.IdHospitalizado,
+                fechaLog: new Date(),
+                descripcionLog: `Cambio de Observaciones Generales: ${oldObservacionesGenerales} a ${newObservacionesGenerales}`
+            }
+        });
+        return res.status(200).json({ message: 'Movimiento al Observaciones Generales', movimiento });
+    } catch (error) {
+        return res.status(500).json({ message: "Internal server error " + error });
+    }
+}   
+
+
 
 
 module.exports = {
     renderHome,
     getPacientes,
     createPaciente,
-    getMovimientosPaciente
+    getMovimientosPaciente,
+    movePatientService,
+    changeRegimen,
+    changeObservacionesAlta,
+    changeObservacionesNutricionista,
+    changeObservacionesGenerales
 }
