@@ -1,0 +1,82 @@
+<div id="patientModal"
+    class="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center hidden overflow-auto">
+    <div class="bg-white rounded-lg shadow-xl max-w-6xl w-full p-6 relative overflow-y-auto max-h-screen">
+        <!-- Botón para cerrar el modal -->
+        <button class="absolute top-2 right-2 text-gray-500 hover:text-gray-800" onclick="closeModal()">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                class="w-6 h-6">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+        </button>
+
+        <!-- Título del modal -->
+        <h2 id="modalNombre" class="text-2xl font-bold text-gray-800 mb-6"></h2>
+        <input type="number" id="idPaciente" name="idPaciente" hidden>
+        <!-- Contenido del modal -->
+        <div class="grid grid-cols-3 gap-4">
+            <div>
+                <div>  
+                    <label class="block font-medium text-gray-700 my-2">Fecha de Alta</label>
+                    <input type="date" id="infoFechaAlta" name="infoFechaAlta" class="my-2 w-full p-2 border rounded"
+                        readonly>
+                </div>
+
+                <div>
+                    <label class="block font-medium text-gray-700 my-2">Nro Cama de Alta</label>
+                    <input type="number" id="infoNroCama" name="infoNroCama" class="my-2 w-full p-2 border rounded"
+                        readonly>
+                </div>
+
+                <div class="">
+                    <label class="block font-medium text-gray-700 my-2">Servicio de Alta</label>
+                    <select id="infoServicioAlta" name="infoServicioAlta" class="my-2 w-full p-2 border rounded"
+                        required>
+                        <option value="" disabled selected>Seleccione</option>
+                        <% servicios.forEach(servicio=> { %>
+                            <option value="<%= servicio.IdTipoServicio %>">
+                                <%= servicio.DescTipoServicio %>
+                            </option>
+                            <% }) %>
+                    </select>
+                    <button id="changeServicioAlta"
+                        class="px-4 py-2 bg-blue-200 text-gray-800 rounded-md shadow-sm hover:bg-gray-300 w-full">Cambiar
+                        Servicio de Alta</button>
+                </div>
+
+                <div>
+                    <label class="block font-medium text-gray-700 my-2">Observaciones de Alta</label>
+                    <textarea type="text" id="infoObservacionesAlta" name="infoObservacionesAlta"
+                        class="my-2 w-full p-2 border rounded h-48" readonly></textarea>
+                    <button id="changeObservacionesAlta"
+                        class="px-4 py-2 bg-blue-200 text-gray-800 rounded-md shadow-sm hover:bg-gray-300 w-full">Cambiar
+                        Observaciones de Alta</button>
+                </div>
+            </div>
+        </div>
+        <div id="logMovimientosPaciente" class="hidden mt-6 p-4 bg-gray-100 rounded-lg">
+            <h3 class="text-xl font-bold text-gray-800 mb-4">Movimientos del Paciente</h3>
+            <div class="timeline max-h-60 overflow-y-auto">
+                <!-- Aquí se mostrarán los movimientos del paciente -->
+                <ul id="movimientosList" class="space-y-3">
+
+                </ul>
+            </div>
+        </div>
+
+        <!-- Botones -->
+        <div class="flex gap-4 justify-center">
+            <div class="mt-6 flex justify-end">
+                <button onclick="closeModal()"
+                    class="px-4 py-2 bg-gray-200 text-gray-800 rounded-md shadow-sm hover:bg-gray-300">Cerrar</button>
+            </div>
+            <div class="mt-6 flex justify-end">
+                <button
+                    class="px-4 py-2 bg-blue-200 text-gray-800 rounded-md shadow-sm hover:bg-gray-300">Editar</button>
+            </div>
+            <div class="mt-6 flex justify-end">
+                <button onclick="toggleLogs()"
+                    class="px-4 py-2 bg-red-200 text-gray-800 rounded-md shadow-sm hover:bg-gray-300">Ver Logs</button>
+            </div>
+        </div>
+    </div>
+</div>

@@ -13,7 +13,7 @@
         <h2 id="modalNombre" class="text-2xl font-bold text-gray-800 mb-6"></h2>
         <input type="number" id="idPaciente" name="idPaciente" hidden>
         <!-- Contenido del modal -->
-        <div class="grid grid-cols-4 gap-4">
+        <div class="grid grid-cols-3 gap-4">
             <div>
                 <div>
                     <label class="block font-medium text-gray-700 my-2">Numero de Cama</label>
@@ -97,45 +97,6 @@
 
             <div>
                 <div>
-                    <label class="block font-medium text-gray-700 my-2">Fecha de Alta</label>
-                    <input type="date" id="infoFechaAlta" name="infoFechaAlta" class="my-2 w-full p-2 border rounded"
-                        readonly>
-                </div>
-
-                <div>
-                    <label class="block font-medium text-gray-700 my-2">Nro Cama de Alta</label>
-                    <input type="number" id="infoNroCama" name="infoNroCama" class="my-2 w-full p-2 border rounded"
-                        readonly>
-                </div>
-
-                <div class="">
-                    <label class="block font-medium text-gray-700 my-2">Servicio de Alta</label>
-                    <select id="infoServicioAlta" name="infoServicioAlta" class="my-2 w-full p-2 border rounded"
-                        required>
-                        <option value="" disabled selected>Seleccione</option>
-                        <% servicios.forEach(servicio=> { %>
-                            <option value="<%= servicio.IdTipoServicio %>">
-                                <%= servicio.DescTipoServicio %>
-                            </option>
-                            <% }) %>
-                    </select>
-                    <button id="changeServicioAlta"
-                        class="px-4 py-2 bg-blue-200 text-gray-800 rounded-md shadow-sm hover:bg-gray-300 w-full">Cambiar
-                        Servicio de Alta</button>
-                </div>
-
-                <div>
-                    <label class="block font-medium text-gray-700 my-2">Observaciones de Alta</label>
-                    <textarea type="text" id="infoObservacionesAlta" name="infoObservacionesAlta"
-                        class="my-2 w-full p-2 border rounded h-48" readonly></textarea>
-                    <button id="changeObservacionesAlta"
-                        class="px-4 py-2 bg-blue-200 text-gray-800 rounded-md shadow-sm hover:bg-gray-300 w-full">Cambiar
-                        Observaciones de Alta</button>
-                </div>
-            </div>
-
-            <div>
-                <div>
                     <label for="infoServicio" class="block font-medium text-gray-700 my-2">Tipo de Servicio</label>
                     <select id="infoServicio" name="infoServicio" class="my-2 w-full p-2 border rounded" required>
                         <option value="" disabled selected>Seleccione</option>
@@ -190,6 +151,44 @@
                     <button id="changeRegimen"
                         class="px-4 py-2 bg-blue-200 text-gray-800 rounded-md shadow-sm hover:bg-gray-300 w-full">Cambiar
                         Regimen</button>
+                </div>
+            </div>
+            <div class="hidden">
+                <div>  
+                    <label class="block font-medium text-gray-700 my-2">Fecha de Alta</label>
+                    <input type="date" id="infoFechaAlta" name="infoFechaAlta" class="my-2 w-full p-2 border rounded"
+                        readonly>
+                </div>
+
+                <div>
+                    <label class="block font-medium text-gray-700 my-2">Nro Cama de Alta</label>
+                    <input type="number" id="infoNroCama" name="infoNroCama" class="my-2 w-full p-2 border rounded"
+                        readonly>
+                </div>
+
+                <div class="">
+                    <label class="block font-medium text-gray-700 my-2">Servicio de Alta</label>
+                    <select id="infoServicioAlta" name="infoServicioAlta" class="my-2 w-full p-2 border rounded"
+                        required>
+                        <option value="" disabled selected>Seleccione</option>
+                        <% servicios.forEach(servicio=> { %>
+                            <option value="<%= servicio.IdTipoServicio %>">
+                                <%= servicio.DescTipoServicio %>
+                            </option>
+                            <% }) %>
+                    </select>
+                    <button id="changeServicioAlta"
+                        class="px-4 py-2 bg-blue-200 text-gray-800 rounded-md shadow-sm hover:bg-gray-300 w-full">Cambiar
+                        Servicio de Alta</button>
+                </div>
+
+                <div>
+                    <label class="block font-medium text-gray-700 my-2">Observaciones de Alta</label>
+                    <textarea type="text" id="infoObservacionesAlta" name="infoObservacionesAlta"
+                        class="my-2 w-full p-2 border rounded h-48" readonly></textarea>
+                    <button id="changeObservacionesAlta"
+                        class="px-4 py-2 bg-blue-200 text-gray-800 rounded-md shadow-sm hover:bg-gray-300 w-full">Cambiar
+                        Observaciones de Alta</button>
                 </div>
             </div>
         </div>

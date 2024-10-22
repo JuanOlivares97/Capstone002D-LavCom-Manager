@@ -13,10 +13,7 @@ function openModal(paciente) {
     document.getElementById('infoDireccion').value = paciente.Direccion || '';
     document.getElementById('infoCorreo').value = paciente.Correo || '';
     document.getElementById('infoObservacionesNutricionista').value = paciente.ObservacionesNutricionista || '';
-    document.getElementById('infoFechaAlta').value = paciente.FechaAlta || '';
-    document.getElementById('infoServicioAlta').value = paciente.ServicioAlta || '';
-    document.getElementById('infoNroCama').value = paciente.CodigoCamaAlta || '';
-    document.getElementById('infoObservacionesAlta').value = paciente.ObservacionesAlta || '';
+
     document.getElementById('infoUnidad').value = paciente.IdTipoUnidad || '';
     document.getElementById('infoServicio').value = paciente.IdTipoServicio || '';
     document.getElementById('infoVia').value = paciente.IdTipoVia || '';
