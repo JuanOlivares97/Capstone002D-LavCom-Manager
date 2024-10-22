@@ -26,6 +26,10 @@ app.set('views', './src/views');
 
 app.use(express.static(path.join(__dirname, "static")))
 
+app.get('/', (req, res) => {
+    res.redirect("/dashboard/home");
+})
+
 app.use('/auth', authRouter);
 app.use('/users',loginRequired, userRouter);
 app.use('/clothes',loginRequired, articulosRouter);
