@@ -9,7 +9,7 @@ async function renderHome(req, res) {
     const TipoFuncionario = await getTipoFuncionario();
     const Contrato = await getContrato();
 
-    res.render('maintainer/home', { tipoUsuario: 1, Estamento, servicios, Unidad, Via, Regimen, TipoFuncionario, w });
+    res.render('maintainer/home', { tipoUsuario: 1, Estamento, servicios, Unidad, Via, Regimen, TipoFuncionario, Contrato });
 }
 
 async function getEstamento() {
