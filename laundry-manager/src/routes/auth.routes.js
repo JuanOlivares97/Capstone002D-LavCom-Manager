@@ -9,6 +9,7 @@ router.post('/send-pwd-mail', authController.sendPwdEmail)
 router.get('/recuperar-pwd-info', authController.renderRecuperarContrasenaInfo);
 router.post('/login', authController.login);
 router.put('/set-email', authController.setEmail);
+router.put('/change-pwd', authController.changePwd);
 
 router.post('/logout', authController.logout);
 
