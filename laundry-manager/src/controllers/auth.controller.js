@@ -108,12 +108,47 @@ async function sendPwdEmail(req, res) {
         const code = Math.floor(Math.random() * (9999 - 1000 + 1)) + 1000;
 
         res.cookie("pwdcode", bcrypt.hashSync(code.toString(), 10), {path: "/"})
+        res.cookie("username", username, {path: "/"})
 
         await mailer.enviarCorreo(email, code.toString())
 
         return res.redirect("/auth/recuperar-pwd-info")
     } catch (error) {
         return res.status(500).json({ message: "Internal server error", error})
+    }
+}
+
+async function changePwd(req, res) {
+    try {
+        const code = req.body.code
+        const pwd = req.body.pwd
+
+        const hashedCode = req.cookies.pwdcode
+
+        if (!hashedCode) {
+            return res.status(500).json({success: false, message: "Código no encontrado"})
+        }
+
+        const isCodeValid = await bcrypt.compare(code, hashedCode)
+
+        if (!isCodeValid) {
+            return res.status(500).json({success: false, message: "Código inválido, intente nuevamente"})
+        }
+
+        const hashedPwd = bcrypt.hashSync(pwd, 10)
+
+        await prisma.usuarios.update({
+            where: {
+                username: username
+            },
+            data: {
+                pwd: hashedPwd
+            }
+        })
+
+        return res.status(200).json({success: true, message: "Contraseña actualizada"})
+    } catch (error) {
+        return res.status(500).json({success: false, message: "Internal server error", error})
     }
 }
 
@@ -134,5 +169,6 @@ module.exports = {
     login,
     logout,
     setEmail,
-    sendPwdEmail
+    sendPwdEmail,
+    changePwd
 }
