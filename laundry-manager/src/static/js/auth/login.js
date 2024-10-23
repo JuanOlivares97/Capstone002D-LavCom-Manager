@@ -69,7 +69,7 @@ form.addEventListener("submit", async (e) => {
         icon: "success",
         title: "Inicio de sesión exitoso",
         text: data.message,
-        timer: 5000, // La alerta se mostrará durante 3 segundos
+        timer: 2000, // La alerta se mostrará durante 3 segundos
         timerProgressBar: true,
         toast: true,
         position: 'top-end',
