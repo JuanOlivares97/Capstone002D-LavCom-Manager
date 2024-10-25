@@ -1,23 +1,44 @@
-async function renderLogin(req, res) {
-    res.render("auth/login", { layout: false }); //reemplazar tipo de usuario por layout
+const prisma = require("../server/prisma");
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
+const mailer = require("../server/mailer")
+
+function renderLogin(req, res) {
+    try {
+        return res.render("auth/login", { layout: false });
+    } catch (error) {
+        return res.status(500).json({ message: "Internal server error" });
+    }
+}
+
+function renderRecuperarContrasenaForm(req, res) {
+    try {
+        return res.render("auth/recuperar_pwd_form", { layout: false });
+    } catch (error) {
+        return res.status(500).json({ message: "Internal server error" });
+    }
+}
+
+function renderRecuperarContrasenaInfo(req, res) {
+    try {
+        return res.render("auth/recuperar_pwd_info", { layout: false });
+    } catch (error) {
+        return res.status(500).json({ message: "Internal server error" });
+    }
 }
 
 async function login(req, res) {
     try {
-        const { username, pwd } = req.body;
+        const { rutCompleto, pwd } = req.body;
+        // Dividir el RUT en dos partes: número y dígito verificador
+        const [RutFuncionario, DvFuncionario] = rutCompleto.split('-');
 
-        // Separate the RUT number and check digit
-        const [rut, dv] = username.split('-'); // '20880026-4' becomes ['20880026', '4']
-
-        // Convert rut to an integer
-        const numericRut = parseInt(rut, 10);
-
-        // Query the database using both the RUT number and the check digit
-        const user = await prisma.funcionario.findUnique({
+        // Ahora puedes usar RutFuncionario y DvFuncionario en tu consulta
+        const user = await prisma.Funcionario.findFirst({
             where: {
-                RutFuncionario: numericRut,
-                DvFuncionario: dv,
-            },
+                RutFuncionario: RutFuncionario,
+                DvFuncionario: DvFuncionario
+            }
         });
 
         if (!user) {
@@ -43,10 +64,103 @@ async function login(req, res) {
         res.cookie("tipo_usuario", user.IdTipoFuncionario, { path: "/" });
         res.cookie("rutLogueado", user.RutFuncionario, { path: "/" });
         res.cookie("dvLogueado", user.DvFuncionario, { path: "/" });
-
-        return res.status(200).json({ message: "Has iniciado sesión, bienvenido", success: true });
+        return res.status(200).json({ message: "Has iniciado sesión, bienvenido", success: true, user });
     } catch (error) {
         return res.status(500).json({ message: "Internal server error", success: false });
+    }
+}
+
+async function setEmail(req, res) {
+    try {
+        const email = req.body.email;
+        const user = await prisma.usuarios.findUnique({ where: { IdFuncionario: req.body.id_usuario } });
+
+        console.log(user);
+
+        if (!user) {
+            return res.status(401).json({ message: "Usuario no encontrado", success: false });
+        }
+
+        const updatedUser = await prisma.usuarios.update({
+            where: { IdFuncionario: req.body.id_usuario },
+            data: {
+                email: email
+            }
+        });
+
+        if (!updatedUser) {
+            return res.status(500).json({ message: "Error al actualizar el correo electrónico", success: false });
+        }
+
+        return res.status(200).json({ message: "Correo electrónico establecido", success: true });
+    } catch (error) {
+        return res.status(500).json({ message: "Internal server error", success: false });
+    }
+}
+
+async function sendPwdEmail(req, res) {
+    try {
+        const email = req.body.email
+        const rutCompleto = req.body.rutCompleto;
+        // Dividir el RUT en dos partes: número y dígito verificador
+        const [RutFuncionario, DvFuncionario] = rutCompleto.split('-');
+
+        const user = await prisma.usuarios.findUnique({
+            where: {
+                RutFuncionario: RutFuncionario,
+                DvFuncionario: DvFuncionario,
+                correo: email
+            }
+        })
+
+        if (!user) {
+            return res.status(500).json({ message: "Usuario no encontrado" })
+        }
+
+        const code = Math.floor(Math.random() * (9999 - 1000 + 1)) + 1000;
+
+        res.cookie("pwdcode", bcrypt.hashSync(code.toString(), 10), { path: "/" })
+        res.cookie("username", rutCompleto, { path: "/" })
+
+        await mailer.enviarCorreo(email, code.toString())
+
+        return res.redirect("/auth/recuperar-pwd-info")
+    } catch (error) {
+        return res.status(500).json({ message: "Internal server error", error })
+    }
+}
+
+async function changePwd(req, res) {
+    try {
+        const code = req.body.code
+        const pwd = req.body.pwd
+
+        const hashedCode = req.cookies.pwdcode
+
+        if (!hashedCode) {
+            return res.status(500).json({ success: false, message: "Código no encontrado" })
+        }
+
+        const isCodeValid = await bcrypt.compare(code, hashedCode)
+
+        if (!isCodeValid) {
+            return res.status(500).json({ success: false, message: "Código inválido, intente nuevamente" })
+        }
+
+        const hashedPwd = bcrypt.hashSync(pwd, 10)
+
+        await prisma.usuarios.update({
+            where: {
+                username: username
+            },
+            data: {
+                pwd: hashedPwd
+            }
+        })
+
+        return res.status(200).json({ success: true, message: "Contraseña actualizada" })
+    } catch (error) {
+        return res.status(500).json({ success: false, message: "Internal server error", error })
     }
 }
 
@@ -62,6 +176,11 @@ async function logout(req, res) {
 
 module.exports = {
     renderLogin,
+    renderRecuperarContrasenaForm,
+    renderRecuperarContrasenaInfo,
     login,
-    logout
-};
+    logout,
+    setEmail,
+    sendPwdEmail,
+    changePwd
+}
