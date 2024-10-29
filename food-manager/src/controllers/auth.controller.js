@@ -73,7 +73,7 @@ async function login(req, res) {
 async function setEmail(req, res) {
     try {
         const email = req.body.email;
-        const user = await prisma.usuarios.findUnique({ where: { IdFuncionario: req.body.id_usuario } });
+        const user = await prisma.usuarios.findUnique({ where: { IdFuncionario: req.body.IdFuncionario } });
 
         console.log(user);
 
@@ -82,7 +82,7 @@ async function setEmail(req, res) {
         }
 
         const updatedUser = await prisma.usuarios.update({
-            where: { IdFuncionario: req.body.id_usuario },
+            where: { IdFuncionario: req.body.IdFuncionario },
             data: {
                 email: email
             }
