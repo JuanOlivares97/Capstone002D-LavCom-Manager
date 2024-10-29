@@ -64,11 +64,34 @@
             </button>
         </div>
     </div>
-        <div class="flex justify-between items-center p-4 mr-8">
-            <button id="altaModal" class="bg-blue-600 text-white px-4 py-2 rounded">Dar alta paciente</button>
-            <button onclick="openSidebar()" class="bg-blue-600 text-white px-4 py-2 rounded">
-                Filtrar por Unidades
-            </button>
+    <!-- KPI: Pacientes Hospitalizados -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5 p-6">
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <h2 class="text-xl font-semibold text-gray-800 mb-2">Pacientes Hospitalizados</h2>
+            <p class="text-3xl font-bold text-purple-600"><%= pacientesHospitalizados %></p>
+            <p class="text-sm text-gray-600">Total hospitalizados</p>
+        </div>
+    
+        <!-- KPI: Pacientes en Ayuno -->
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <h2 class="text-xl font-semibold text-gray-800 mb-2">Pacientes en Ayuno</h2>
+            <p class="text-3xl font-bold text-red-600"><%= pacientesEnAyuno %></p>
+            <p class="text-sm text-gray-600">En ayuno hoy</p>
+        </div>
+    
+        <!-- KPI: Ingresos del Día -->
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <h2 class="text-xl font-semibold text-gray-800 mb-2">Ingresos del Día</h2>
+            <p class="text-3xl font-bold text-indigo-600"><%= ingresosHoy %></p>
+            <p class="text-sm text-gray-600">Nuevos ingresos hoy</p>
+        </div>
+    
+        <!-- KPI: Altas del Día -->
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <h2 class="text-xl font-semibold text-gray-800 mb-2">Altas del Día</h2>
+            <p class="text-3xl font-bold text-pink-600"><%= altasHoy %></p>
+            <p class="text-sm text-gray-600">Pacientes dados de alta hoy</p>
+        </div>
     </div>
     <!-- Contenedor de pacientes -->
     <div id="cardGridPacientes" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-5 p-6">
