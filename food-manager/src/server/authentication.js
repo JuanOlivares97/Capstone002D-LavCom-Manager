@@ -15,8 +15,8 @@ async function loginRequired(req, res, next) {
         }
 
         // Buscar el usuario en la base de datos
-        const user = await prisma.usuarios.findUnique({
-            where: { id_usuario: decoded.id_usuario }
+        const user = await prisma.Funcionario.findUnique({
+            where: { IdFuncionario: decoded.id_usuario }
         });
 
         if (!user) {
