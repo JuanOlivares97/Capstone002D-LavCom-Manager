@@ -7,7 +7,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body {
-            background-image: url('/img/login_bg.jpg');
+            background-image: url('/img/bg-auth.webp');
             background-size: cover;
             background-position: center;
         }
@@ -22,8 +22,8 @@
         <p class="text-black-600 text-center mb-6">Ingresa tu usuario y correo electrónico registrado y le enviaremos su nueva contraseña</p>
         <form method="post" action="/auth/send-pwd-mail">
             <div class="mb-4">
-                <label for="username" class="block text-black-700 mb-2">Nombre de usuario</label>
-                <input type="text" name="username" class="w-full p-2 border rounded" placeholder="Nombre de usuario" required>
+                <label for="rutCompleto" class="block text-black-700 mb-2">Rut de usuario</label>
+                <input type="text" name="rutCompleto" id="rutCompleto" class="w-full p-2 border rounded" placeholder="Nombre de usuario" required>
             </div>
             <div class="mb-4">
                 <label for="email" class="block text-black-700 mb-2">Correo electrónico</label>
