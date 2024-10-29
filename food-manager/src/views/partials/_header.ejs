@@ -67,9 +67,10 @@ function tieneAcceso(tiposPermitidos, tipoUsuario) {
 
         <h1 class="text-center text-2xl flex-1">SISTEMA DE CONTROL DE ALIMENTACIÓN</h1>
 
-        <button
+        <button id="btn-logout-pc"
             class="bg-transparent text-black px-4 py-2 rounded hover:bg-gray-400 hover:text-white transition duration-300 flex items-center">
             <%- include("../icons/logout_icon") %>
-                <a href="/login">Cerrar Sesión</a>
+            <label class="ml-2">Cerrar Sesión</label>
         </button>
+        <script src="/js/auth/logout.js"></script>
     </header>
