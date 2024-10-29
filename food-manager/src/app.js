@@ -1,7 +1,9 @@
 const express = require('express');
 const expressLayout = require('express-ejs-layouts');
 const path = require('path');
+const cookieParser = require('cookie-parser');
 const fs = require('fs');
+const { log } = require('console');
 
 const app = express();
 
@@ -14,10 +16,14 @@ app.set('views', './src/views');
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
 // Servir archivos estáticos
 app.use(express.static(path.join(__dirname, "static")))
+
 // Middleware de autenticación global (si es necesario)
-// app.use(authMiddleware);
+const { loginRequired } = require('./server/authentication');
+
+app.use(cookieParser());
 
 //Redireccionar a la página de dashboard
 app.get('/', (req, res) => {
@@ -30,7 +36,13 @@ routeFiles.forEach(file => {
     const routePath = `./routes/${file}`;
     const route = require(routePath);
     const routeName = `/${file.replace('.routes.js', '')}`;
-    app.use(routeName, route);
+    
+    // Aplicar middleware de autenticación a todas las rutas, excepto las de la carpeta 'auth'
+    if (routeName.startsWith('/auth')) {
+        app.use(routeName, route);
+    } else {
+        app.use(routeName, loginRequired, route);
+    }
 });
 
 
