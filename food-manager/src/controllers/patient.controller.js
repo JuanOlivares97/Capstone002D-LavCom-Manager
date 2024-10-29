@@ -28,6 +28,57 @@ async function renderHome(req, res) {
             }
         });
 
+        const today = new Date();
+      const days = Array.from({ length: 7 }, (_, i) => {
+        const date = new Date(today);
+        date.setDate(today.getDate() - i);
+        return date.toISOString().split('T')[0];
+      }).reverse();
+  
+      // Promesas para KPIs diarios y datos históricos
+      const [
+        funcionariosHabilitados,
+        funcionariosConfirmados,
+        funcionariosAlmorzaron,
+        pacientesHospitalizados,
+        pacientesEnAyuno,
+        ingresosHoy,
+        altasHoy,
+        tendenciasColaciones,
+        ingresosAltasSemana,
+        distribucionRegimen
+      ] = await Promise.all([
+        prisma.Funcionario.count({ where: { Habilitado: "S" } }),
+        prisma.Colacion.count({ where: { Retirado: 0, FechaSolicitud: today } }),
+        prisma.Colacion.count({ where: { Retirado: 1, FechaSolicitud: today } }),
+        prisma.Hospitalizado.count(),
+        prisma.Hospitalizado.count({ where: { FechaFinAyuno: { lt: today } } }),
+        prisma.Hospitalizado.count({ where: { FechaIngreso: today } }),
+        prisma.Hospitalizado.count({ where: { FechaAlta: today } }),
+  
+        // Colaciones confirmadas y pacientes en ayuno por día
+        Promise.all(days.map(async (day) => ({
+          day,
+          confirmados: await prisma.Colacion.count({ where: { Retirado: 0, FechaSolicitud: new Date(day) } }),
+          ayuno: await prisma.Hospitalizado.count({ where: { FechaFinAyuno: { lt: new Date(day) } } })
+        }))),
+  
+        // Ingresos y altas por día
+        Promise.all(days.map(async (day) => ({
+          day,
+          ingresos: await prisma.Hospitalizado.count({ where: { FechaIngreso: new Date(day) } }),
+          altas: await prisma.Hospitalizado.count({ where: { FechaAlta: new Date(day) } })
+        }))),
+  
+        // Distribución de tipos de régimen
+        prisma.Hospitalizado.groupBy({
+          by: ['IdTipoRegimen'],
+          _count: {
+            IdTipoRegimen: true
+          }
+        })
+      ]);
+
         // Añadir la edad a cada paciente
         const pacientesConEdad = pacientes.map(paciente => {
             return {
@@ -37,7 +88,10 @@ async function renderHome(req, res) {
         });
 
         // Renderizar la vista y pasar los servicios y pacientes
-        res.render('patient/home', { tipoUsuario: 1, pacientes: pacientesConEdad, servicios, unidades, vias, regimen });
+        res.render('patient/home', { tipoUsuario: 1, pacientes: pacientesConEdad, servicios, unidades, vias, regimen, pacientesHospitalizados,
+            pacientesEnAyuno,
+            ingresosHoy,
+            altasHoy, });
     } catch (error) {
         return res.status(500).json({ message: "Internal server error " + error });
     }
