@@ -30,6 +30,7 @@ function renderRecuperarContrasenaInfo(req, res) {
 async function login(req, res) {
     try {
         const { rutCompleto, pwd } = req.body;
+
         // Dividir el RUT en dos partes: número y dígito verificador
         const [RutFuncionario, DvFuncionario] = rutCompleto.split('-');
 
@@ -42,13 +43,13 @@ async function login(req, res) {
         });
 
         if (!user) {
-            return res.status(401).json({ message: "Usuario o contraseña incorrectos", success: false });
+            return res.status(401).json({ message: "Rut o contraseña incorrectos", success: false });
         }
 
         const isPasswordValid = await bcrypt.compare(pwd, user.contrasena);
 
         if (!isPasswordValid) {
-            return res.status(401).json({ message: "Usuario o contraseña incorrectos", success: false });
+            return res.status(401).json({ message: "Rut o contraseña incorrectos", success: false });
         }
 
         const token_data = {
@@ -64,6 +65,7 @@ async function login(req, res) {
         res.cookie("tipo_usuario", user.IdTipoFuncionario, { path: "/" });
         res.cookie("rutLogueado", user.RutFuncionario, { path: "/" });
         res.cookie("dvLogueado", user.DvFuncionario, { path: "/" });
+
         return res.status(200).json({ message: "Has iniciado sesión, bienvenido", success: true, user });
     } catch (error) {
         return res.status(500).json({ message: "Internal server error", success: false });
@@ -100,35 +102,37 @@ async function setEmail(req, res) {
 
 async function sendPwdEmail(req, res) {
     try {
-        const email = req.body.email
+        const email = req.body.email;
         const rutCompleto = req.body.rutCompleto;
-        // Dividir el RUT en dos partes: número y dígito verificador
+    
         const [RutFuncionario, DvFuncionario] = rutCompleto.split('-');
 
-        const user = await prisma.usuarios.findUnique({
+        const user = await prisma.Funcionario.findUnique({
             where: {
-                RutFuncionario: RutFuncionario,
-                DvFuncionario: DvFuncionario,
-                correo: email
+                RutFuncionario_DvFuncionario: {
+                    RutFuncionario: RutFuncionario,
+                    DvFuncionario: DvFuncionario
+                }
             }
-        })
+        });
 
-        if (!user) {
-            return res.status(500).json({ message: "Usuario no encontrado" })
+        if (!user || user.correo !== email) {
+            return res.status(500).json({ message: "Usuario no encontrado" });
         }
 
         const code = Math.floor(Math.random() * (9999 - 1000 + 1)) + 1000;
 
-        res.cookie("pwdcode", bcrypt.hashSync(code.toString(), 10), { path: "/" })
-        res.cookie("username", rutCompleto, { path: "/" })
+        res.cookie("pwdcode", bcrypt.hashSync(code.toString(), 10), { path: "/" });
+        res.cookie("username", rutCompleto, { path: "/" });
 
-        await mailer.enviarCorreo(email, code.toString())
+        await mailer.enviarCorreo(email, code.toString());
 
-        return res.redirect("/auth/recuperar-pwd-info")
+        return res.redirect("/auth/recuperar-pwd-info");
     } catch (error) {
-        return res.status(500).json({ message: "Internal server error", error })
+        return res.status(500).json({ message: "Internal server error", error: error.message });
     }
 }
+
 
 async function changePwd(req, res) {
     try {
@@ -149,18 +153,24 @@ async function changePwd(req, res) {
 
         const hashedPwd = bcrypt.hashSync(pwd, 10)
 
-        await prisma.usuarios.update({
+        const rutCompleto = req.cookies["username"]
+        const [RutFuncionario, DvFuncionario] = rutCompleto.split('-');
+
+        await prisma.Funcionario.update({
             where: {
-                username: username
+                RutFuncionario_DvFuncionario: {
+                    RutFuncionario: RutFuncionario,
+                    DvFuncionario: DvFuncionario
+                }
             },
             data: {
-                pwd: hashedPwd
+                contrasena: hashedPwd
             }
         })
 
         return res.status(200).json({ success: true, message: "Contraseña actualizada" })
     } catch (error) {
-        return res.status(500).json({ success: false, message: "Internal server error", error })
+        return res.status(500).json({ success: false, message: "Internal server error " + error, error: error.message })
     }
 }
 
@@ -168,6 +178,9 @@ async function logout(req, res) {
     try {
         res.clearCookie("token");
         res.clearCookie("logged-in");
+        res.clearCookie("tipo_usuario");
+        res.clearCookie("rutLogueado");
+        res.clearCookie("dvLogueado");
         return res.status(200).json({ message: "Has cerrado sesión", success: true });
     } catch (error) {
         return res.status(500).json({ message: "Internal server error", success: false });
