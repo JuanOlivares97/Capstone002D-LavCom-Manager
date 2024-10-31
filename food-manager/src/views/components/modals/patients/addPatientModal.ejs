@@ -52,33 +52,41 @@
                 <label for="subgrupo" class="block font-medium text-gray-700 mt-1">Tipo de Servicio</label>
                 <select id="Servicio" name="Servicio" class="my-2 w-full p-2 border rounded" required>
                     <option value="" disabled selected>Seleccione</option>
-                    <option value="subgrupo1">Subgrupo 1</option>
-                    <option value="subgrupo2">Subgrupo 2</option>
-                    <option value="subgrupo3">Subgrupo 3</option>
+                    <% servicios.forEach(servicio=> { %>
+                        <option value="<%= servicio.IdTipoServicio %>">
+                            <%= servicio.DescTipoServicio %>
+                        </option>
+                        <% }) %>
                 </select>
 
                 <label for="subgrupo" class="block font-medium text-gray-700 mt-1">Tipo de Unidad</label>
                 <select id="Unidad" name="Unidad" class="my-2 w-full p-2 border rounded" required>
                     <option value="" disabled selected>Seleccione</option>
-                    <option value="subgrupo1">Subgrupo 1</option>
-                    <option value="subgrupo2">Subgrupo 2</option>
-                    <option value="subgrupo3">Subgrupo 3</option>
+                    <% unidades.forEach(unidad=> { %>
+                        <option value="<%= unidad.IdTipoUnidad %>">
+                            <%= unidad.DescTipoUnidad %>
+                        </option>
+                        <% }) %>
                 </select>
 
                 <label for="subgrupo" class="block font-medium text-gray-700 mt-1">Tipo de Via</label>
                 <select id="Via" name="Via" class="my-2 w-full p-2 border rounded" required>
                     <option value="" disabled selected>Seleccione</option>
-                    <option value="subgrupo1">Subgrupo 1</option>
-                    <option value="subgrupo2">Subgrupo 2</option>
-                    <option value="subgrupo3">Subgrupo 3</option>
+                    <% vias.forEach(via=> { %>
+                        <option value="<%= via.IdTipoVia %>">
+                            <%= via.DescTipoVia %>
+                        </option>
+                        <% }) %>
                 </select>
 
                 <label for="subgrupo" class="block font-medium text-gray-700 mt-1">Tipo de Regimen</label>
                 <select id="Regimen" name="Regimen" class="my-2 w-full p-2 border rounded" required>
                     <option value="" disabled selected>Seleccione</option>
-                    <option value="subgrupo1">Subgrupo 1</option>
-                    <option value="subgrupo2">Subgrupo 2</option>
-                    <option value="subgrupo3">Subgrupo 3</option>
+                    <% regimen.forEach(reg=> { %>
+                        <option value="<%= reg.IdTipoRegimen %>">
+                            <%= reg.DescTipoRegimen%>
+                        </option>
+                        <% }) %>
                 </select>
             </div>
 
@@ -87,13 +95,10 @@
         <!-- Botones -->
         <div class="flex gap-4 justify-center">
             <div class="my-3 flex justify-end">
-                <button id="closeModalAddPatient"  class="px-4 py-2 bg-gray-200 text-gray-800 rounded-md shadow-sm hover:bg-gray-300">Cerrar</button>
+                <button id="addPaciente" class="px-4 py-2 bg-green-200 text-white-800 rounded-md shadow-sm hover:bg-gray-300">Ingresar Paciente</button>
             </div>
             <div class="my-3 flex justify-end">
-                <button  class="px-4 py-2 bg-blue-200 text-gray-800 rounded-md shadow-sm hover:bg-gray-300">Editar</button>
-            </div>
-            <div class="my-3 flex justify-end">
-                <button  class="px-4 py-2 bg-red-200 text-gray-800 rounded-md shadow-sm hover:bg-gray-300">Ver Logs</button>
+                <button id="closeModalAddPatient" class="px-4 py-2 bg-red-200 text-white-800 rounded-md shadow-sm hover:bg-gray-300">Cancelar Ingreso</button>
             </div>
         </div>
     </div>
