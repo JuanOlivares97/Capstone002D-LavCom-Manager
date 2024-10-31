@@ -27,7 +27,7 @@ app.use(cookieParser());
 
 //Redireccionar a la página de dashboard
 app.get('/', (req, res) => {
-    res.redirect('/dashboard/home');
+    res.redirect('/food-manager/dashboard/home');
 });
 
 // Cargar rutas dinámicamente
