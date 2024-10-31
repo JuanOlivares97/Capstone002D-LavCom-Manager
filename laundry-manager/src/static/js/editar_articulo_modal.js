@@ -7,13 +7,44 @@ document.addEventListener("DOMContentLoaded", function() {
         modal.querySelector('.transform').classList.add('scale-95');
         setTimeout(() => {
             modal.classList.add('hidden');
-        }, 300); // Duration should match the CSS transition duration
+        }, 300);
     });
 
-    modal.addEventListener("submit", function (e) {
+    modal.addEventListener("submit", async function (e) {
         e.preventDefault();
-        // form data
         const formData = new FormData(e.target);
-        alert(JSON.stringify(Object.fromEntries(formData), null, 2));
+        const updatedData = Object.fromEntries(formData);
+
+        console.log(updatedData);
+        
+        
+        await fetch("/clothes/update-clothes", {
+            method: "PUT",
+            body: JSON.stringify(updatedData),
+            headers: {
+                "Content-Type": "application/json",
+            },
+        })
+        .then((response) => response.json())
+        .then((data) => {
+            if (!data.success) {
+                Swal.fire({
+                    title: "Error",
+                    text: data.message,
+                    icon: "error",
+                });
+                return;
+            }
+
+            Swal.fire({
+                title: "Éxito",
+                text: data.message,
+                icon: "success"
+            }).then(() => {
+                // Cerrar el modal
+                modal.classList.add('hidden');
+                location.reload();
+            });
+        });
     });
 });
