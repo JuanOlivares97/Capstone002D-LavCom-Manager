@@ -89,6 +89,48 @@ async function getContrato() {
     }
 }
 
+async function createItem(req, res, model, dataField) {
+    try {
+        const data = req.body[dataField];
+        const item = await prisma[model].create({
+            data: {
+                [dataField]: data
+            }
+        });
+        res.status(201).json(item);
+    } catch (error) {
+        res.status(500).json({ error: `Error al crear el item: ${error.message}` });
+    }
+}
+
+// Wrappers para llamar a la función genérica con los parámetros adecuados
+async function createEstamento(req, res) {
+    await createItem(req, res, 'TipoEstamento', 'DescTipoEstamento');
+}
+
+async function createService(req, res) {
+    await createItem(req, res, 'TipoServicio', 'DescTipoServicio');
+}
+
+async function createUnidad(req, res) {
+    await createItem(req, res, 'TipoUnidad', 'DescTipoUnidad');
+}
+
+async function createVia(req, res) {
+    await createItem(req, res, 'TipoVia', 'DescTipoVia');
+}
+
+async function createTipoRegimen(req, res) {
+    await createItem(req, res, 'TipoRegimen', 'DescTipoRegimen');
+}
+
+async function createTipoFuncionario(req, res) {
+    await createItem(req, res, 'TipoFuncionario', 'TipoPerfil');
+}
+
+async function createContrato(req, res) {
+    await createItem(req, res, 'TipoContrato', 'TipoContrato');
+}
 
 module.exports = {
     renderHome,
@@ -98,5 +140,12 @@ module.exports = {
     getVia,
     getRegimen,
     getTipoFuncionario,
-    getContrato
+    getContrato,
+    createEstamento,
+    createUnidad,
+    createVia,
+    createTipoFuncionario,
+    createContrato,
+    createTipoRegimen,
+    createService
 }
