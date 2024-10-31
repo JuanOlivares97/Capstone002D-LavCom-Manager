@@ -84,13 +84,9 @@ async function updateArticulo(req, res) {
             return res.status(400).json({ message: "Error updating user" });
         }
 
-        return res
-            .status(200)
-            .json({ message: "Usuario actualizado exitosamente" });
+        return res.status(200).json({ message: "Usuario actualizado exitosamente" });
     } catch (error) {
-        return res
-            .status(500)
-            .json({ message: "Internal server error  " + error });
+        return res.status(500).json({ message: "Internal server error  " + error });
     }
 }
 
@@ -105,15 +101,11 @@ async function deleteArticulo(req, res) {
             },
         });
         if (!articulo) {
-            return res.status(400).json({ message: "Error deleting user" });
+            return res.status(400).json({ message: "Error al eliminar artículo", success: false });
         }
-        return res
-            .status(200)
-            .json({ message: "Usuario eliminado exitosamente" });
+        return res.status(200).json({ message: "Articulo eliminado exitosamente", success: true });
     } catch (error) {
-        return res
-            .status(500)
-            .json({ message: "Internal server error  " + error });
+        return res.status(500).json({ message: "Internal server error", error, success: false });
     }
 }
 
