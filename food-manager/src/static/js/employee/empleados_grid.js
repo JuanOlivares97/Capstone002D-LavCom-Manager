@@ -3,7 +3,7 @@ document.addEventListener('DOMContentLoaded', async function () {
     let gridApi;
 
     try {
-        const employee = await fetch('/employee/get-funcionarios')
+        const employee = await fetch('/food-manager/employee/get-funcionarios')
             .then(response => {
                 if (!response.ok) {
                     throw new Error('Error al obtener los empleados');
@@ -164,7 +164,7 @@ window.deleteUsuario = function (data) {
     }).then(async (result) => {
         if (result.isConfirmed) {
             try {
-                const response = await fetch(`/api/employees/delete-funcionario/${data.rut}`, {
+                const response = await fetch(`/employees/delete-funcionario/${data.rut}`, {
                     method: 'DELETE'
                 });
 
