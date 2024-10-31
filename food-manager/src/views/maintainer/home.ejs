@@ -9,93 +9,122 @@
     </div>
 
 
-<div id="cardGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-5 p-6">
+    <div id="cardGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-5 p-6">
+        <!-- Tarjeta de agregar item en Estamentos -->
+        <div class="card-item Estamento flex justify-center items-center bg-white rounded-lg shadow-lg p-5 cursor-pointer transition-transform duration-300 ease-in-out hover:transform hover:-translate-y-1">
+            <span class="text-gray-500 text-4xl font-bold">+</span>
+        </div>
         <% Estamento.forEach(Estamentos => { %>
-                <div class="hidden card-item Estamento flex flex-col gap-2 bg-white rounded-lg shadow-lg p-5 cursor-pointer transition-transform duration-300 ease-in-out hover:transform hover:-translate-y-1">
-                    <label class="text-gray-800 font-bold text-xl mb-2 text-center">
-                        <%- Estamentos.DescTipoEstamento %>
-                    </label>
-                    <button>Editar</button>
-                </div>
-            <% }) %>
+            <div class="card-item Estamento flex flex-col gap-2 bg-white rounded-lg shadow-lg p-5 cursor-pointer transition-transform duration-300 ease-in-out hover:transform hover:-translate-y-1">
+                <label class="text-gray-800 font-bold text-xl mb-2 text-center">
+                    <%- Estamentos.DescTipoEstamento %>
+                </label>
+                <div class="flex-grow"></div>
+                <button class="bg-blue-500 text-white font-semibold py-2 px-4 rounded hover:bg-blue-600 transition-colors duration-200 mt-auto">Editar</button>
+
+            </div>
+        <% }) %>
         
-            <% Unidad.forEach(Unidades => { %>
-                <div class="hidden card-item Unidad flex flex-col gap-2 bg-white rounded-lg shadow-lg p-5 cursor-pointer transition-transform duration-300 ease-in-out hover:transform hover:-translate-y-1">
-                    <label class="text-gray-800 font-bold text-xl mb-2 text-center">
-                        <%- Unidades.DescTipoUnidad %>
-                    </label>
-                    <button>Editar</button>
-                </div>
-            <% }) %>
+        <!-- Tarjeta de agregar item en Unidades -->
+        <div class="hidden card-item Unidad flex justify-center items-center bg-white rounded-lg shadow-lg p-5 cursor-pointer transition-transform duration-300 ease-in-out hover:transform hover:-translate-y-1">
+            <span class="text-gray-500 text-4xl font-bold">+</span>
+        </div>
 
-            <% servicios.forEach(servicio => { %>
-                <div class="hidden card-item Servicios flex flex-col gap-2 bg-white rounded-lg shadow-lg p-5 cursor-pointer transition-transform duration-300 ease-in-out hover:transform hover:-translate-y-1">
-                    <label class="text-gray-800 font-bold text-xl mb-2 text-center">
-                        <%- servicio.DescTipoServicio %>
-                    </label>
-                    <button>Editar</button>
-                </div>
-            <% }) %>
+        <% Unidad.forEach(Unidades => { %>
+            <div class="hidden card-item Unidad flex flex-col gap-2 bg-white rounded-lg shadow-lg p-5 cursor-pointer transition-transform duration-300 ease-in-out hover:transform hover:-translate-y-1">
+                <label class="text-gray-800 font-bold text-xl mb-2 text-center">
+                    <%- Unidades.DescTipoUnidad %>
+                </label>
+                <div class="flex-grow"></div>
+                <button class="bg-blue-500 text-white font-semibold py-2 px-4 rounded hover:bg-blue-600 transition-colors duration-200 mt-auto">Editar</button>
+
+            </div>
+        <% }) %>
         
-            <% Via.forEach(Vias => { %>
-                <div class="hidden card-item Vias flex flex-col gap-2 bg-white rounded-lg shadow-lg p-5 cursor-pointer transition-transform duration-300 ease-in-out hover:transform hover:-translate-y-1">
-                    <label class="text-gray-800 font-bold text-xl mb-2 text-center">
-                        <%- Vias.DescTipoVia %>
-                    </label>
-                    <button>Editar</button>
-                </div>
-            <% }) %>
+            
+        <!-- Tarjeta de agregar item en Servicios -->
+        <div class="hidden card-item Servicios flex justify-center items-center bg-white rounded-lg shadow-lg p-5 cursor-pointer transition-transform duration-300 ease-in-out hover:transform hover:-translate-y-1">
+            <span class="text-gray-500 text-4xl font-bold">+</span>
+        </div>
 
-            <% Contrato.forEach(Contratos => { %>
-                <div class="hidden card-item Contratos flex flex-col gap-2 bg-white rounded-lg shadow-lg p-5 cursor-pointer transition-transform duration-300 ease-in-out hover:transform hover:-translate-y-1">
-                    <label class="text-gray-800 font-bold text-xl mb-2 text-center">
-                        <%- Contratos.TipoContrato %>
-                    </label>
-                    <button>Editar</button>
-                </div>
-            <% }) %>
+        <% servicios.forEach(servicio => { %>
+            <div class="hidden card-item Servicios flex flex-col gap-2 bg-white rounded-lg shadow-lg p-5 cursor-pointer transition-transform duration-300 ease-in-out hover:transform hover:-translate-y-1">
+                <label class="text-gray-800 font-bold text-xl mb-2 text-center">
+                    <%- servicio.DescTipoServicio %>
+                </label>
+                <div class="flex-grow"></div>
+                <button class="bg-blue-500 text-white font-semibold py-2 px-4 rounded hover:bg-blue-600 transition-colors duration-200 mt-auto">Editar</button>
 
-            <% Regimen.forEach(Regimens => { %>
-                <div class="hidden card-item Regimen flex flex-col gap-2 bg-white rounded-lg shadow-lg p-5 cursor-pointer transition-transform duration-300 ease-in-out hover:transform hover:-translate-y-1">
-                    <label class="text-gray-800 font-bold text-xl mb-2 text-center">
-                        <%- Regimens.DescTipoRegimen %>
-                    </label>
-                    <button>Editar</button>
-                </div>
-            <% }) %>
+            </div>
+        <% }) %>
         
-            <% TipoFuncionario.forEach(TipoFuncionarios => { %>
-                <div class="hidden card-item Perfiles flex flex-col gap-2 bg-white rounded-lg shadow-lg p-5 cursor-pointer transition-transform duration-300 ease-in-out hover:transform hover:-translate-y-1">
-                    <label class="text-gray-800 font-bold text-xl mb-2 text-center">
-                        <%- TipoFuncionarios.TipoPerfil %>
-                    </label>
-                    <button>Editar</button>
-                </div>
-            <% }) %>
-</div>
+            
+        <!-- Tarjeta de agregar item en Vias -->
+        <div class="hidden card-item Vias flex justify-center items-center bg-white rounded-lg shadow-lg p-5 cursor-pointer transition-transform duration-300 ease-in-out hover:transform hover:-translate-y-1">
+            <span class="text-gray-500 text-4xl font-bold">+</span>
+        </div>
 
-<script>
-        document.addEventListener('DOMContentLoaded', function () {
-    const filtroLinks = document.querySelectorAll('.filtro-link');
+        <% Via.forEach(Vias => { %>
+            <div class="hidden card-item Vias flex flex-col gap-2 bg-white rounded-lg shadow-lg p-5 cursor-pointer transition-transform duration-300 ease-in-out hover:transform hover:-translate-y-1">
+                <label class="text-gray-800 font-bold text-xl mb-2 text-center">
+                    <%- Vias.DescTipoVia %>
+                </label>
+                <div class="flex-grow"></div>
+                <button class="bg-blue-500 text-white font-semibold py-2 px-4 rounded hover:bg-blue-600 transition-colors duration-200 mt-auto">Editar</button>
 
-    filtroLinks.forEach(link => {
-        link.addEventListener('click', (e) => {
-            e.preventDefault();
-            const filter = e.target.getAttribute('data-filter');
+            </div>
+        <% }) %>
+        
+            
+        <!-- Tarjeta de agregar item en Contratos -->
+        <div class="hidden card-item Contratos flex justify-center items-center bg-white rounded-lg shadow-lg p-5 cursor-pointer transition-transform duration-300 ease-in-out hover:transform hover:-translate-y-1">
+            <span class="text-gray-500 text-4xl font-bold">+</span>
+        </div>
 
-            // Obtener todas las tarjetas
-            const cards = document.querySelectorAll('.card-item');
+        <% Contrato.forEach(Contratos => { %>
+            <div class="hidden card-item Contratos flex flex-col gap-2 bg-white rounded-lg shadow-lg p-5 cursor-pointer transition-transform duration-300 ease-in-out hover:transform hover:-translate-y-1">
+                <label class="text-gray-800 font-bold text-xl mb-2 text-center">
+                    <%- Contratos.TipoContrato %>
+                </label>
+                <div class="flex-grow"></div>
+                <button class="bg-blue-500 text-white font-semibold py-2 px-4 rounded hover:bg-blue-600 transition-colors duration-200 mt-auto">Editar</button>
 
-            // Mostrar u ocultar las tarjetas según el filtro seleccionado
-            cards.forEach(card => {
-                if (card.classList.contains(filter)) {
-                    card.classList.remove('hidden'); // Mostrar tarjeta
-                } else {
-                    card.classList.add('hidden'); // Ocultar tarjeta
-                }
-            });
-        });
-    });
-});
+            </div>
+        <% }) %>
+        
+            
+        <!-- Tarjeta de agregar item en Regimen -->
+        <div class="hidden card-item Regimen flex justify-center items-center bg-white rounded-lg shadow-lg p-5 cursor-pointer transition-transform duration-300 ease-in-out hover:transform hover:-translate-y-1">
+            <span class="text-gray-500 text-4xl font-bold">+</span>
+        </div>
 
-</script>
+        <% Regimen.forEach(Regimens => { %>
+            <div class="hidden card-item Regimen flex flex-col gap-2 bg-white rounded-lg shadow-lg p-5 cursor-pointer transition-transform duration-300 ease-in-out hover:transform hover:-translate-y-1">
+                <label class="text-gray-800 font-bold text-xl mb-2 text-center">
+                    <%- Regimens.DescTipoRegimen %>
+                </label>
+                <div class="flex-grow"></div>
+                <button class="bg-blue-500 text-white font-semibold py-2 px-4 rounded hover:bg-blue-600 transition-colors duration-200 mt-auto">Editar</button>
+
+            </div>
+        <% }) %>
+        
+        <!-- Tarjeta de agregar item en Perfiles -->
+        <div class="hidden card-item Perfiles flex justify-center items-center bg-white rounded-lg shadow-lg p-5 cursor-pointer transition-transform duration-300 ease-in-out hover:transform hover:-translate-y-1">
+            <span class="text-gray-500 text-4xl font-bold">+</span>
+        </div>
+    
+        <% TipoFuncionario.forEach(TipoFuncionarios => { %>
+            <div class="hidden card-item Perfiles flex flex-col gap-2 bg-white rounded-lg shadow-lg p-5 cursor-pointer transition-transform duration-300 ease-in-out hover:transform hover:-translate-y-1">
+                <label class="text-gray-800 font-bold text-xl mb-2 text-center">
+                    <%- TipoFuncionarios.TipoPerfil %>
+                </label>
+                <div class="flex-grow"></div>
+                <button class="bg-blue-500 text-white font-semibold py-2 px-4 rounded hover:bg-blue-600 transition-colors duration-200 mt-auto">Editar</button>
+
+            </div>
+        <% }) %>
+        
+    </div>
+    <%- include('../components/modals/maintainers/modalAddMaintainer') %>
+    <script src="/food-manager/js/maintainers/openModal.js" defer></script>
