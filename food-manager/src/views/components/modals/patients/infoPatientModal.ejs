@@ -47,10 +47,11 @@
                 <div>
                     <label class="block font-medium text-gray-700 my-2">Observaciones Generales</label>
                     <textarea type="text" id="infoObservacionesGenerales" name="infoObservacionesGenerales"
-                        class="my-2 w-full p-2 border rounded h-48" readonly></textarea>
+                        class="my-2 w-full p-2 border rounded h-48"></textarea>
                     <button id="changeObservacionesGenerales"
-                        class="px-4 py-2 bg-blue-200 text-gray-800 rounded-md shadow-sm hover:bg-gray-300 w-full">Cambiar
-                        Observaciones Generales</button>
+                        class="px-4 py-2 bg-blue-200 text-gray-800 rounded-md shadow-sm hover:bg-gray-300 w-full">
+                        Cambiar Observaciones Generales
+                    </button>
                 </div>
             </div>
 
@@ -88,7 +89,7 @@
                 <div>
                     <label class="block font-medium text-gray-700 my-2">Observaciones Nutricionista</label>
                     <textarea type="text" id="infoObservacionesNutricionista" name="infoObservacionesNutricionista"
-                        class="my-2 w-full p-2 border rounded h-48" readonly></textarea>
+                        class="my-2 w-full p-2 border rounded h-48"></textarea>
                     <button id="changeObservacionesNutricionista"
                         class="px-4 py-2 bg-blue-200 text-gray-800 rounded-md shadow-sm hover:bg-gray-300 w-full">Cambiar
                         Observaciones Nutricionista</button>
@@ -99,7 +100,7 @@
                 <div>
                     <label for="infoServicio" class="block font-medium text-gray-700 my-2">Tipo de Servicio</label>
                     <select id="infoServicio" name="infoServicio" class="my-2 w-full p-2 border rounded" required>
-                        <option value="" disabled selected>Seleccione</option>
+                        <option value="no-usar" disabled selected>Seleccione</option>
                         <% servicios.forEach(servicio=> { %>
                             <option value="<%= servicio.IdTipoServicio %>">
                                 <%= servicio.DescTipoServicio %>
@@ -114,7 +115,7 @@
                 <div>
                     <label for="infoUnidad" class="block font-medium text-gray-700 my-2">Tipo de Unidad</label>
                     <select id="infoUnidad" name="infoUnidad" class="my-2 w-full p-2 border rounded" required>
-                        <option value="" disabled selected>Seleccione</option>
+                        <option value="no-usar" disabled selected>Seleccione</option>
                         <% unidades.forEach(unidad=> { %>
                             <option value="<%= unidad.IdTipoUnidad %>">
                                 <%= unidad.DescTipoUnidad %>
@@ -126,7 +127,7 @@
                 <div>
                     <label for="infoVia" class="block font-medium text-gray-700 my-2">Tipo de Via</label>
                     <select id="infoVia" name="infoVia" class="my-2 w-full p-2 border rounded" required>
-                        <option value="" disabled selected>Seleccione</option>
+                        <option value="no-usar" disabled selected>Seleccione</option>
                         <% vias.forEach(via=> { %>
                             <option value="<%= via.IdTipoVia %>">
                                 <%= via.DescTipoVia %>
@@ -141,7 +142,7 @@
                 <div>
                     <label for="infoRegimen" class="block font-medium text-gray-700 my-2">Tipo de Regimen</label>
                     <select id="infoRegimen" name="infoRegimen" class="my-2 w-full p-2 border rounded" required>
-                        <option value="" disabled selected>Seleccione</option>
+                        <option value="no-usar" disabled selected>Seleccione</option>
                         <% regimen.forEach(reg=> { %>
                             <option value="<%= reg.IdTipoRegimen %>">
                                 <%= reg.DescTipoRegimen%>
@@ -216,9 +217,11 @@
                 <button onclick="toggleLogs()"
                     class="px-4 py-2 bg-red-200 text-gray-800 rounded-md shadow-sm hover:bg-gray-300">Ver Logs</button>
             </div>
-        <div class="mt-6 flex justify-end">
-        <button id="altaModal" class="px-4 py-2 bg-blue-200 text-white-800 rounded-md shadow-sm hover:bg-blue-300">Dar alta paciente</button>
+            <div class="mt-6 flex justify-end">
+                <button id="altaModal"
+                    class="px-4 py-2 bg-blue-200 text-white-800 rounded-md shadow-sm hover:bg-blue-300">Dar alta
+                    paciente</button>
+            </div>
+        </div>
     </div>
-</div>
-</div>
 </div>
