@@ -2,11 +2,11 @@
 <% 
 // Definir las secciones y qué tipo de usuarios tienen acceso a ellas
 const secciones = [
-    { icon: "../icons/user_group", label: "Gestor de Pacientes", tipos: [1, 2, 3, 4], endpoint: "/patient/home" },
-    { icon: "../icons/adjustments-horizontal", label: "Mantenedores", tipos: [1, 2], endpoint: "/maintainer/home" },
-    { icon: "../icons/dashboard_icon", label: "Dashboard", tipos: [1, 2, 3], endpoint: "/dashboard/home" },
-    { icon: "../icons/clipboard_document", label: "Gestor de Funcionarios", tipos: [1, 2, 5], endpoint: "/employee/home" },
-    { icon: "../icons/presentation_chart", label: "Reportes", tipos: [1, 2, 3], endpoint: "/report/home" }
+    { icon: "../icons/user_group", label: "Gestor de Pacientes", tipos: [1, 2, 3, 4], endpoint: "/food-manager/patient/home" },
+    { icon: "../icons/adjustments-horizontal", label: "Mantenedores", tipos: [1, 2], endpoint: "/food-manager/maintainer/home" },
+    { icon: "../icons/dashboard_icon", label: "Dashboard", tipos: [1, 2, 3], endpoint: "/food-manager/dashboard/home" },
+    { icon: "../icons/clipboard_document", label: "Gestor de Funcionarios", tipos: [1, 2, 5], endpoint: "/food-manager/employee/home" },
+    { icon: "../icons/presentation_chart", label: "Reportes", tipos: [1, 2, 3], endpoint: "/food-manager/report/home" }
 ];
 
 // Función para verificar si el usuario tiene acceso a la sección
@@ -42,13 +42,13 @@ function tieneAcceso(tiposPermitidos, tipoUsuario) {
 
             <!-- Otras secciones sin lógica compleja -->
             <li class="mb-4">
-                <a href="/lunch/home" class="flex items-center p-2 text-black hover:bg-white rounded transition duration-300">
+                <a href="/food-manager/lunch/home" class="flex items-center p-2 text-black hover:bg-white rounded transition duration-300">
                     <%- include("../icons/bell-alert") %>
                     <span class="ml-2 sidebar-text">Registrar Colación</span>
                 </a>
             </li>
             <li class="mb-4">
-                <a href="/help/home" class="flex items-center p-2 text-black hover:bg-white rounded transition duration-300">
+                <a href="/food-manager/help/home" class="flex items-center p-2 text-black hover:bg-white rounded transition duration-300">
                     <%- include("../icons/question-mark-circle") %>
                     <span class="ml-2 sidebar-text">Ayuda</span>
                 </a>
@@ -72,5 +72,5 @@ function tieneAcceso(tiposPermitidos, tipoUsuario) {
             <%- include("../icons/logout_icon") %>
             <label class="ml-2">Cerrar Sesión</label>
         </button>
-        <script src="/js/auth/logout.js"></script>
+        <script src="/food-manager/js/auth/logout.js"></script>
     </header>

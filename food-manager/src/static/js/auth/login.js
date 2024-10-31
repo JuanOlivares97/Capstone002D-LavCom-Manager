@@ -4,7 +4,7 @@ form.addEventListener("submit", async (e) => {
 
     const rutCompleto = form.querySelector("input[name='RutCompleto']").value;
     const pwd = form.querySelector("input[name='pwd']").value;
-    const response = await fetch("/auth/login", {
+    const response = await fetch("/food-manager/auth/login", {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
@@ -42,7 +42,7 @@ form.addEventListener("submit", async (e) => {
             position: 'top-end',
         });
         if (email) {
-            const response_email = await fetch("/auth/set-email", {
+            const response_email = await fetch("/food-manager/auth/set-email", {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json"
@@ -74,7 +74,7 @@ form.addEventListener("submit", async (e) => {
         position: 'top-end',
         showConfirmButton: false, // No mostrar botón de confirmación
         willClose: () => {
-            window.location.href = "/dashboard/home"; // Redirigir cuando la alerta se cierre
+            window.location.href = "/food-manager/dashboard/home"; // Redirigir cuando la alerta se cierre
         }
     });
 });

@@ -1,10 +1,13 @@
-const logoutButtons = [document.getElementById('btn-logout-pc'), document.getElementById('btn-logout-mobile')];
+const logoutButtons = [
+    document.getElementById('btn-logout-pc'),
+    document.getElementById('btn-logout-mobile')
+].filter(button => button !== null); // Filtrar elementos nulos
 
 logoutButtons.forEach(button => {
     button.addEventListener('click', async (e) => {
         e.preventDefault(); // Prevenir la acción predeterminada del botón
         console.log('Logout button clicked');
-        const response = await fetch("/auth/logout", {
+        const response = await fetch("/food-manager/auth/logout", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
@@ -19,7 +22,7 @@ logoutButtons.forEach(button => {
                 title: 'Sesión Cerrada',
                 html: 'Serás redirigido en <b></b> segundos.',
                 icon: 'success',
-                timer: 2000, // Tiempo total en milisegundos (3 segundos)
+                timer: 2000, // Tiempo total en milisegundos (2 segundos)
                 timerProgressBar: true,
                 didOpen: () => {
                     // Actualizamos el texto de la cuenta regresiva cada segundo
@@ -32,7 +35,7 @@ logoutButtons.forEach(button => {
                     clearInterval(timerInterval);
                 }
             }).then(() => {
-                window.location.href = "/auth/login"; // Redirigir al login después de la alerta
+                window.location.href = "/food-manager/auth/login"; // Redirigir al login después de la alerta
             });
         } else {
             Swal.fire({
