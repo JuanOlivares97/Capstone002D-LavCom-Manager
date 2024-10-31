@@ -32,7 +32,7 @@ document.addEventListener("DOMContentLoaded", async function () {
                         <button class="edit bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 text-sm rounded mr-1" onclick="editArticulo(${JSON.stringify(
                             params.data
                         ).replace(/"/g, "&quot;")})">Editar</button>
-                        <button class="delete bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 text-sm rounded" onclick="deleteArticulo(${JSON.stringify(
+                        <button class="delete bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 text-sm rounded" onclick="deleteArticulo(${params.node.rowIndex}, ${JSON.stringify(
                             params.data
                         ).replace(/"/g, "&quot;")})">Borrar</button>
                     `;
@@ -48,11 +48,13 @@ document.addEventListener("DOMContentLoaded", async function () {
             sortable: true,
             filter: true,
         },
+        onGridReady: function (params) {
+            gridApi = params.api;
+        }
     };
 
     const gridDiv = document.querySelector("#grid");
     gridApi = agGrid.createGrid(gridDiv, gridOptions);
-});
 
 window.editArticulo = function (data) {
     const modal = document.getElementById("editar_articulo_modal");
@@ -77,9 +79,9 @@ window.editArticulo = function (data) {
     }, 10); // Small delay to ensure the class is applied after removing 'hidden'
 };
 
-window.deleteArticulo = function (data) {
+window.deleteArticulo = function (rowIndex, articulo) {
     Swal.fire({
-        title: `¿Estás seguro de que deseas borrar el articulo ${data.nombre_articulo}?`,
+        title: `¿Estás seguro de que deseas borrar el articulo ${articulo.nombre_articulo}?`,
         text: "¡No podrás revertir esto! ¿Deseas continuar? ",
         icon: "warning",
         renderCancelButton: true,
@@ -87,9 +89,33 @@ window.deleteArticulo = function (data) {
         cancelButtonColor: "#d33",
         confirmButtonText: "Sí, bórralo!",
         cancelButtonText: "Cancelar",
-    }).then((result) => {
+    }).then(async (result) => {
         if (result.isConfirmed) {
-            Swal.fire("¡Borrado!", "El artículo ha sido borrado.", "success");
+            await fetch("/clothes/delete-clothes", {
+                method: "DELETE",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ id_articulo: articulo.id_articulo }),
+            })
+            .then((response) => response.json())
+            .then((data) => {
+                if (!data.success) {
+                    Swal.fire({
+                        title: "Error",
+                        text: data.message,
+                        icon: "error",
+                    });
+                    return;
+                }
+                Swal.fire(data.message).then(() => {
+                    const rowNode = gridApi.getRowNode(rowIndex);
+                    gridApi.applyTransaction({ remove: [rowNode.data] });
+                })
+                return;
+            });
         }
     });
 };
+
+});
