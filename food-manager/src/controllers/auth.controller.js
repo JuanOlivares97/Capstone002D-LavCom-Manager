@@ -60,11 +60,11 @@ async function login(req, res) {
         }
         const token = jwt.sign(token_data, process.env.JWT_SECRET, { expiresIn: "8h" });
 
-        res.cookie("token", token, { path: "/" });
-        res.cookie("logged-in", true, { path: "/" });
-        res.cookie("tipo_usuario", user.IdTipoFuncionario, { path: "/" });
-        res.cookie("rutLogueado", user.RutFuncionario, { path: "/" });
-        res.cookie("dvLogueado", user.DvFuncionario, { path: "/" });
+        res.cookie("token", token, { path: "/food-manager" });
+        res.cookie("logged-in", true, { path: "/food-manager" });
+        res.cookie("tipo_usuario", user.IdTipoFuncionario, { path: "/food-manager" });
+        res.cookie("rutLogueado", user.RutFuncionario, { path: "/food-manager" });
+        res.cookie("dvLogueado", user.DvFuncionario, { path: "/food-manager" });
 
         return res.status(200).json({ message: "Has iniciado sesión, bienvenido", success: true, user });
     } catch (error) {
@@ -123,7 +123,7 @@ async function sendPwdEmail(req, res) {
         const code = Math.floor(Math.random() * (9999 - 1000 + 1)) + 1000;
 
         res.cookie("pwdcode", bcrypt.hashSync(code.toString(), 10), { path: "/" });
-        res.cookie("username", rutCompleto, { path: "/" });
+        res.cookie("username", rutCompleto, { path: "/food-manager" });
 
         await mailer.enviarCorreo(email, code.toString());
 
