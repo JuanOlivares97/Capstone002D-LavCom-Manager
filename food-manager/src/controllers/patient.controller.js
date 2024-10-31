@@ -5,6 +5,8 @@ const {
     getVia,
     getRegimen } = require('./maintainer.controller');
 
+const tempo = require("@formkit/tempo");
+
 async function renderHome(req, res) {
     try {
         // Obtener los servicios
@@ -95,7 +97,8 @@ async function createPaciente(req, res) {
         // Verificar si el paciente ya existe en la base de datos
         const pacienteExistente = await prisma.Hospitalizado.findFirst({
             where: {
-                RutHospitalizado: parseInt(req.body.RutHospitalizado)  // Buscar por el Rut
+                RutHospitalizado: req.body.RutHospitalizado, // Buscar por el Rut
+                DvHospitalizado: req.body.DvHospitalizado // Buscar por el Dv
             }
         });
 
@@ -106,7 +109,7 @@ async function createPaciente(req, res) {
                     IdHospitalizado: pacienteExistente.IdHospitalizado
                 },
                 data: {
-                    FechaIngreso: new Date(req.body.FechaIngreso)  // Actualizar la fecha de ingreso
+                    FechaIngreso: new Date(req.body.FechaIngreso)  // Convertir la fecha de ingreso
                 }
             });
 
@@ -125,17 +128,18 @@ async function createPaciente(req, res) {
             const nuevoPaciente = await prisma.Hospitalizado.create({
                 data: {
                     CodigoCama: parseInt(req.body.CodigoCama),
-                    RutHospitalizado: parseInt(req.body.RutHospitalizado),
-                    DvHospitalizado: req.body.DvHospitalizado,
+                    RutHospitalizado: req.body.RutHospitalizado,
+                    DvHospitalizado: req.body.DvHospitalizado, // Cambié a string para manejar el dígito verificador
                     NombreHospitalizado: req.body.NombreHospitalizado,
                     ApellidoP: req.body.ApellidoP,
                     ApellidoM: req.body.ApellidoM,
-                    FechaNacimiento: new Date(req.body.FechaNacimiento),
-                    FechaIngreso: new Date(req.body.FechaIngreso),
+                    FechaNacimiento: new Date(req.body.FechaNacimiento), // Convertir la fecha de nacimiento
+                    FechaIngreso: new Date(req.body.FechaIngreso), // Convertir la fecha de ingreso
                     Telefono: parseInt(req.body.Telefono),
                     Direccion: req.body.Direccion,
                     Correo: req.body.Correo,
                     ObservacionesNutricionista: req.body.ObservacionesNutricionista,
+                    ObservacionesSala: req.body.ObservacionesSala,
                     IdTipoServicio: parseInt(req.body.IdTipoServicio),
                     IdTipoUnidad: parseInt(req.body.IdTipoUnidad),
                     IdTipoVia: parseInt(req.body.IdTipoVia),
@@ -232,8 +236,8 @@ async function movePatientService(req, res) {
 }
 
 async function changeRegimen(req, res) {
-    // Verificar si el paciente existe en la base de datos
     try {
+        // Verificar si el paciente existe en la base de datos
         const paciente = await prisma.Hospitalizado.findFirst({
             where: {
                 IdHospitalizado: parseInt(req.params.id)
@@ -242,20 +246,33 @@ async function changeRegimen(req, res) {
                 TipoRegimen: true
             }
         });
-        const oldRegimen = paciente.TipoRegimen.DescTipoRegimen;
+
+        // Verificar si el paciente existe
+        if (!paciente) {
+            return res.status(404).json({ message: 'Paciente no encontrado' });
+        }
+
+        const oldRegimen = paciente.TipoRegimen ? paciente.TipoRegimen.DescTipoRegimen : null;
+        const currentRegimenId = paciente.IdTipoRegimen;
         const newRegimen = parseInt(req.body.newRegimen);
 
+        // Obtener la lista de regímenes
         const regimens = await getRegimen();
         const newRegimenIndex = regimens.findIndex(regimen => regimen.IdTipoRegimen === newRegimen);
 
+        // Validar si el nuevo régimen es válido
         if (newRegimenIndex === -1) {
-            return res.status(400).json({ message: 'Regimen no válido' });
+            return res.status(400).json({ message: 'Régimen no válido' });
         }
-        if (newRegimen === oldRegimen) {
-            return res.status(400).json({ message: 'Regimen no cambiado' });
+
+        // Validar si el nuevo régimen es el mismo que el actual
+        if (currentRegimenId === newRegimen) {
+            return res.status(400).json({ message: 'El régimen no ha cambiado' });
         }
+
         const strRegimen = regimens[newRegimenIndex].DescTipoRegimen;
-        // Actualizar el servicio del paciente
+
+        // Actualizar el régimen del paciente
         await prisma.Hospitalizado.update({
             where: {
                 IdHospitalizado: paciente.IdHospitalizado
@@ -264,16 +281,20 @@ async function changeRegimen(req, res) {
                 IdTipoRegimen: newRegimen
             }
         });
+
+        // Registrar el movimiento del cambio de régimen
         const movimiento = await prisma.logMovimientosPaciente.create({
             data: {
                 idPaciente: paciente.IdHospitalizado,
                 fechaLog: new Date(),
-                descripcionLog: `Movimiento del Regimen ${oldRegimen} al ${strRegimen}`
+                descripcionLog: `Cambio de régimen de ${oldRegimen} a ${strRegimen}`
             }
         });
-        return res.status(200).json({ message: 'Movimiento al Regimen', movimiento });
+
+        return res.status(200).json({ message: 'Movimiento de régimen exitoso', movimiento });
     } catch (error) {
-        return res.status(500).json({ message: "Internal server error " + error });
+        console.error('Error interno:', error);
+        return res.status(500).json({ message: 'Error interno del servidor', error: error.message });
     }
 }
 
@@ -336,6 +357,7 @@ async function changeObservacionesNutricionista(req, res) {
                 descripcionLog: `Cambio de Observaciones Nutricionista: ${oldObservacionesNutricionista} a ${newObservacionesNutricionista}`
             }
         });
+        return res.status(200).json({ message: 'Movimiento al Observaciones de Nutricionista', movimiento });   
     } catch (error) {
         return res.status(500).json({ message: "Internal server error " + error });
     }
@@ -371,9 +393,69 @@ async function changeObservacionesGenerales(req, res) {
     } catch (error) {
         return res.status(500).json({ message: "Internal server error " + error });
     }
-}   
+}
 
+async function changeVia(req, res) {
+    try {
+        // Verificar si el paciente existe en la base de datos
+        const paciente = await prisma.Hospitalizado.findFirst({
+            where: {
+                IdHospitalizado: parseInt(req.params.id)
+            },
+            include: {
+                TipoVia: true
+            }
+        });
 
+        // Verificar si se encontró el paciente
+        if (!paciente) {
+            return res.status(404).json({ message: 'Paciente no encontrado' });
+        }
+
+        const oldVia = paciente.TipoVia ? paciente.TipoVia.DescTipoVia : null;
+        const newVia = parseInt(req.body.newVia);
+
+        // Obtener la lista de vías
+        const Vias = await getVia();
+        const newViaIndex = Vias.findIndex(via => via.IdTipoVia === newVia);
+
+        // Validar si la nueva vía es válida
+        if (newViaIndex === -1) {
+            return res.status(400).json({ message: 'Vía no válida' });
+        }
+
+        // Validar si la nueva vía es la misma que la anterior
+        if (paciente.IdTipoVia === newVia) {
+            return res.status(400).json({ message: 'La vía no ha cambiado' });
+        }
+
+        const strVia = Vias[newViaIndex].DescTipoVia;
+
+        // Actualizar la vía del paciente
+        await prisma.Hospitalizado.update({
+            where: {
+                IdHospitalizado: paciente.IdHospitalizado
+            },
+            data: {
+                IdTipoVia: newVia
+            }
+        });
+
+        // Registrar el movimiento del cambio de vía
+        const movimiento = await prisma.logMovimientosPaciente.create({
+            data: {
+                idPaciente: paciente.IdHospitalizado,
+                fechaLog: new Date(),
+                descripcionLog: `Cambio de ingesta de alimentos de ${oldVia} a ${strVia}`
+            }
+        });
+
+        return res.status(200).json({ message: 'Vía de ingesta actualizada exitosamente', movimiento });
+    } catch (error) {
+        console.error('Error interno:', error);
+        return res.status(500).json({ message: "Error interno del servidor", error: error.message });
+    }
+}
 
 
 module.exports = {
@@ -385,5 +467,6 @@ module.exports = {
     changeRegimen,
     changeObservacionesAlta,
     changeObservacionesNutricionista,
-    changeObservacionesGenerales
+    changeObservacionesGenerales,
+    changeVia
 }
