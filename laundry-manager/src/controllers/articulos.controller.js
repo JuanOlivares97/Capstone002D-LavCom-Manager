@@ -52,17 +52,16 @@ async function createArticulo(req, res) {
         };
         const articulo = await prisma.articulo.create({
             data: newArticulo,
+            include: {
+                subgrupo_ropa: true,
+            }
         });
         if (!articulo) {
-            return res.status(400).json({ message: "Error creating user" });
+            return res.status(400).json({ message: "Error al crear artículo" , success: false});
         }
-        return res
-            .status(201)
-            .json({ message: "Articulo creado exitosamente" });
+        return res.status(200).json({ message: "Articulo creado exitosamente", success: true, articulo });
     } catch (error) {
-        return res
-            .status(500)
-            .json({ message: "Internal server  error  " + error });
+        return res.status(500).json({ message: "Internal server  error  ", error, success: false });
     }
 }
 
