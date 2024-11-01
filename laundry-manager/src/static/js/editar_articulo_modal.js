@@ -43,7 +43,18 @@ document.addEventListener("DOMContentLoaded", function() {
             }).then(() => {
                 // Cerrar el modal
                 modal.classList.add('hidden');
-                location.reload();
+                const newdata = data.articulo_actualizado;
+                const row = window.gridApi.getRowNode(updatedData.rowIndex);
+                if (row) {
+                    row.setData({
+                        ...row.data,
+                        id_articulo: newdata.id_articulo,
+                        nombre_articulo: newdata.nombre_articulo,
+                        stock: newdata.stock,
+                        subgrupo: newdata.subgrupo_ropa.desc_subgrupo,
+                        id_subgrupo_ropa: newdata.id_subgrupo_ropa
+                    });
+                }
             });
         });
     });
