@@ -14,9 +14,6 @@ document.addEventListener("DOMContentLoaded", function() {
         e.preventDefault();
         const formData = new FormData(e.target);
         const updatedData = Object.fromEntries(formData);
-
-        console.log(updatedData);
-        
         
         await fetch("/clothes/update-clothes", {
             method: "PUT",
