@@ -57,7 +57,7 @@ window.editArticulo = function (rowIndex, data) {
     const modal = document.getElementById("editar_articulo_modal");
 
     const modalTitle = modal.getElementsByTagName("h2");
-    modalTitle[0].innerText = `Editar Artículo con ID ${data.id_articulo}`;
+    modalTitle[0].innerText = `Editar ${data.nombre_articulo}`;
 
     const idInput = modal.querySelector("input[name='id_articulo']");
     const rowIndexInput = modal.querySelector("input[name='rowIndex']");
