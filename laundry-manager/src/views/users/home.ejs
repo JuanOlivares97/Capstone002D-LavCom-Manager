@@ -4,7 +4,7 @@
         type="button" 
         class="flex gap-2 text-black p-2 rounded hover:bg-gray-400 hover:text-white transition duration-300 mt-3" >
         <%- include('../icons/add_user') %>
-        <span class="class=ml-2">Crear Nuevo Usuario</span>
+        <span class="class=ml-2" id="openModal">Crear Nuevo Usuario</span>
     </button>
     
     <div id="gridForUsers" class="ag-theme-quartz h-5/6 max-w-screen mt-3 md:text-lg"></div>
@@ -12,4 +12,6 @@
 <%- include('../components/modals/users/crear_usuario_modal') %>        
 <%- include('../components/modals/users/editar_usuario_modal') %>   
 <script type="module" src="/js/reportsHome_grid.js"></script>
-<script defer src="/js/openReport_modal.js"></script>
+<script defer src="/js/users/usuarios_grid.js" type="module"></script>
+<script defer src="/js/users/crear_usuario_modal.js"></script>
+<script defer src="/js/users/editar_usuario_modal.js"></script>
