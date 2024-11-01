@@ -20,7 +20,7 @@ document.addEventListener("DOMContentLoaded", async function () {
             },
             { field: "stock", flex: 1 },
             {
-                field: "subgrupo_ropa.desc_subgrupo",
+                field: "subgrupo",
                 headerName: "Subgrupo",
                 flex: 1,
             },
@@ -29,7 +29,7 @@ document.addEventListener("DOMContentLoaded", async function () {
                 field: "actions",
                 cellRenderer: function (params) {
                     return `
-                        <button class="edit bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 text-sm rounded mr-1" onclick="editArticulo(${JSON.stringify(
+                        <button class="edit bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 text-sm rounded mr-1" onclick="editArticulo(${params.node.rowIndex}, ${JSON.stringify(
                             params.data
                         ).replace(/"/g, "&quot;")})">Editar</button>
                         <button class="delete bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 text-sm rounded" onclick="deleteArticulo(${params.node.rowIndex}, ${JSON.stringify(
@@ -47,27 +47,26 @@ document.addEventListener("DOMContentLoaded", async function () {
             resizable: false,
             sortable: true,
             filter: true,
-        },
-        onGridReady: function (params) {
-            gridApi = params.api;
         }
     };
 
     const gridDiv = document.querySelector("#grid");
     gridApi = agGrid.createGrid(gridDiv, gridOptions);
 
-window.editArticulo = function (data) {
+window.editArticulo = function (rowIndex, data) {
     const modal = document.getElementById("editar_articulo_modal");
 
     const modalTitle = modal.getElementsByTagName("h2");
     modalTitle[0].innerText = `Editar Artículo con ID ${data.id_articulo}`;
 
     const idInput = modal.querySelector("input[name='id_articulo']");
+    const rowIndexInput = modal.querySelector("input[name='rowIndex']");
     const nameInput = modal.querySelector("input[name='nombre']");
     const stockInput = modal.querySelector("input[name='stock']");
     const subgrupoInput = modal.querySelector("select[name='subgrupo']");
 
     idInput.value = data.id_articulo;
+    rowIndexInput.value = rowIndex;
     nameInput.value = data.nombre_articulo;
     stockInput.value = data.stock;
     subgrupoInput.value = data.id_subgrupo_ropa;
@@ -118,4 +117,5 @@ window.deleteArticulo = function (rowIndex, articulo) {
     });
 };
 
+window.gridApi = gridApi;
 });
