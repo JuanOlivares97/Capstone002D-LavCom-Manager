@@ -32,7 +32,7 @@ async function getArticulos(req, res) {
                         id_subgrupo_ropa: articulo.id_subgrupo_ropa,
                     },
                 });
-                return { ...articulo, subgrupo_ropa: subgrupo };
+                return { ...articulo, subgrupo: subgrupo.desc_subgrupo };
             })
         );
         
@@ -74,17 +74,20 @@ async function updateArticulo(req, res) {
             id_subgrupo_ropa: parseInt(req.body.subgrupo),
             borrado: false,
         };
-        const articulos = await prisma.articulo.update({
+        const articulo_actualizado = await prisma.articulo.update({
             where: {
                 id_articulo: parseInt(req.body.id_articulo),
             },
             data: articulo,
+            include: {
+                subgrupo_ropa: true,
+            }
         });
-        if (!articulos) {
+        if (!articulo_actualizado) {
             return res.status(400).json({ message: "Error al actualizar artículo", success: false });
         }
 
-        return res.status(200).json({ message: "Artículo actualizado exitosamente", success: true });
+        return res.status(200).json({ message: "Artículo actualizado exitosamente", success: true, articulo_actualizado });
     } catch (error) {
         return res.status(500).json({ message: "Internal server error", error, success: false });
     }
