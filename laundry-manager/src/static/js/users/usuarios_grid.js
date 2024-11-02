@@ -8,13 +8,15 @@ document.addEventListener("DOMContentLoaded", async function() {
         rowData: users,
         localeText: AG_GRID_LOCALE_ES,
         columnDefs: [
-            { headerName: "#", field: "id_usuario" },
+            { headerName: "#", field: "id_usuario", flex: 1 },
             {
                 headerName: "Rut",
+                field: "rut",
                 valueGetter: function (params) {
                     // Concatenar rut_usuario con dv_usuario
                     return `${params.data.rut_usuario}-${params.data.dv_usuario}`;
-                }
+                },
+                flex: 1,
             },
             { headerName: "Nombre", field: "nombre", flex: 1 },
             {
@@ -29,14 +31,17 @@ document.addEventListener("DOMContentLoaded", async function() {
                             params.data
                         ).replace(/"/g, "&quot;")})">Borrar</button>
                     `;
-                }
+                },
+                flex: 1,
             }
         ],
         defaultColDef: {
             resizable: false,
             sortable: true,
             filter: true,
-        }
+        },
+        pagination: true,
+        paginationPageSize: 13,
     };
     const gridDiv = document.querySelector("#gridForUsers");
     gridApi = agGrid.createGrid(gridDiv, gridOptions);
@@ -57,7 +62,6 @@ document.addEventListener("DOMContentLoaded", async function() {
         const estamentoInput = modal.querySelector("select[id='eestamento']");
         const tipoUsuarioInput = modal.querySelector("select[id='etipo_usuario']");
         const usernameInput = modal.querySelector("input[id='eusername']");
-        const passwordInput = modal.querySelector("input[id='epwd']");
 
         // Asignar valores de los datos
         rutInput.value = `${user.rut_usuario}-${user.dv_usuario}`;
@@ -68,7 +72,6 @@ document.addEventListener("DOMContentLoaded", async function() {
         estamentoInput.value = user.id_estamento;
         tipoUsuarioInput.value = user.id_tipo_usuario;
         usernameInput.value = user.username;
-        passwordInput.value = user.pwd;
 
         modal.classList.remove('hidden');
         setTimeout(() => {
