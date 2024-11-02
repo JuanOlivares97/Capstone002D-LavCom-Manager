@@ -13,4 +13,17 @@ router.post('/create-tipo-funcionario', maintainerController.createTipoFuncionar
 router.post('/create-contrato', maintainerController.createContrato);
 
 
+router.put('/update-regimen/:id', maintainerController.updateTipoRegimen);
+router.put('/update-servicio/:id', maintainerController.updateService);
+router.put('/update-estamento/:id', maintainerController.updateEstamento);
+router.put('/update-unidad/:id', maintainerController.updateUnidad);
+router.put('/update-via/:id', maintainerController.updateVia);
+router.put('/update-tipo-funcionario/:id', maintainerController.updateTipoFuncionario);
+router.put('/update-contrato/:id', maintainerController.updateContrato);
+
+
+router.delete('/delete-regimen/:id', maintainerController.deleteRegimen);
+router.delete('/delete-servicio/:id', maintainerController.deleteService);
+router.delete('/delete-unidad/:id', maintainerController.deleteUnidad);
+
 module.exports = router;
