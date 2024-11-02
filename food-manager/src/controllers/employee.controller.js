@@ -25,7 +25,7 @@ async function renderHome(req, res) {
 async function getFuncionarios(req, res) {
     try {
         // Obtener todos los funcionarios desde Prisma
-        const funcionarios = await prisma.funcionario.findMany({
+        const funcionarios = await prisma.Funcionario.findMany({
             include: {
                 TipoContrato: true,
                 TipoEstamento: true,
