@@ -58,7 +58,6 @@ document.addEventListener("DOMContentLoaded", async function() {
         const nombreInput = modal.querySelector("input[id='enombre']");
         const servicioInput = modal.querySelector("select[id='eservicio']");
         const contratoInput = modal.querySelector("select[id='etipo_contrato']");
-        const sigcomInput = modal.querySelector("select[id='eunidad_sigcom']");
         const estamentoInput = modal.querySelector("select[id='eestamento']");
         const tipoUsuarioInput = modal.querySelector("select[id='etipo_usuario']");
         const usernameInput = modal.querySelector("input[id='eusername']");
@@ -68,7 +67,6 @@ document.addEventListener("DOMContentLoaded", async function() {
         nombreInput.value = user.nombre;
         servicioInput.value = user.id_servicio;
         contratoInput.value = user.id_tipo_contrato;
-        sigcomInput.value = user.id_unidad_sigcom;
         estamentoInput.value = user.id_estamento;
         tipoUsuarioInput.value = user.id_tipo_usuario;
         usernameInput.value = user.username;
