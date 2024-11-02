@@ -68,25 +68,24 @@ async function login(req, res) {
 
         return res.status(200).json({ message: "Has iniciado sesión, bienvenido", success: true, user });
     } catch (error) {
-        return res.status(500).json({ message: "Internal server error", success: false });
+        return res.status(500).json({ message: "Internal server error" + error, success: false });
     }
 }
 
 async function setEmail(req, res) {
     try {
         const email = req.body.email;
-        const user = await prisma.usuarios.findUnique({ where: { IdFuncionario: req.body.IdFuncionario } });
+        const user = await prisma.Funcionario.findUnique({ where: { IdFuncionario: req.body.IdFuncionario } });
 
-        console.log(user);
 
         if (!user) {
             return res.status(401).json({ message: "Usuario no encontrado", success: false });
         }
 
-        const updatedUser = await prisma.usuarios.update({
+        const updatedUser = await prisma.Funcionario.update({
             where: { IdFuncionario: req.body.IdFuncionario },
             data: {
-                email: email
+                correo: email
             }
         });
 
@@ -96,7 +95,7 @@ async function setEmail(req, res) {
 
         return res.status(200).json({ message: "Correo electrónico establecido", success: true });
     } catch (error) {
-        return res.status(500).json({ message: "Internal server error", success: false });
+        return res.status(500).json({ message: "Internal server error " + error, success: false });
     }
 }
 
