@@ -1,4 +1,3 @@
-// Al cargar el contenido de la página
 document.addEventListener('DOMContentLoaded', function () {
     const filtroLinks = document.querySelectorAll('.filtro-link');
 
@@ -14,9 +13,9 @@ document.addEventListener('DOMContentLoaded', function () {
             cards.forEach(card => {
                 if (card.classList.contains(filter)) {
                     card.classList.remove('hidden'); // Mostrar tarjeta
+                } else {
+                    card.classList.add('hidden'); // Ocultar tarjeta
                 }
-                card.classList.add('hidden'); // Ocultar tarjeta
-
             });
         });
     });
