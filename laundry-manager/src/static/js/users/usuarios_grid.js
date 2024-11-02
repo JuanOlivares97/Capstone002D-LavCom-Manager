@@ -88,7 +88,29 @@ document.addEventListener("DOMContentLoaded", async function() {
             cancelButtonText: "Cancelar",
         }).then(async (result) => {
             if (result.isConfirmed) {
-                // Eliminar el usuario
+                await fetch("/users/delete-user", {
+                    method: "DELETE",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({ id_usuario: user.id_usuario }),
+                })
+                .then((response) => response.json())
+                .then((data) => {
+                    if (!data.success) {
+                        Swal.fire({
+                            title: "Error",
+                            text: data.message,
+                            icon: "error",
+                        });
+                        return;
+                    }
+                    Swal.fire(data.message).then(() => {
+                        const rowNode = gridApi.getRowNode(rowIndex);
+                        gridApi.applyTransaction({ remove: [rowNode.data] });
+                    })
+                    return;
+                });
             }
         });
     };
