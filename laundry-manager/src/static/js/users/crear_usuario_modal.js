@@ -19,5 +19,56 @@ document.addEventListener("DOMContentLoaded", function() {
 
     modal.addEventListener("submit", async function (e) {
         e.preventDefault();
+        const formData = new FormData(e.target);
+        const newUser = Object.fromEntries(formData);
+        
+        const valid = Fn.validaRut(newUser.rut_usuario);
+        console.log(valid);
+        
+        if (!valid) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: `El rut ${newUser.rut_usuario} es inválido`,
+                toast: true,
+                position: 'top-end',
+            })
+            return;
+        }
+
+        const response = await fetch('/users/create-user', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(newUser),
+        });
+
+        const data = await response.json();
+
+        if (!data.success) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: data.message,
+                toast: true,
+                position: 'top-end',
+            });
+            return;
+        }
+
+        Swal.fire({
+            icon: 'success',
+            title: 'Usuario creado',
+            text: data.message,
+        }).then(() => {
+            modal.classList.add('hidden');
+            const gridData = {
+                ...data.user,
+                rut: `${data.user.rut_usuario}-${data.user.dv_usuario}`,
+            }
+            window.gridApi.applyTransaction({ add: [gridData] });
+            e.target.reset();
+        })
     });
 });
