@@ -122,20 +122,20 @@ async function deleteUsuario(req, res) {
     try {
         const user = await prisma.usuarios.update({
             where: {
-                id_usuario: parseInt(req.params.id_usuario)
+                id_usuario: parseInt(req.body.id_usuario)
             },
             data: {
-                borrado: 1
+                borrado: true
             }
         });
         
         if (!user) {
-            return res.status(400).json({ message: "Error deleting user" });
+            return res.status(400).json({ message: "Error al eliminar usuario", success: false });
         }
 
-        return res.status(200).json({ message: "Usuario eliminado exitosamente" });
+        return res.status(200).json({ message: "Usuario eliminado exitosamente", success: true });
     } catch (error) {
-        return res.status(500).json({ message: "Internal server error" });
+        return res.status(500).json({ message: "Internal server error", error, success: false });
     }
 }
 
