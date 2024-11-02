@@ -4,7 +4,7 @@ async function renderHome(req, res) {
     const Estamento = await getEstamento();
     const servicios = await getServicio();
     const Unidad = await getUnidad();
-    const Via = await getVia(); 
+    const Via = await getVia();
     const Regimen = await getRegimen();
     const TipoFuncionario = await getTipoFuncionario();
     const Contrato = await getContrato();
@@ -40,7 +40,7 @@ async function getUnidad() {
             where: {
                 Habilitado: 'S'
             },
-            
+
         });
         return Unidad;
     } catch (error) {
@@ -63,7 +63,7 @@ async function getRegimen() {
             where: {
                 Habilitado: 'S'
             },
-            
+
         });
         return Regimen;
     } catch (error) {
@@ -132,6 +132,91 @@ async function createContrato(req, res) {
     await createItem(req, res, 'TipoContrato', 'TipoContrato');
 }
 
+async function updateItem(req, res, model, dataField, idField) {
+    try {
+        const data = req.body[dataField];
+        const existingItem = await prisma[model].findUnique({
+            where: {
+                [idField]: parseInt(req.params.id)
+            }
+        });
+
+        if (existingItem[dataField] === data) {
+            return res.status(400).json({ error: "El nuevo valor debe ser distinto al valor actual." });
+        }
+
+        const item = await prisma[model].update({
+            where: {
+                [idField]: parseInt(req.params.id)
+            },
+            data: {
+                [dataField]: data
+            }
+        });
+        res.status(200).json(item);
+    } catch (error) {
+        res.status(500).json({ error: `Error al actualizar el item: ${error.message}` });
+    }
+}
+
+async function updateEstamento(req, res) {
+    await updateItem(req, res, 'TipoEstamento', 'DescTipoEstamento', 'IdTipoEstamento');
+}
+
+async function updateService(req, res) {
+    await updateItem(req, res, 'TipoServicio', 'DescTipoServicio', 'IdTipoServicio');
+}
+
+async function updateUnidad(req, res) {
+    await updateItem(req, res, 'TipoUnidad', 'DescTipoUnidad', 'IdTipoUnidad');
+}
+
+async function updateVia(req, res) {
+    await updateItem(req, res, 'TipoVia', 'DescTipoVia', 'IdTipoVia');
+}
+
+async function updateTipoRegimen(req, res) {
+    await updateItem(req, res, 'TipoRegimen', 'DescTipoRegimen', 'IdTipoRegimen');
+}
+
+async function updateTipoFuncionario(req, res) {
+    await updateItem(req, res, 'TipoFuncionario', 'TipoPerfil', 'IdTipoFuncionario');
+}
+
+async function updateContrato(req, res) {
+    await updateItem(req, res, 'TipoContrato', 'TipoContrato', 'IdTipoContrato');
+}
+
+async function deleteItem(req, res, model, idField) {
+    try {
+        const item = await prisma[model].update({
+            where: {
+                [idField]: parseInt(req.params.id)
+            },
+            data: {
+                Habilitado: 'N'
+            }
+        });
+        res.status(200).json(item);
+    } catch (error) {
+        res.status(500).json({ error: `Error al actualizar el item: ${error.message}` });
+    }
+}
+
+async function deleteRegimen(req, res) {
+    await deleteItem(req, res, 'TipoRegimen','IdTipoRegimen');
+}
+
+async function deleteService(req, res) {
+    await deleteItem(req, res, 'TipoServicio','IdTipoServicio');
+}
+
+async function deleteUnidad(req, res) {
+    await deleteItem(req, res, 'TipoUnidad','IdTipoUnidad');
+}
+
+
+
 module.exports = {
     renderHome,
     getEstamento,
@@ -147,5 +232,15 @@ module.exports = {
     createTipoFuncionario,
     createContrato,
     createTipoRegimen,
-    createService
+    createService,
+    updateEstamento,
+    updateService,
+    updateUnidad,
+    updateVia,
+    updateTipoRegimen,
+    updateTipoFuncionario,
+    updateContrato,
+    deleteRegimen,
+    deleteService,
+    deleteUnidad,
 }
