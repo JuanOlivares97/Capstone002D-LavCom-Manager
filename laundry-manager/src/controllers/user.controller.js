@@ -6,6 +6,19 @@ async function getUsuarios(req, res) {
         const users = await prisma.usuarios.findMany({
             where: {
                 borrado: false
+            },
+            select: {
+                id_usuario: true,
+                rut_usuario: true,
+                dv_usuario: true,
+                nombre: true,
+                id_servicio: true,
+                id_tipo_contrato: true,
+                id_unidad_sigcom: true,
+                id_estamento: true,
+                id_tipo_usuario: true,
+                username: true,
+                pwd: false
             }
         });
         return res.json(users);
@@ -31,31 +44,46 @@ async function getUsuario(req, res) {
 async function createUsuario(req, res) {
     try {
         const hashedPassword = bcrypt.hashSync(req.body.pwd, 10);
+        const rut = req.body.rut_usuario.split('-')[0];
+        const dv = req.body.rut_usuario.split('-')[1];
 
         const user = await prisma.usuarios.create({
             data: {
-                rut_usuario: parseInt(req.body.rut_usuario),
-                dv_usuario: req.body.dv_usuario,
+                rut_usuario: parseInt(rut),
+                dv_usuario: dv,
                 nombre: req.body.nombre,
-                id_servicio: parseInt(req.body.id_servicio),
-                id_tipo_contrato: parseInt(req.body.id_tipo_contrato),
-                id_unidad_sigcom: parseInt(req.body.id_unidad_sigcom),
-                id_estamento: parseInt(req.body.id_estamento),
-                id_tipo_usuario: parseInt(req.body.id_tipo_usuario),
+                id_servicio: parseInt(req.body.servicio),
+                id_tipo_contrato: parseInt(req.body.tipo_contrato),
+                id_unidad_sigcom: null,
+                id_estamento: parseInt(req.body.estamento),
+                id_tipo_usuario: parseInt(req.body.tipo_usuario),
                 username: req.body.username,
                 pwd: hashedPassword,
                 borrado: false
+            },
+            select: {
+                id_usuario: true,
+                rut_usuario: true,
+                dv_usuario: true,
+                nombre: true,
+                id_servicio: true,
+                id_tipo_contrato: true,
+                id_unidad_sigcom: true,
+                id_estamento: true,
+                id_tipo_usuario: true,
+                username: true,
+                pwd: false
             }
         });
 
         if (!user) {
-            return res.status(400).json({ message: "Error al crear usuario" });
+            return res.status(400).json({ message: "Error al crear usuario", success: false });
         }
 
-        return res.status(201).json({ message: "Usuario creado exitosamente" });
+        return res.status(200).json({ message: "Usuario creado exitosamente", success: true, user });
     } catch (error) {
         console.error(error);
-        return res.status(500).json({ message: "Error interno del servidor: " + error.message });
+        return res.status(500).json({ message: "Error interno del servidor: ", error, success: false });
     }
 }
 
@@ -113,7 +141,11 @@ async function deleteUsuario(req, res) {
 
 async function renderHome(req, res) {
     const tipo_user = req.cookies["tipo_usuario"];
-    res.render('users/home', {tipo_usuario: parseInt(tipo_user)})
+    const servicios = await prisma.servicio.findMany();
+    const estamentos = await prisma.estamento.findMany();
+    const tipo_contrato = await prisma.tipo_contrato.findMany();
+    const tipo_usuario = await prisma.tipo_usuario.findMany();
+    res.render('users/home', {tipo_usuario: parseInt(tipo_user), servicios, estamentos, tipo_contrato, tipo_usuario});
 }
 
 module.exports = {
