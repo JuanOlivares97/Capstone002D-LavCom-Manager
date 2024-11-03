@@ -89,32 +89,35 @@ async function createUsuario(req, res) {
 
 async function updateUsuario(req, res) {
     try {
+        const hashedPassword = bcrypt.hashSync(req.body.epwd, 10);
+        const rut = req.body.erut_usuario.split('-')[0];
+        const dv = req.body.erut_usuario.split('-')[1];
         const usuario = {
-            rut_usuario: req.body.rut_usuario,
-            dv_usuario: req.body.dv_usuario,
-            nombre: req.body.nombre,
-            id_servicio: req.body.id_servicio,
-            id_tipo_contrato: req.body.id_tipo_contrato,   
-            id_unidad_sigcom: req.body.id_unidad_sigcom,
-            id_estamento: req.body.id_estamento,
-            id_tipo_usuario: req.body.id_tipo_usuario,
-            username: req.body.username,
-            pwd: bcrypt.hashSync(req.body.pwd, 10),
+            rut_usuario: parseInt(rut),
+            dv_usuario: dv,
+            nombre: req.body.enombre,
+            id_servicio: parseInt(req.body.eservicio),
+            id_tipo_contrato: parseInt(req.body.etipo_contrato),   
+            // id_unidad_sigcom: req.body.id_unidad_sigcom,
+            id_estamento: parseInt(req.body.eestamento),
+            id_tipo_usuario: parseInt(req.body.etipo_usuario),
+            username: req.body.eusername,
+            pwd: hashedPassword,
         }
-        const user = await prisma.usuarios.update({
+        const usuario_actualizado = await prisma.usuarios.update({
             where: {
-                id_usuario: parseInt(req.params.id_usuario)
+                id_usuario: parseInt(req.body.id_usuario)
             },
             data: usuario
         });
         
-        if (!user) {
-            return res.status(400).json({ message: "Error updating user" });
+        if (!usuario_actualizado) {
+            return res.status(400).json({ message: "Error al actualizar el usuario", success: false });
         }
 
-        return res.status(200).json({ message: "Usuario actualizado exitosamente" });
+        return res.status(200).json({ message: "Usuario actualizado exitosamente", success: true, usuario_actualizado });
     } catch (error) {
-        return res.status(500).json({ message: "Internal server error" });
+        return res.status(500).json({ message: "Internal server error", error, success: false });
     }
 }
 
