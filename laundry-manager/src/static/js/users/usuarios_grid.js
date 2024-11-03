@@ -54,6 +54,8 @@ document.addEventListener("DOMContentLoaded", async function() {
         modalTitle.innerText = `Editar Usuario con RUT: ${user.rut_usuario}-${user.dv_usuario}`;
 
         // Campos del formulario
+        const idUsuarioInput = modal.querySelector("input[name='id_usuario']");
+        const rowIndexInput = modal.querySelector("input[name='rowIndex']");
         const rutInput = modal.querySelector("input[id='erut_usuario']");
         const nombreInput = modal.querySelector("input[id='enombre']");
         const servicioInput = modal.querySelector("select[id='eservicio']");
@@ -63,6 +65,8 @@ document.addEventListener("DOMContentLoaded", async function() {
         const usernameInput = modal.querySelector("input[id='eusername']");
 
         // Asignar valores de los datos
+        idUsuarioInput.value = user.id_usuario;
+        rowIndexInput.value = rowIndex;
         rutInput.value = `${user.rut_usuario}-${user.dv_usuario}`;
         nombreInput.value = user.nombre;
         servicioInput.value = user.id_servicio;
