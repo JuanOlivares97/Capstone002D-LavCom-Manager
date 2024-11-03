@@ -43,7 +43,7 @@
                 <div>
                     <label class="block text-black mb-2">Tipo Usuario</label>
                     <select class="w-full p-2 border rounded" required name="tipo_usuario">
-                        <% tipo_usuario.forEach(tu => { %>
+                        <% tipos_usuario.forEach(tu => { %>
                         <option value="<%= tu.id_tipo_usuario %>"><%= tu.tipo_usuario %></option>
                         <% }) %>
                     </select>
