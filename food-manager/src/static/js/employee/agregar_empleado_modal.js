@@ -22,5 +22,55 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     toggleModal('#modal_crear_usuario','#openModalAddUser','#closeModalAddUser')
-    toggleModal('#modal_editar_usuario','#openModalEditUser','#closeModalEditUser')
 });
+
+// Cerrar modal al hacer clic fuera
+function closeModalIfClickedOutside(event) {
+    const modal = document.getElementById('modal_crear_usuario');
+    modal.classList.add('hidden');
+    modal.classList.remove('opacity-100');
+}
+async function submitForm(event) {
+    event.preventDefault();
+    const formData = new FormData(event.target);
+    const data = Object.fromEntries(formData.entries());
+
+    try {
+        const response = await fetch(event.target.action, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data),
+        });
+
+        if (response.ok) {
+            const result = await response.json();
+            Swal.fire({
+                title: 'Éxito',
+                text: 'Empleado creado exitosamente',
+                icon: 'success',
+                confirmButtonText: 'OK',
+            });
+        } else {
+            const error = await response.json();
+            Swal.fire({
+                title: 'Error',
+                text: error.message || 'Hubo un problema al crear el empleado',
+                icon: 'error',
+                confirmButtonText: 'OK',
+            });
+        }
+    } catch (error) {
+        Swal.fire({
+            title: 'Error',
+            text: 'Error de red o del servidor' + error,
+            icon: 'error',
+            confirmButtonText: 'OK',
+        });
+    }
+}
+
+// Añadir el event listener al formulario
+const formElement = document.getElementById('formCrearEmpleado');
+formElement.addEventListener('submit', submitForm);

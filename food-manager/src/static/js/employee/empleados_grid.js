@@ -1,6 +1,6 @@
 import { AG_GRID_LOCALE_ES } from '../utils.js';
+let gridApi; 
 document.addEventListener('DOMContentLoaded', async function () {
-    let gridApi;
 
     try {
         const employee = await fetch('/food-manager/employee/get-funcionarios')
@@ -30,7 +30,7 @@ document.addEventListener('DOMContentLoaded', async function () {
                     flex: 1,
                     filter: true,
                     floatingFilter: true,
-                
+
                 },
                 {
                     headerName: "Correo",
@@ -99,6 +99,7 @@ document.addEventListener('DOMContentLoaded', async function () {
                             <button class="edit bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 text-sm rounded mr-1" onclick="editUsuario(${JSON.stringify(params.data).replace(/"/g, '&quot;')})">Editar</button>
                             <button class="delete bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 text-sm rounded" onclick="deleteUsuario(${JSON.stringify(params.data).replace(/"/g, '&quot;')})">Borrar</button>
                         `;
+
                     }
                 }
             ],
@@ -131,29 +132,110 @@ function capitalizeWords(str) {
 
 // Función para editar usuario
 window.editUsuario = function (data) {
-    const modal = document.getElementById("editar_usuario_modal");
+    const modal = document.getElementById("modal_editar_usuario");
 
-    const modalTitle = modal.getElementsByTagName("h2");
-    modalTitle[0].innerText = `Editar Usuario con RUT ${data.rut}`;
+    if (!modal) {
+        console.error("El modal no se encontró en el DOM");
+        return;
+    }
+    const idInput = document.getElementById("editIdFuncionario");
+    const rutInput = document.getElementById("editRutCompleto");
+    const nameInput = document.getElementById("editnombre_usuario");
+    const servicioSelect = document.querySelector("select[name='edittipoServicio']");
+    const contratoSelect = document.querySelector("select[name='edittipoContrato']");
+    const unidadSelect = document.querySelector("select[name='edittipoUnidad']");
+    const estamentoSelect = document.querySelector("select[name='edittipoEstamento']");
+    const funcionarioSelect = document.querySelector("select[name='edittipoFuncionario']");
+    console.log(data);
+    // Verificar que los datos de RUT existan
+    const rutCompleto = (data.RutFuncionario && data.DvFuncionario)
+        ? `${data.RutFuncionario}-${data.DvFuncionario}`
+        : 'Datos de RUT no disponibles';
 
-    const rutInput = modal.querySelector("input[name='rut']");
-    const nameInput = modal.querySelector("input[name='nombre']");
-    const contratoInput = modal.querySelector("select[name='tipo_contrato']");
+    if (rutInput && nameInput && servicioSelect && contratoSelect && unidadSelect && estamentoSelect && funcionarioSelect) {
+        idInput.value = data.IdFuncionario || '';
+        rutInput.value = rutCompleto;
+        nameInput.value = capitalizeWords(data.NombreFuncionario || 'Nombre no disponible');
+        servicioSelect.value = data.TipoServicio?.IdTipoServicio || '';
+        contratoSelect.value = data.TipoContrato?.IdTipoContrato || '';
+        unidadSelect.value = data.TipoUnidad?.IdTipoUnidad || '';
+        estamentoSelect.value = data.TipoEstamento?.IdTipoEstamento || '';
+        funcionarioSelect.value = data.IdTipoFuncionario !== null && data.IdTipoFuncionario !== undefined ? data.IdTipoFuncionario : '';
 
-    rutInput.value = data.rut;
-    nameInput.value = data.nombre;
-    contratoInput.value = data.tipo_contrato;
+        modal.classList.remove('hidden');
+        setTimeout(() => {
+            modal.classList.remove('opacity-0');
+        }, 10);
 
-    modal.classList.remove('hidden');
-    setTimeout(() => {
-        modal.classList.remove('opacity-0');
-        modal.querySelector('.transform').classList.remove('scale-95');
-    }, 10);
-}
+        if (document.getElementById('closeModalEditUser').addEventListener('click', () => {
+            modal.classList.add('opacity-0');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 300);
+        })) {
+            console.error("No se pudo agregar el event listener para cerrar el modal");
+        }
+    } else {
+        console.error("Algunos elementos del formulario no se encontraron en el DOM");
+    }
+};
+
+document.getElementById('formEditarEmpleado').addEventListener('submit', async function (event) {
+    event.preventDefault(); // Prevenir el envío por defecto del formulario
+
+    // Obtener los valores de los campos
+    const idInput = document.getElementById('editIdFuncionario').value;
+    const rutCompleto = document.getElementById('editRutCompleto').value;
+    const nombreUsuario = document.getElementById('editnombre_usuario').value;
+    const tipoServicio = document.querySelector("select[name='edittipoServicio']").value;
+    const tipoContrato = document.querySelector("select[name='edittipoContrato']").value;
+    const tipoUnidad = document.querySelector("select[name='edittipoUnidad']").value;
+    const tipoEstamento = document.querySelector("select[name='edittipoEstamento']").value;
+    const tipoFuncionario = document.querySelector("select[name='edittipoFuncionario']").value;
+
+    // Dividir el RUT en número y dígito verificador
+    const [rutUsuario, dvUsuario] = rutCompleto.split('-');
+
+    // Crear un objeto con los datos
+    const data = {
+        rut_usuario: rutUsuario,
+        dv_usuario: dvUsuario,
+        nombre_usuario: nombreUsuario,
+        tipoServicio: tipoServicio,
+        tipoContrato: tipoContrato,
+        tipoUnidad: tipoUnidad,
+        tipoEstamento: tipoEstamento,
+        tipoFuncionario: tipoFuncionario,
+    };
+
+    try {
+        // Enviar los datos al backend
+        const response = await fetch(`/food-manager/employee/update-empleado/${idInput}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data),
+        });
+
+        if (response.ok) {
+            const result = await response.json();
+            alert('Usuario modificado con éxito');
+            // Lógica adicional si es necesario (por ejemplo, cerrar el modal, recargar datos, etc.)
+        } else {
+            const errorData = await response.json();
+            alert(`Error al modificar el usuario: ${errorData.message || 'Error desconocido'}`);
+        }
+    } catch (error) {
+        console.error('Error al enviar la solicitud:', error);
+        alert('Hubo un problema al enviar la solicitud. Inténtalo de nuevo más tarde.');
+    }
+});
+
 
 window.deleteUsuario = function (data) {
     Swal.fire({
-        title: `¿Estás seguro de que deseas borrar al usuario ${data.nombre}?`,
+        title: `¿Estás seguro de que deseas borrar al usuario ${data.NombreFuncionario}?`,
         text: "¡No podrás revertir esto! ¿Deseas continuar?",
         icon: 'warning',
         showCancelButton: true,
@@ -164,7 +246,7 @@ window.deleteUsuario = function (data) {
     }).then(async (result) => {
         if (result.isConfirmed) {
             try {
-                const response = await fetch(`/employees/delete-funcionario/${data.rut}`, {
+                const response = await fetch(`/food-manager/employee/delete-empleado/${data.IdFuncionario}`, {
                     method: 'DELETE'
                 });
 
@@ -174,14 +256,15 @@ window.deleteUsuario = function (data) {
                         'El usuario ha sido eliminado.',
                         'success'
                     );
-                    gridApi.applyTransaction({ remove: [data] });
+                    gridApi.applyTransaction({ remove: [data] }); // Uso de gridApi
                 } else {
-                    throw new Error('Error al borrar el usuario');
+                    const errorMessage = response.status === 204 ? 'El usuario fue eliminado, pero no hubo contenido de respuesta.' : 'Error al borrar el usuario';
+                    alert(errorMessage);
                 }
             } catch (error) {
                 Swal.fire(
                     'Error',
-                    'Hubo un problema al eliminar al usuario. Inténtalo más tarde.',
+                    'Hubo un problema al eliminar al usuario. Inténtalo más tarde.' + error,
                     'error'
                 );
             }
