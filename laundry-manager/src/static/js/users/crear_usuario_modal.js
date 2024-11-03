@@ -23,7 +23,6 @@ document.addEventListener("DOMContentLoaded", function() {
         const newUser = Object.fromEntries(formData);
         
         const valid = Fn.validaRut(newUser.rut_usuario);
-        console.log(valid);
         
         if (!valid) {
             Swal.fire({
