@@ -1,12 +1,13 @@
-<main class="flex-1 p-6 h-screen">
-    <button id="openModalAddUser" type="button"
-        class="flex gap-2 text-black p-2 rounded hover:bg-gray-400 hover:text-white transition duration-300 mt-3">
-        <%- include('../icons/add_user') %>
-            <span class="class=ml-2">Crear Nuevo Usuario</span>
-    </button>
-    <div id="gridFuncionarios" class="ag-theme-quartz h-screen w-full p-4"></div>
-</main>
+<button id="openModalAddUser" type="button"
+    class="flex gap-2 text-black p-2 rounded hover:bg-gray-400 hover:text-white transition duration-300 mt-3">
+    <%- include('../icons/add_user') %>
+        <span class="class=ml-2">Crear Nuevo Usuario</span>
+</button>
+<div id="gridFuncionarios" class="ag-theme-quartz h-screen w-full py-2"></div>
 
-<%- include('../components/modals/employees/agregar_usuario_modal') %> 
-<script type="module" src="/food-manager/js/employee/empleados_grid.js"></script>
-<script defer src="/food-manager/js/employee/agregar_empleado_modal.js"></script>
+
+<%- include('../components/modals/employees/agregar_usuario_modal') %>
+    <%- include('../components/modals/employees/editar_usuario_modal') %>
+        <script type="module" src="/food-manager/js/employee/empleados_grid.js"></script>
+        <script defer src="/food-manager/js/employee/agregar_empleado_modal.js"></script>
+        <script defer src="/food-manager/js/employee/utils.js"></script>
