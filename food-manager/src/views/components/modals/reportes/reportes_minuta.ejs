@@ -1,9 +1,87 @@
-<div class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden opacity-0 transition-opacity duration-300" id="modal_minuta_diaria">
-    <div class="bg-white rounded-lg shadow-lg p-8 w-full transform scale-95 transition-transform duration-300">
-        <div id="gridForReportsStockGeneral" class="ag-theme-quartz h-96 w-max-screen mt-3"></div>
-        <div class="mt-4 text-center">
-            <button id="ExportGeneralToExcel" class="w-full mt-2 bg-green-500 text-white p-2 rounded hover:bg-green-400">Exportar a Excel</button>
-            <button id="closeModalReporteDiario" class="w-full mt-2 bg-red-500 text-white p-2 rounded hover:bg-red-400">Cerrar</button>
+<div class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden opacity-0 transition-opacity duration-300 overflow-y-auto"
+     id="modal_minuta_diaria">
+    <div class="bg-white rounded-lg shadow-lg p-6 transform scale-95 transition-transform duration-300 h-5/6 overflow-y-auto">
+        <h2 class="text-2xl font-semibold mb-4 text-center">Reporte de Raciones</h2>
+        <div class="mb-6 flex flex-col sm:flex-row justify-center sm:justify-end space-y-2 sm:space-y-0 sm:space-x-4">
+            <button id="ExportGeneralToExcel"
+                    class="w-full sm:w-auto bg-green-600 text-white px-4 py-2 rounded hover:bg-green-500 transition-colors duration-200">
+                Exportar a Excel
+            </button>
+            <button id="closeModalReporteDiario"
+                    class="w-full sm:w-auto bg-red-600 text-white px-4 py-2 rounded hover:bg-red-500 transition-colors duration-200">
+                Cerrar
+            </button>
         </div>
+        <div class="overflow-x-auto overflow-y-auto">
+            <!-- Table responsive wrapper -->
+            <table id="reporteRacionesTable" class="min-w-full text-left text-base text-black whitespace-nowrap">
+                <!-- Table head -->
+                <thead class="bg-gray-200 sticky top-0">
+                    <tr>
+                        <th scope="col" class="px-6 py-3">
+                            Unidad
+                        </th>
+                        <th scope="col" class="px-6 py-3">
+                            Raciones Funcionarios
+                        </th>
+                        <th scope="col" class="px-6 py-3">
+                            Raciones Hospitalizados
+                        </th>
+                    </tr>
+                </thead>
+                <!-- Table body -->
+                <tbody>
+                    <% 
+                        // Declara las variables fuera del bloque 'if'
+                        let totalFuncionarios = 0;
+                        let totalHospitalizados = 0;
+                    %>
+                    <% if (reportes && reportes.length > 0) { %>
+                        <% reportes.forEach(reporte => { %>
+                            <tr class="border-b hover:bg-gray-100">
+                                <td class="px-6 py-4">
+                                    <%= reporte.TipoUnidad && reporte.TipoUnidad.DescTipoUnidad ? reporte.TipoUnidad.DescTipoUnidad : 'Sin información' %>
+                                </td>
+                                <td class="px-6 py-4"><%= reporte.RacionesFuncionarios %></td>
+                                <td class="px-6 py-4"><%= reporte.RacionesHospitalizados %></td>
+                            </tr>
+                            <% 
+                                // Acumula los totales
+                                totalFuncionarios += reporte.RacionesFuncionarios; 
+                                totalHospitalizados += reporte.RacionesHospitalizados; 
+                            %>
+                        <% }) %>
+                    <% } else { %>
+                        <tr>
+                            <td colspan="3" class="px-6 py-4 text-center">No se encontraron reportes.</td>
+                        </tr>
+                    <% } %>
+                </tbody>
+                <!-- Table footer -->
+                <% if (reportes && reportes.length > 0) { %>
+                    <tfoot class="bg-gray-200">
+                        <tr>
+                            <th class="px-6 py-3 text-left">Total:</th>
+                            <th class="px-6 py-3"><%= totalFuncionarios %></th>
+                            <th class="px-6 py-3"><%= totalHospitalizados %></th>
+                        </tr>
+                    </tfoot>
+                <% } %>
+            </table>
+        </div>
+        
     </div>
 </div>
+
+<script>
+    document.getElementById('ExportGeneralToExcel').addEventListener('click', function () {
+        // Obtener la tabla
+        var table = document.getElementById('reporteRacionesTable');
+
+        // Convertir la tabla en una hoja de cálculo
+        var workbook = XLSX.utils.table_to_book(table, { sheet: "Reporte de Raciones" });
+
+        // Generar el archivo Excel y forzar su descarga
+        XLSX.writeFile(workbook, 'ReporteRaciones.xlsx');
+    });
+</script>
