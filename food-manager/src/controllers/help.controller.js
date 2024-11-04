@@ -1,5 +1,6 @@
 async function renderHome(req, res) {
-    res.render('help/home', { tipoUsuario: 1 });
+    const tipoUsuario = req.cookies['tipo_usuario']
+    res.render('help/home', { tipoUsuario: parseInt(tipoUsuario) });
 }
 module.exports = {
     renderHome
