@@ -5,15 +5,14 @@ const {
     getVia,
     getRegimen } = require('./maintainer.controller');
 
-const tempo = require("@formkit/tempo");
-
 async function renderHome(req, res) {
     try {
-        // Obtener los servicios
+        // Obtener los servicios y otros datos
         const servicios = await getServicio();
         const unidades = await getUnidad();
         const vias = await getVia();
         const regimen = await getRegimen();
+
         // Obtener los pacientes
         const pacientes = await prisma.Hospitalizado.findMany({
             where: {
@@ -30,43 +29,71 @@ async function renderHome(req, res) {
             }
         });
 
-        const today = new Date();
-      const days = Array.from({ length: 7 }, (_, i) => {
-        const date = new Date(today);
-        date.setDate(today.getDate() - i);
-        return date.toISOString().split('T')[0];
-      }).reverse();
-  
-      // Promesas para KPIs diarios y datos históricos
-      const [
-        pacientesHospitalizados,
-        pacientesEnAyuno,
-        ingresosHoy,
-        altasHoy,
-      ] = await Promise.all([
-        prisma.Hospitalizado.count(),
-        prisma.Hospitalizado.count({ where: { FechaFinAyuno: { lt: today } } }),
-        prisma.Hospitalizado.count({ where: { FechaIngreso: today } }),
-        prisma.Hospitalizado.count({ where: { FechaAlta: today } }),
-      ]);
+        // Obtener el inicio y fin del día actual en UTC
+        const startOfToday = new Date();
+        startOfToday.setUTCHours(0, 0, 0, 0);
 
-        // Añadir la edad a cada paciente
-        const pacientesConEdad = pacientes.map(paciente => {
-            return {
-                ...paciente,
-                edad: calcularEdad(paciente.FechaNacimiento)
-            };
-        });
+        const startOfTomorrow = new Date(startOfToday);
+        startOfTomorrow.setUTCDate(startOfToday.getUTCDate() + 1);
 
-        // Renderizar la vista y pasar los servicios y pacientes
-        res.render('patient/home', { tipoUsuario: 1, pacientes: pacientesConEdad, servicios, unidades, vias, regimen, pacientesHospitalizados,
+        // Promesas para KPIs diarios y datos históricos
+        const [
+            pacientesHospitalizados,
             pacientesEnAyuno,
             ingresosHoy,
-            altasHoy, });
+            altasHoy,
+        ] = await Promise.all([
+            prisma.Hospitalizado.count(),
+            prisma.Hospitalizado.count({
+                where: {
+                    FechaFinAyuno: { lt: startOfToday }
+                }
+            }),
+            prisma.Hospitalizado.count({
+                where: {
+                    FechaIngreso: {
+                        gte: startOfToday,
+                        lt: startOfTomorrow
+                    }
+                }
+            }),
+            prisma.Hospitalizado.count({
+                where: {
+                    FechaAlta: {
+                        gte: startOfToday,
+                        lt: startOfTomorrow
+                    }
+                }
+            }),
+        ]);
+
+        // Añadir la edad a cada paciente
+        const pacientesConEdad = pacientes.map(paciente => ({
+            ...paciente,
+            edad: calcularEdad(paciente.FechaNacimiento)
+        }));
+
+        // Renderizar la vista y pasar los datos
+        res.render('patient/home', {
+            tipoUsuario: 1,
+            pacientes: pacientesConEdad,
+            servicios,
+            unidades,
+            vias,
+            regimen,
+            pacientesHospitalizados,
+            pacientesEnAyuno,
+            ingresosHoy,
+            altasHoy,
+        });
     } catch (error) {
+        console.error('Error en renderHome:', error);
         return res.status(500).json({ message: "Internal server error " + error });
     }
 }
+
+
+
 
 async function getPacientes(req, res) {
     try {
@@ -357,7 +384,7 @@ async function changeObservacionesNutricionista(req, res) {
                 descripcionLog: `Cambio de Observaciones Nutricionista: ${oldObservacionesNutricionista} a ${newObservacionesNutricionista}`
             }
         });
-        return res.status(200).json({ message: 'Movimiento al Observaciones de Nutricionista', movimiento });   
+        return res.status(200).json({ message: 'Movimiento al Observaciones de Nutricionista', movimiento });
     } catch (error) {
         return res.status(500).json({ message: "Internal server error " + error });
     }

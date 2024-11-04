@@ -14,8 +14,8 @@ async function renderHome(req, res) {
         const unidades = await getUnidad();
         const estamentos = await getEstamento();
         const tipoFuncionario = await getTipoFuncionario();
-
-        res.render('employee/home', { tipoUsuario: 1, contrato, servicios, unidades, estamentos, tipoFuncionario });
+        const tipoUsuario = req.cookies['tipo_usuario']
+        res.render('employee/home', { tipoUsuario: parseInt(tipoUsuario), contrato, servicios, unidades, estamentos, tipoFuncionario });
 
     } catch (error) {
         return res.status(500).json({ message: "Internal server error" });
@@ -56,7 +56,6 @@ async function getFuncionarios(req, res) {
 }
 
 async function createEmployee(req, res) {
-
     try {
         const {
             nombre_usuario,
@@ -78,9 +77,38 @@ async function createEmployee(req, res) {
 
         const [rut_usuario, dv_usuario] = RutCompleto.split('-');
 
+        // Verificar si el empleado ya existe en la base de datos
+        const existingEmployee = await prisma.Funcionario.findUnique({
+            where: {
+                RutFuncionario_DvFuncionario: {
+                    RutFuncionario: rut_usuario,
+                    DvFuncionario: dv_usuario
+                }
+            }
+        });
+
+        if (existingEmployee) {
+            // Si el empleado ya existe, actualizar Habilitado a 'S'
+            const updatedEmployee = await prisma.Funcionario.update({
+                where: {
+                    IdFuncionario: existingEmployee.id
+                },
+                data: {
+                    Habilitado: 'S'
+                }
+            });
+
+            return res.status(200).json({
+                message: "El empleado ya existía y se actualizó su estado a 'Habilitado'.",
+                empleado: updatedEmployee
+            });
+        }
+
+        // Crear la contraseña
         const password = await bcrypt.hash(rut_usuario + dv_usuario, 10);
 
-        const funcionario = await prisma.funcionario.create({
+        // Crear un nuevo empleado si no existe
+        const funcionario = await prisma.Funcionario.create({
             data: {
                 NombreFuncionario: nombre_usuario.toUpperCase(),
                 RutFuncionario: rut_usuario,
@@ -123,6 +151,7 @@ async function createEmployee(req, res) {
         res.status(500).json({ message: "Internal server error: " + error.message });
     }
 }
+
 
 
 async function updateEmployee(req, res) {
