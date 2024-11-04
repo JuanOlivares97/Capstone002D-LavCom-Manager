@@ -1,0 +1,49 @@
+<!-- views/lunch/totem.ejs -->
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  body {
+    background-image: url('/food-manager/img/bg-auth.webp');
+    background-size: cover;
+    background-position: center;
+  }
+</style>
+
+<div class="flex items-center justify-center h-screen">
+  <div class="bg-white p-8 rounded-lg shadow-lg">
+    <% if (typeof errorMessage !== 'undefined' && errorMessage) { %>
+        <div class="text-red-500 mb-4"><%= errorMessage %></div>
+      <% } %>
+
+    <% if (!mostrarMenu) { %>
+      <h2 class="text-2xl font-bold mb-4">Ingresar Rut del Empleado</h2>
+      <form action="/food-manager/totem/check-in" method="POST">
+        <input type="text" name="rutSolicitante" placeholder="Ingrese el Rut" class="w-full bg-white border border-gray-300 rounded-md py-2 px-3 mb-4" required>
+        <button type="submit" class="bg-blue-500 text-white py-2 px-4 rounded">Ingresar</button>
+      </form>
+    <% } else { %>
+      <h2 class="text-2xl font-bold mb-4">Seleccione su Menú</h2>
+      <form action="/food-manager/totem/register-lunch" method="POST">
+        <input type="hidden" name="rutSolicitante" value="<%= rutSolicitante %>">
+        <div class="grid md:grid-cols-2 gap-8">
+          <!-- Menú 1 -->
+          <div class="bg-white rounded-lg shadow-md p-6">
+            <h2 class="text-xl font-semibold text-gray-700 mb-4">Menú 1</h2>
+            <!-- Lista de platos -->
+            <button type="submit" name="menu" value="1" class="mt-6 w-full bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 transition duration-300">
+              Seleccionar Menú 1
+            </button>
+          </div>
+
+          <!-- Menú 2 -->
+          <div class="bg-white rounded-lg shadow-md p-6">
+            <h2 class="text-xl font-semibold text-gray-700 mb-4">Menú 2</h2>
+            <!-- Lista de platos -->
+            <button type="submit" name="menu" value="2" class="mt-6 w-full bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600 transition duration-300">
+              Seleccionar Menú 2
+            </button>
+          </div>
+        </div>
+      </form>
+    <% } %>
+  </div>
+</div>

@@ -1,0 +1,37 @@
+<!-- views/lunch/lunchlist.ejs -->
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Listado de Colaciones</title>
+  <!-- Incluye Tailwind CSS -->
+  <script src="/socket.io/socket.io.js"></script>
+</head>
+<body>
+  <div class="container mx-auto">
+    <h1>Listado de Colaciones</h1>
+    <ul id="lunchList">
+      <% lunches.forEach(function(lunch) { %>
+        <li>
+          <strong>RUT:</strong> <%= lunch.RutSolicitante %> -
+          <strong>Menú:</strong> Menú <%= lunch.Menu %> -
+          <strong>Hora:</strong> <%= (lunch.FechaSolicitud) %>
+        </li>
+      <% }); %>
+    </ul>
+  </div>
+
+  <script>
+    const socket = io();
+
+    socket.on('lunchRegistered', function(lunch) {
+      const list = document.getElementById('lunchList');
+      const item = document.createElement('li');
+      item.innerHTML = '<strong>RUT:</strong> ' + lunch.RutSolicitante +
+                       ' - <strong>Menú:</strong> Menú ' + lunch.Menu +
+                       ' - <strong>Hora:</strong> ' + new Date(lunch.FechaSolicitud).toLocaleTimeString();
+      list.appendChild(item);
+    });
+  </script>
+</body>
+</html>
