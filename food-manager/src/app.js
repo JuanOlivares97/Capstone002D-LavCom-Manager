@@ -1,11 +1,15 @@
 const express = require('express');
+const app = express();
+
 const expressLayout = require('express-ejs-layouts');
 const path = require('path');
 const cookieParser = require('cookie-parser');
 const fs = require('fs');
-const { log } = require('console');
+const http = require('http').createServer(app);
+const io = require('socket.io')(http);
+const lunchController = require('./controllers/lunch.controller');
 
-const app = express();
+
 
 // Configuración de EJS y layouts
 app.use(expressLayout);
@@ -16,6 +20,8 @@ app.set('views', './src/views');
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+app.set('socketio', io);
 
 // Servir archivos estáticos
 app.use(express.static(path.join(__dirname, "static")))
@@ -45,6 +51,16 @@ routeFiles.forEach(file => {
     }
 });
 
+// Rutas del tótem
+app.get('/totem', lunchController.renderTotem);
+
+app.post('/totem/check-in', lunchController.checkInLunch);
+
+// Ruta para registrar colación desde el tótem
+app.post('/totem/register-lunch', lunchController.registerLunchAtTotem);
+
+// Ruta para el listado de colaciones
+app.get('/lunch/list', lunchController.renderLunchList);
 
 // Manejo de errores 404
 app.use((req, res) => {

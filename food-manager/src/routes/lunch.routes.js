@@ -4,4 +4,6 @@ const router = Router();
 
 router.get('/home', lunchController.renderHome)
 
+router.post('/register-lunch', lunchController.registrationLunch);
+
 module.exports = router;
