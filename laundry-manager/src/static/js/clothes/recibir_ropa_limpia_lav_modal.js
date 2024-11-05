@@ -50,7 +50,7 @@ function updateRowNumbersRecibirLav() {
 
 document.addEventListener('DOMContentLoaded', async () => {
     const form_recibir_ropa_limpia_lav = document.getElementById('recibir_ropa_limpia_lav_form');
-    form_recibir_ropa_limpia_lav.addEventListener('submit', function (e) {
+    form_recibir_ropa_limpia_lav.addEventListener('submit', async function (e) {
         e.preventDefault();
         const articulosData = [];
         const filas = document.querySelectorAll('#recibir_ropa_limpia_lav_container > div');
@@ -61,20 +61,51 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (select.value && input.value) {
                 articulosData.push({
                     id: index + 1,
-                    articuloId: select.value,
+                    id_articulo: select.value,
                     cantidad: input.value
                 });
             }
         });
 
-        let data = {
-            rut_usuario_1: form_recibir_ropa_limpia_lav.querySelector("input[name='rut_usuario_1']").value,
+        let registro_data = {
+            // rut_usuario_1: form_recibir_ropa_limpia_lav.querySelector("input[name='rut_usuario_1']").value,
             articulos: articulosData
         }
 
         if (articulosData.length !== 0) {
-            alert(JSON.stringify(data));
+            const response = await fetch('/clothes/recibir-ropa-limpia', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(registro_data)
+            })
+            const data = await response.json();
+            if (!data.success) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: data.message
+                });
+                return;
+            }
+            Swal.fire({
+                icon: 'success',
+                title: 'Éxito',
+                text: data.message
+            })
+            .then(() => {
+                modal.classList.add('hidden');
+                e.target.reset();
+                document.getElementById('recibir_ropa_limpia_lav_container').innerHTML = '';
+            })
+            return;
         }
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Debe ingresar al menos un artículo'
+        });
     });
     
     
