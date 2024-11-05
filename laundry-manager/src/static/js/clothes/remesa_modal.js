@@ -50,7 +50,7 @@ function updateRowNumbersRemesa() {
 
 document.addEventListener('DOMContentLoaded', async () => {
     const remesa_form = document.getElementById('remesa_form');
-    remesa_form.addEventListener('submit', function (e) {
+    remesa_form.addEventListener('submit', async function (e) {
         e.preventDefault();
         const articulosData = [];
         const filas = document.querySelectorAll('#remesa_container > div');
@@ -61,22 +61,53 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (select.value && input.value) {
                 articulosData.push({
                     id: index + 1,
-                    articuloId: select.value,
+                    id_articulo: select.value,
                     cantidad: input.value
                 });
             }
         });
 
-        let data = {
-            rut_usuario_1: remesa_form.querySelector("input[name='rut_usuario_1']").value,
-            rut_usuario_2: remesa_form.querySelector("select[name='rut_usuario_2']").value,
-            servicio: remesa_form.querySelector("select[name='servicio']").value,
+        let registro_data = {
+            //rut_usuario_1: remesa_form.querySelector("input[name='rut_usuario_1']").value,
+            //rut_usuario_2: remesa_form.querySelector("select[name='rut_usuario_2']").value,
+            //id_unidad_sigcom: remesa_form.querySelector("select[name='servicio']").value,
             articulos: articulosData
         }
 
         if (articulosData.length !== 0) {
-            alert(JSON.stringify(data));
+            const response = await fetch('/clothes/remesa-ropa-sucia', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(registro_data)
+            })
+            const data = await response.json();
+            if (!data.success) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: data.message
+                });
+                return;
+            }
+            Swal.fire({
+                icon: 'success',
+                title: 'Éxito',
+                text: data.message
+            })
+            .then(() => {
+                modal.classList.add('hidden');
+                e.target.reset();
+                document.getElementById('remesa_container').innerHTML = '';
+            })
+            return;
         }
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Debe ingresar al menos un artículo'
+        });
     });
     
     
