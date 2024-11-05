@@ -1,0 +1,152 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Colacion {
+  IdColacion     Int      @id @default(autoincrement())
+  RutSolicitante String   @db.VarChar(255)
+  FechaSolicitud DateTime @db.Date
+  Retirado       Int      @default(0)
+  Menu           Int
+}
+
+model Funcionario {
+  IdFuncionario        Int             @id @default(autoincrement())
+  RutFuncionario       String          @db.VarChar(20)
+  DvFuncionario        String          @db.Char(1)
+  NombreFuncionario    String          @db.VarChar(255)
+  FechaInicioContrato  DateTime?       @db.Date
+  FechaTerminoContrato DateTime?       @db.Date
+  Habilitado           String?         @default("S") @db.Char(1)
+  correo               String?         @db.VarChar(100)
+  contrasena           String?         @db.VarChar(255)
+  IdTipoUnidad         Int
+  IdTipoFuncionario    Int
+  IdTipoServicio       Int
+  IdTipoContrato       Int
+  IdTipoEstamento      Int
+  TipoContrato         TipoContrato    @relation(fields: [IdTipoContrato], references: [IdTipoContrato], map: "fk_funcionario_contrato")
+  TipoEstamento        TipoEstamento   @relation(fields: [IdTipoEstamento], references: [IdTipoEstamento], map: "fk_funcionario_estamento")
+  TipoServicio         TipoServicio    @relation(fields: [IdTipoServicio], references: [IdTipoServicio], map: "fk_funcionario_servicio")
+  TipoFuncionario      TipoFuncionario @relation(fields: [IdTipoFuncionario], references: [IdTipoFuncionario], map: "fk_funcionario_tipo_funcionario")
+  TipoUnidad           TipoUnidad      @relation(fields: [IdTipoUnidad], references: [IdTipoUnidad], map: "fk_funcionario_unidad")
+
+  @@unique([RutFuncionario, DvFuncionario], map: "unique_rut_dv")
+  @@index([IdTipoContrato], map: "fk_funcionario_contrato")
+  @@index([IdTipoEstamento], map: "fk_funcionario_estamento")
+  @@index([IdTipoServicio], map: "fk_funcionario_servicio")
+  @@index([IdTipoFuncionario], map: "fk_funcionario_tipo_funcionario")
+  @@index([IdTipoUnidad], map: "fk_funcionario_unidad")
+}
+
+model Hospitalizado {
+  IdHospitalizado                                         Int                      @id @default(autoincrement())
+  CodigoCama                                              Int
+  RutHospitalizado                                        String                   @db.VarChar(11)
+  DvHospitalizado                                         String                   @db.VarChar(1)
+  NombreHospitalizado                                     String                   @db.VarChar(255)
+  FechaNacimiento                                         DateTime                 @db.Date
+  FechaIngreso                                            DateTime                 @db.Date
+  ObservacionesNutricionista                              String?                  @db.VarChar(255)
+  FechaAlta                                               DateTime?                @db.Date
+  ObservacionesAlta                                       String?                  @db.VarChar(255)
+  ServicioAlta                                            Int?
+  CodigoCamaAlta                                          Int?
+  IdTipoServicio                                          Int?
+  IdTipoUnidad                                            Int?
+  IdTipoVia                                               Int?
+  IdTipoRegimen                                           Int
+  FechaFinAyuno                                           DateTime?                @db.Date
+  ApellidoP                                               String                   @db.VarChar(255)
+  ApellidoM                                               String                   @db.VarChar(255)
+  Telefono                                                Int?
+  Correo                                                  String?                  @db.VarChar(255)
+  Direccion                                               String                   @db.VarChar(255)
+  ObservacionesSala                                       String?                  @db.VarChar(255)
+  Diagnostico                                             String?                  @db.VarChar(255)
+  TipoRegimen                                             TipoRegimen              @relation(fields: [IdTipoRegimen], references: [IdTipoRegimen], onUpdate: Restrict, map: "fk_Regimen")
+  TipoServicio_Hospitalizado_IdTipoServicioToTipoServicio TipoServicio?            @relation("Hospitalizado_IdTipoServicioToTipoServicio", fields: [IdTipoServicio], references: [IdTipoServicio], onDelete: Restrict, onUpdate: Restrict, map: "fk_Servicio")
+  TipoServicio_Hospitalizado_ServicioAltaToTipoServicio   TipoServicio?            @relation("Hospitalizado_ServicioAltaToTipoServicio", fields: [ServicioAlta], references: [IdTipoServicio], onDelete: Restrict, onUpdate: Restrict, map: "fk_ServicioAlta")
+  TipoUnidad                                              TipoUnidad?              @relation(fields: [IdTipoUnidad], references: [IdTipoUnidad], onDelete: Restrict, onUpdate: Restrict, map: "fk_Unidad")
+  TipoVia                                                 TipoVia?                 @relation(fields: [IdTipoVia], references: [IdTipoVia], onDelete: Restrict, onUpdate: Restrict, map: "fk_Via")
+  logMovimientosPaciente                                  logMovimientosPaciente[]
+
+  @@unique([RutHospitalizado, DvHospitalizado], map: "unique_rut_dv_paciente")
+  @@index([IdTipoRegimen], map: "fk_hospitalizado_regimen")
+  @@index([IdTipoServicio], map: "fk_hospitalizado_servicio")
+  @@index([ServicioAlta], map: "fk_hospitalizado_servicioalta")
+  @@index([IdTipoUnidad], map: "fk_hospitalizado_unidad")
+  @@index([IdTipoVia], map: "fk_hospitalizado_via")
+}
+
+model Reportes {
+  IdReporte              Int @id @default(autoincrement())
+  IdTipoUnidad           Int
+  RacionesFuncionarios   Int @default(0)
+  RacionesHospitalizados Int @default(0)
+  Anio                   Int
+  Mes                    Int
+}
+
+model TipoContrato {
+  IdTipoContrato Int           @id @default(autoincrement())
+  TipoContrato   String        @db.VarChar(255)
+  Funcionario    Funcionario[]
+}
+
+model TipoEstamento {
+  IdTipoEstamento   Int           @id @default(autoincrement())
+  DescTipoEstamento String        @db.VarChar(255)
+  Funcionario       Funcionario[]
+}
+
+model TipoFuncionario {
+  IdTipoFuncionario Int           @id @default(autoincrement())
+  TipoPerfil        String        @db.VarChar(255)
+  Funcionario       Funcionario[]
+}
+
+model TipoRegimen {
+  IdTipoRegimen   Int             @id @default(autoincrement())
+  DescTipoRegimen String          @db.VarChar(255)
+  Habilitado      String          @default("S") @db.Char(1)
+  Hospitalizado   Hospitalizado[]
+}
+
+model TipoServicio {
+  IdTipoServicio                                           Int             @id @default(autoincrement())
+  DescTipoServicio                                         String          @db.VarChar(255)
+  Habilitado                                               String          @default("S") @db.Char(1)
+  Funcionario                                              Funcionario[]
+  Hospitalizado_Hospitalizado_IdTipoServicioToTipoServicio Hospitalizado[] @relation("Hospitalizado_IdTipoServicioToTipoServicio")
+  Hospitalizado_Hospitalizado_ServicioAltaToTipoServicio   Hospitalizado[] @relation("Hospitalizado_ServicioAltaToTipoServicio")
+}
+
+model TipoUnidad {
+  IdTipoUnidad   Int             @id @default(autoincrement())
+  DescTipoUnidad String          @db.VarChar(255)
+  Habilitado     String          @default("S") @db.Char(1)
+  Funcionario    Funcionario[]
+  Hospitalizado  Hospitalizado[]
+}
+
+model TipoVia {
+  IdTipoVia     Int             @id @default(autoincrement())
+  DescTipoVia   String          @db.VarChar(255)
+  Hospitalizado Hospitalizado[]
+}
+
+model logMovimientosPaciente {
+  idLog          Int           @id @default(autoincrement())
+  fechaLog       DateTime      @db.Date
+  descripcionLog String        @db.VarChar(255)
+  idPaciente     Int
+  Hospitalizado  Hospitalizado @relation(fields: [idPaciente], references: [IdHospitalizado], onUpdate: Restrict, map: "fk_paciente_log")
+
+  @@index([idPaciente], map: "fk_paciente_log")
+}

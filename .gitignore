@@ -3,4 +3,5 @@
 
 # Ignorar todos los archivos .env
 **/.env
-/food-manager/prisma
+
+/.idx

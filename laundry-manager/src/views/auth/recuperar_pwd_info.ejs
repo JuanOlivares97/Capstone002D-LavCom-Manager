@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recuperar Contraseña</title>
+    <link rel="stylesheet" href="/css/tailwind.css">
+    <style>
+        body {
+            background-image: url('/img/login_bg.jpg');
+            background-size: cover;
+            background-position: center;
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body class="h-screen flex items-center justify-center">
+    <div class="bg-white shadow-lg rounded-2xl p-8 max-w-sm w-full border-2 border-black">
+        <div class="flex justify-center mb-4">
+            <%- include("../icons/logo_hospital") %>
+        </div>
+        <h1 class="text-2xl mb-4 text-center">Recuperar contraseña</h1>
+        <p class="text-black-700 text-center mb-6">
+            Hemos enviado un código de recuperación a tu correo electrónico. Por favor, ingresalo junto con tu nueva contraseña.
+        </p>
+        <form id="form_nueva_pwd">
+            <div class="flex justify-center space-x-2 mb-4">
+                <input type="text" maxlength="1" class="w-12 h-12 text-center border-2 border-gray-300 rounded focus:outline-none focus:border-black" required/>
+                <input type="text" maxlength="1" class="w-12 h-12 text-center border-2 border-gray-300 rounded focus:outline-none focus:border-black" required/>
+                <input type="text" maxlength="1" class="w-12 h-12 text-center border-2 border-gray-300 rounded focus:outline-none focus:border-black" required/>
+                <input type="text" maxlength="1" class="w-12 h-12 text-center border-2 border-gray-300 rounded focus:outline-none focus:border-black" required/>
+            </div>
+            <div class="mb-4">
+                <input type="password" name="pwd1" class="w-full p-2 border rounded-lg" placeholder="Nueva contraseña" required>
+            </div>
+            <div class="mb-4">
+                <input type="password" name="pwd2" class="w-full p-2 border rounded-lg" placeholder="Confirme nueva contraseña" required>
+            </div>
+            <button type="submit" class="w-full bg-black text-white p-2 rounded hover:bg-gray-800 transition duration-300">Confirmar</button>
+        </form>
+    </div>
+    <script src="/js/auth/change_pwd.js"></script>
+</body>
+</html>
