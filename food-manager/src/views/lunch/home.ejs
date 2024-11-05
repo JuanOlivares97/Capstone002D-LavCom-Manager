@@ -1,39 +1,94 @@
-<!-- views/lunch/home.ejs -->
 <div class="container mx-auto px-4 py-8">
-    <h1 class="text-3xl font-bold text-center text-gray-800 mb-8">Menú del Día - Comedor Hospital de Melipilla</h1>
-  
-    <% if (errorMessage) { %>
-      <div class="text-red-500 mb-4"><%= errorMessage %></div>
-    <% } %>
-  
-    <% if (successMessage) { %>
-      <div class="text-green-500 mb-4"><%= successMessage %></div>
-    <% } %>
-  
+  <h1 class="text-3xl font-bold text-center text-gray-800 mb-8">Menú del Día - Comedor Hospital de Melipilla</h1>
+  <% if (mostrarMenu===true) { %>
     <div class="grid md:grid-cols-2 gap-8">
       <!-- Menú 1 -->
       <div class="bg-white rounded-lg shadow-md p-6">
         <h2 class="text-xl font-semibold text-gray-700 mb-4">Menú 1</h2>
         <!-- Lista de platos -->
-        <form action="/food-manager/lunch/register-lunch" method="POST">
+        <form id="menu1Form" action="/food-manager/lunch/register-lunch" method="POST">
           <input type="hidden" name="menu" value="1">
-          <button type="submit" class="mt-6 w-full bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 transition duration-300">
+          <button type="submit"
+            class="mt-6 w-full bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 transition duration-300">
             Seleccionar Menú 1
           </button>
         </form>
       </div>
-  
+
       <!-- Menú 2 -->
       <div class="bg-white rounded-lg shadow-md p-6">
         <h2 class="text-xl font-semibold text-gray-700 mb-4">Menú 2</h2>
         <!-- Lista de platos -->
-        <form action="/food-manager/lunch/register-lunch" method="POST">
+        <form id="menu2Form" action="/food-manager/lunch/register-lunch" method="POST">
           <input type="hidden" name="menu" value="2">
-          <button type="submit" class="mt-6 w-full bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600 transition duration-300">
+          <button type="submit"
+            class="mt-6 w-full bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600 transition duration-300">
             Seleccionar Menú 2
           </button>
         </form>
       </div>
     </div>
-  </div>
-  
+    <% } else { %>
+      <h1>Ya has registrado tu colación</h1>
+      <% } %>
+</div>
+
+<script>
+  // Handle form submission for both menus
+  document.getElementById('menu1Form').addEventListener('submit', function (e) {
+    e.preventDefault();
+    submitLunchForm(this);
+  });
+
+  document.getElementById('menu2Form').addEventListener('submit', function (e) {
+    e.preventDefault();
+    submitLunchForm(this);
+  });
+
+  // Function to submit the form using fetch and display SweetAlert
+  async function submitLunchForm(form) {
+    try {
+      const formData = {
+        menu: form.querySelector('input[name="menu"]').value
+      };
+
+      const response = await fetch(form.action, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(formData)
+      });
+
+      console.log(formData);
+
+      let result;
+      const contentType = response.headers.get("content-type");
+
+      // Check if the response is JSON
+      if (contentType && contentType.includes("application/json")) {
+        result = await response.json();
+      } else {
+        result = { message: await response.text() };
+      }
+
+      if (response.ok) {
+        Swal.fire({
+          icon: 'success',
+          title: '¡Éxito!',
+          text: result.message,
+          confirmButtonText: 'Aceptar'
+        });
+      } else {
+        throw new Error(result.message || 'Error al registrar colación');
+      }
+    } catch (error) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: error.message,
+        confirmButtonText: 'Aceptar'
+      });
+    }
+  }
+</script>

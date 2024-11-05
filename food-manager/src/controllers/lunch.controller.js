@@ -3,9 +3,20 @@ const moment = require('moment');
 
 async function renderHome(req, res) {
     try {
-        const tipoUsuario = req.cookies['tipo_usuario']
-        return res.render('lunch/home', { tipoUsuario: parseInt(tipoUsuario), errorMessage: null,
-            mostrarMenu: false, successMessage: null });
+        const tipoUsuario = req.cookies['tipo_usuario'];
+        const today = moment().format('YYYY-MM-DD'); // Format today's date
+
+        const existingLunch = await prisma.Colacion.findFirst({
+            where: {
+                RutSolicitante: req.cookies["rutLogueado"] + "-" + req.cookies["dvLogueado"],
+                FechaSolicitud: new Date(today) // Use formatted date
+            },
+        });
+
+        if (existingLunch) {
+            return res.render('lunch/home', { tipoUsuario: parseInt(tipoUsuario), Message: 'Ya has registrado una colación hoy', mostrarMenu: false });
+        }
+        return res.render('lunch/home', { tipoUsuario: parseInt(tipoUsuario), mostrarMenu: true });
     } catch (error) {
         return res.status(500).json({ message: "Internal server error" });
     }
@@ -14,175 +25,63 @@ async function renderHome(req, res) {
 async function registrationLunch(req, res) {
     try {
         const { menu } = req.body;
+
+        // Validate menu is a valid number
+        if (!menu || isNaN(parseInt(menu))) {
+            return res.status(400).json({ message: "Menu selection is invalid" });
+        }
+
         const rutSolicitante = req.cookies["rutLogueado"] + "-" + req.cookies["dvLogueado"];
-        const rut = req.cookies["rutLogueado"]// Asumiendo que el middleware JWT agrega el RUT del usuario al objeto req.user
-        const dv = req.cookies["dvLogueado"]
-        // Verificar si ya registró una colación hoy
-        const todayStart = moment().startOf('day').toDate();
+        const rut = req.cookies["rutLogueado"];
+        const dv = req.cookies["dvLogueado"];
+        
+        const today = moment().format('YYYY-MM-DD');
+
         const existingLunch = await prisma.Colacion.findFirst({
             where: {
                 RutSolicitante: rutSolicitante,
-                FechaSolicitud: {
-                    gte: todayStart,
-                },
+                FechaSolicitud: new Date(today)
             },
         });
-
-        const funcionario = await prisma.Funcionario.findFirst({
-            where: {
-                    RutFuncionario: rut,
-                    DvFuncionario: dv
-            }
-        });
-        // Registrar la colación
-        const nuevaColacion = await prisma.Colacion.create({
-            data: {
-                RutSolicitante: rutSolicitante,
-                FechaSolicitud: new Date(),
-                Menu: parseInt(menu),
-                Retirado: 0,
-                IdTipoUnidad: funcionario.IdTipoUnidad // Ajusta según corresponda
-            },
-        });
-
-        // Emitir evento al WebSocket
-        req.app.get('socketio').emit('lunchRegistered', nuevaColacion);
-
-        res.render('lunch/home', { successMessage: 'Colación registrada exitosamente', errorMessage:null, tipoUsuario:1 });
-    } catch (error) {
-        console.error(error);
-        res.status(500).send('Error al registrar la colación');
-    }
-}
-
-function renderTotem(req, res) {
-    res.render('lunch/totem', {
-        errorMessage: null,
-        mostrarMenu: false,
-        rutSolicitante: null,
-        layout: false
-    });
-}
-
-async function checkInLunch(req, res) {
-    try {
-        const { rutSolicitante } = req.body;
-        if (typeof rutSolicitante !== 'string' || !rutSolicitante.includes('-')) {
-            console.error('El rut solicitante no es válido');
-            return res.render('lunch/totem', { errorMessage: 'El rut solicitante no es válido', mostrarMenu: false, layout: false });
-        }
-
-        // Dividir y verificar que ambos valores existan
-        const [rut, dv] = rutSolicitante.split('-');
-        if (!rut || !dv) {
-            console.error('El rut solicitante no es válido');
-            return res.render('lunch/totem', { errorMessage: 'El rut solicitante no es válido', mostrarMenu: false, layout: false });
-        }
-
-        // Verificar si el empleado existe
-        const empleado = await prisma.Funcionario.findUnique({
-            where: {
-                RutFuncionario_DvFuncionario: {
-                    RutFuncionario: rut,
-                    DvFuncionario: dv
-                },
-            }
-        });
-
-        if (!empleado) {
-            return res.render('lunch/totem', {
-                errorMessage: 'Empleado no encontrado',
-                mostrarMenu: false,
-                rutSolicitante: null,
-                layout:false
-            });
-        }
-
-        // Verificar si ya registró colación hoy
-        const todayStart = moment().startOf('day').toDate();
-        let colacion = await prisma.colacion.findFirst({
-            where: {
-                RutSolicitante: rutSolicitante,
-                FechaSolicitud: {
-                    gte: todayStart,
-                },
-            },
-        });
-
-        if (colacion) {
-            // Actualizar el estado de 'Retirado' si no lo ha hecho
-            if (colacion.Retirado === 0) {
-                colacion = await prisma.colacion.update({
-                    where: { IdColacion: colacion.IdColacion },
-                    data: { Retirado: 1 },
-                });
-            }
-            // Emitir evento al WebSocket
-            req.app.get('socketio').emit('lunchRegistered', colacion);
-
-            // Renderizar el ticket
-            return res.render('lunch/ticket', { colacion, layout:false });
-        } else {
-            // Permitir seleccionar menú
-            res.render('lunch/totem', { rutSolicitante, mostrarMenu: true , layout:false});
-        }
-    } catch (error) {
-        console.error(error);
-        res.status(500).send('Error al procesar el check-in ' + error);
-    }
-}
-
-async function registerLunchAtTotem(req, res) {
-    try {
-        const { rutSolicitante, menu } = req.body;
-
-        // Verificar si ya registró colación hoy
-        const todayStart = moment().startOf('day').toDate();
-        let colacion = await prisma.colacion.findFirst({
-            where: {
-                RutSolicitante: rutSolicitante,
-                FechaSolicitud: {
-                    gte: todayStart,
-                },
-            },
-        });
-
-        if (colacion) {
-            return res.render('lunch/totem', { errorMessage: 'Ya has registrado una colación hoy', mostrarMenu: false });
-        }
-        const { rut, dv } = rutSolicitante.split('-');
 
         const funcionario = await prisma.Funcionario.findFirst({
             where: {
                 RutFuncionario: rut,
-                dvFuncionario: dv
+                DvFuncionario: dv
             }
         });
-        // Registrar la colación
-        colacion = await prisma.Colacion.create({
+
+        if (!funcionario) {
+            return res.status(404).json({ message: "Funcionario not found" });
+        }
+        
+        // Register the lunch
+        const nuevaColacion = await prisma.Colacion.create({
             data: {
                 RutSolicitante: rutSolicitante,
-                FechaSolicitud: new Date(),
+                FechaSolicitud: new Date(today),
                 Menu: parseInt(menu),
-                Retirado: 1,
-                IdTipoUnidad: funcionario.IdTipoUnidad // Ajusta según corresponda
+                Estado: 0,
+                TipoUnidad: {
+                    connect: { IdTipoUnidad: funcionario.IdTipoUnidad } // Connect to existing TipoUnidad by Id
+                }
             },
         });
 
-        // Emitir evento al WebSocket
-        req.app.get('socketio').emit('lunchRegistered', colacion);
+        console.log('Emitting lunchRegistered event:', nuevaColacion);
+        req.app.get('socketio').emit('lunchRegistered', nuevaColacion);
 
-        
-        // Renderizar el ticket
-        res.render('lunch/ticket', { colacion, layout: false });
+        return res.status(200).json({ message: 'Colacion Ingresada exitosamente' });
     } catch (error) {
         console.error(error);
-        res.status(500).send('Error al registrar la colación en el tótem');
+        res.status(500).send('Error al registrar la colación: ' + error);
     }
 }
 
+
 async function renderLunchList(req, res) {
     try {
+        const tipoUsuario = req.cookies['tipo_usuario'];
         const todayStart = moment().startOf('day').toDate();
         const lunches = await prisma.Colacion.findMany({
             where: {
@@ -194,7 +93,7 @@ async function renderLunchList(req, res) {
                 FechaSolicitud: 'asc',
             },
         });
-        res.render('lunch/lunchlist', { lunches, layout: false });
+        res.render('totem/LunchList', { lunches, tipoUsuario: parseInt(tipoUsuario) });
     } catch (error) {
         console.error(error);
         res.status(500).send('Error al cargar el listado de colaciones');
@@ -205,8 +104,5 @@ async function renderLunchList(req, res) {
 module.exports = {
     renderHome,
     registrationLunch,
-    renderTotem,
-    checkInLunch,
-    registerLunchAtTotem,
     renderLunchList,
 };
