@@ -44,8 +44,9 @@ Este proyecto está desarrollado utilizando **SvelteKit**. A continuación, se d
    ```bash
    npm run dev
    ```
+   
+4. **Acceso al proyecto**: Abre tu navegador web y navega a `http://localhost:3000` para Food-Manager o `http://localhost:4000` para Laundry-Manager para ver la aplicación en funcionamiento.
 
-4. **Acceso al proyecto**: Abre tu navegador web y navega a `http://localhost:3000` para ver la aplicación en funcionamiento.
 
 ## Fases del Capstone 2024
 
