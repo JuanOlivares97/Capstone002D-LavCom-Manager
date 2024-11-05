@@ -2,7 +2,7 @@ import { AG_GRID_LOCALE_ES } from "../utils.js";
 document.addEventListener("DOMContentLoaded", async function () {
     let gridApi;
 
-    const response = await fetch("/clothes/get-clothes");
+    const response = await fetch("/laundry-manager/clothes/get-clothes");
     const articulos = await response.json();
 
     const gridOptions = {
@@ -90,7 +90,7 @@ window.deleteArticulo = function (rowIndex, articulo) {
         cancelButtonText: "Cancelar",
     }).then(async (result) => {
         if (result.isConfirmed) {
-            await fetch("/clothes/delete-clothes", {
+            await fetch("/laundry-manager/clothes/delete-clothes", {
                 method: "DELETE",
                 headers: {
                     "Content-Type": "application/json",

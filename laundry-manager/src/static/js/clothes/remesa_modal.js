@@ -23,7 +23,7 @@ async function addArticuloRemesa() {
     `;
     document.getElementById('remesa_container').appendChild(newRow);
 
-    const response = await fetch('/clothes/get-clothes');
+    const response = await fetch('/laundry-manager/clothes/get-clothes');
     const articulos = await response.json();
 
     const selectArticulo = newRow.querySelector('select');
@@ -75,7 +75,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         if (articulosData.length !== 0) {
-            const response = await fetch('/clothes/remesa-ropa-sucia', {
+            const response = await fetch('/laundry-manager/clothes/remesa-ropa-sucia', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'

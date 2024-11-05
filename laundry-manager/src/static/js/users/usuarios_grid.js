@@ -1,7 +1,7 @@
 import { AG_GRID_LOCALE_ES } from "../utils.js";
 document.addEventListener("DOMContentLoaded", async function() {
     let gridApi;
-    const responseUsers = await fetch('/users/get-users');
+    const responseUsers = await fetch('/laundry-manager/users/get-users');
     const users = await responseUsers.json();
 
     const gridOptions = {
@@ -92,7 +92,7 @@ document.addEventListener("DOMContentLoaded", async function() {
             cancelButtonText: "Cancelar",
         }).then(async (result) => {
             if (result.isConfirmed) {
-                await fetch("/users/delete-user", {
+                await fetch("/laundry-manager/users/delete-user", {
                     method: "DELETE",
                     headers: {
                         "Content-Type": "application/json",

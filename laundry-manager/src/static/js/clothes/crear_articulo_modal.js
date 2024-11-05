@@ -32,7 +32,7 @@ document.addEventListener("DOMContentLoaded", function() {
         };
         
         try {
-            const response = await fetch("/clothes/create-clothes", {
+            const response = await fetch("/laundry-manager/clothes/create-clothes", {
                 method: "POST",
                 body: JSON.stringify(dataToSend),
                 headers: {

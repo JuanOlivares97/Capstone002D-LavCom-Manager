@@ -39,7 +39,7 @@ document.getElementById('form_nueva_pwd').addEventListener('submit', async funct
         });
         return;
     }
-    await fetch("/auth/change-pwd", {
+    await fetch("/laundry-manager/auth/change-pwd", {
         method: "PUT",
         headers: {
             "Content-Type": "application/json"
@@ -59,7 +59,7 @@ document.getElementById('form_nueva_pwd').addEventListener('submit', async funct
                 showConfirmButton: false
             });
             setTimeout(() => {
-                window.location.href = "/auth/login";
+                window.location.href = "/laundry-manager/auth/login";
             }, 2000);
         } else {
             Swal.fire({

@@ -101,7 +101,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         window.URL.revokeObjectURL(url);
     }
     
-    const response = await fetch('/reports/get-report');
+    const response = await fetch('/laundry-manager/reports/get-report');
     const generalReport = await response.json();
 
     // Segundo grid: Stock General
@@ -126,7 +126,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     );
 
     
-    const responseServices = await fetch('/reports/get-services-report');
+    const responseServices = await fetch('/laundry-manager/reports/get-services-report');
     const servicesReport = await responseServices.json();
 
     // Tercer Grid: Reporte de Ropa en Servicios
@@ -147,7 +147,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         'stock_en_servicios.xlsx'      // Nombre del archivo
     );
 
-    const responseServicesDown = await fetch('/reports/get-bajas-services');
+    const responseServicesDown = await fetch('/laundry-manager/reports/get-bajas-services');
     const servicesDownReport = await responseServicesDown.json();
 
     
@@ -186,7 +186,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         'ropa_en_transito.xlsx'      // Nombre del archivo
     );
 
-    const response3 = await fetch('/reports/get-bajas-perdidas');
+    const response3 = await fetch('/laundry-manager/reports/get-bajas-perdidas');
     const ropaBajaPerdidas = await response3.json();
 
     // Sexto Grid: Reporte de de Bajas y Perdidas del Mes

@@ -14,7 +14,7 @@ document.addEventListener("DOMContentLoaded", function() {
         const formData = new FormData(e.target);
         const updatedData = Object.fromEntries(formData);
         
-        await fetch("/users/update-user", {
+        await fetch("/laundry-manager/users/update-user", {
             method: "PUT",
             body: JSON.stringify(updatedData),
             headers: {

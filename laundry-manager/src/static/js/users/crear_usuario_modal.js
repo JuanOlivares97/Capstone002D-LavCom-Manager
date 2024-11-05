@@ -35,7 +35,7 @@ document.addEventListener("DOMContentLoaded", function() {
             return;
         }
 
-        const response = await fetch('/users/create-user', {
+        const response = await fetch('/laundry-manager/users/create-user', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

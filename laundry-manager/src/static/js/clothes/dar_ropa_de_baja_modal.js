@@ -23,7 +23,7 @@ async function addArticuloDarRopaDeBaja() {
     `;
     document.getElementById('dar_ropa_de_baja_container').appendChild(newRow);
 
-    const response = await fetch('/clothes/get-clothes');
+    const response = await fetch('/laundry-manager/clothes/get-clothes');
     const articulos = await response.json();
 
     const selectArticulo = newRow.querySelector('select');
@@ -79,7 +79,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         if (articulosData.length !== 0) {
-            const response = await fetch('/clothes/dar-ropa-baja', {
+            const response = await fetch('/laundry-manager/laundry-manager/clothes/dar-ropa-baja', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'

@@ -23,7 +23,7 @@ async function addArticuloEntregarUnidadSigcom() {
     `;
     document.getElementById('entregar_ropa_unidad_sigcom_container').appendChild(newRow);
 
-    const response = await fetch('/clothes/get-clothes');
+    const response = await fetch('/laundry-manager/clothes/get-clothes');
     const articulos = await response.json();
 
     const selectArticulo = newRow.querySelector('select');
@@ -77,7 +77,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         if (articulosData.length !== 0) {
-            const response = await fetch('/clothes/entregar-unidad-sigcom', {
+            const response = await fetch('/laundry-manager/clothes/entregar-unidad-sigcom', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'

@@ -23,7 +23,7 @@ async function addArticuloDeclararPerdida() {
     `;
     document.getElementById('declarar_perdida_container').appendChild(newRow);
 
-    const response = await fetch('/clothes/get-clothes');
+    const response = await fetch('/laundry-manager/clothes/get-clothes');
     const articulos = await response.json();
 
     const selectArticulo = newRow.querySelector('select');
@@ -78,7 +78,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         if (articulosData.length !== 0) {
-            const response = await fetch('/clothes/declarar-perdida', {
+            const response = await fetch('/laundry-manager/clothes/declarar-perdida', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'

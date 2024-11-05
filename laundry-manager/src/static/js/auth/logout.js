@@ -1,10 +1,10 @@
-const logoutButtons = [document.getElementById('btn-logout-pc'), document.getElementById('btn-logout-mobile')];
+const logoutButtons = [document.getElementById('btn-logout-pc')];
 
 logoutButtons.forEach(button => {
     button.addEventListener('click', async (e) => {
         e.preventDefault(); // Prevenir la acción predeterminada del botón
         console.log('Logout button clicked');
-        const response = await fetch("/auth/logout", {
+        const response = await fetch("/laundry-manager/auth/logout", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
@@ -32,7 +32,7 @@ logoutButtons.forEach(button => {
                     clearInterval(timerInterval);
                 }
             }).then(() => {
-                window.location.href = "/auth/login"; // Redirigir al login después de la alerta
+                window.location.href = "/laundry-manager/auth/login"; // Redirigir al login después de la alerta
             });
         } else {
             Swal.fire({

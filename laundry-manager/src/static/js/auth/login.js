@@ -5,7 +5,7 @@ form.addEventListener("submit", async (e) => {
     const username = form.querySelector("input[name='username']").value;
     const pwd = form.querySelector("input[name='pwd']").value;
 
-    const response = await fetch("/auth/login", {
+    const response = await fetch("/laundry-manager/auth/login", {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
@@ -43,7 +43,7 @@ form.addEventListener("submit", async (e) => {
             position: 'top-end',
         });
         if (email) {
-            const response_email = await fetch("/auth/set-email", {
+            const response_email = await fetch("/laundry-manager/auth/set-email", {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json"
@@ -75,7 +75,7 @@ form.addEventListener("submit", async (e) => {
         position: 'top-end',
         showConfirmButton: false, // No mostrar botón de confirmación
         willClose: () => {
-            window.location.href = "/dashboard/home"; // Redirigir cuando la alerta se cierre
+            window.location.href = "/laundry-manager/dashboard/home"; // Redirigir cuando la alerta se cierre
         }
     });
 });

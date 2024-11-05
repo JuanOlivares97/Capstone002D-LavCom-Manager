@@ -1,11 +1,11 @@
 <% 
 // Definir las secciones y qué tipo de usuarios tienen acceso a ellas
 const secciones = [
-    { icon: "../icons/reportes_icon", label: "Reportes", link: "/reports/home", tipos: [1, 2] }, // Admin, Encargado de ropa limpia
-    { icon: "../icons/articulos_icon", label: "Artículos", link: "/clothes/home", tipos: [1, 2, 3] }, // Admin, Encargado ropa limpia, Encargado ropa sucia
-    { icon: "../icons/dashboard_icon", label: "Dashboard", link: "/dashboard/home", tipos: [1] }, // Solo Admin
-    { icon: "../icons/user_group", label: "Usuarios", link: "/users/home", tipos: [1] }, // Solo Admin
-    { icon: "../icons/ayuda_icon", label: "Ayuda", link: "/help/home", tipos: [1, 2, 3] } // Admin, Encargado ropa limpia, Encargado ropa sucia
+    { icon: "../icons/reportes_icon", label: "Reportes", link: "/laundry-manager/reports/home", tipos: [1, 2] }, // Admin, Encargado de ropa limpia
+    { icon: "../icons/articulos_icon", label: "Artículos", link: "/laundry-manager/clothes/home", tipos: [1, 2, 3] }, // Admin, Encargado ropa limpia, Encargado ropa sucia
+    { icon: "../icons/dashboard_icon", label: "Dashboard", link: "/laundry-manager/dashboard/home", tipos: [1] }, // Solo Admin
+    { icon: "../icons/user_group", label: "Usuarios", link: "/laundry-manager/users/home", tipos: [1] }, // Solo Admin
+    { icon: "../icons/ayuda_icon", label: "Ayuda", link: "/laundry-manager/help/home", tipos: [1, 2, 3] } // Admin, Encargado ropa limpia, Encargado ropa sucia
 ];
 
 // Función para verificar si el usuario tiene acceso a la sección
@@ -83,4 +83,4 @@ function tieneAcceso(tiposPermitidos, tipoUsuario) {
                     <span>Cerrar Sesión</span>
             </button>
         </header>
-        <script src="/js/auth/logout.js"></script>
+        <script src="/laundry-manager/js/auth/logout.js"></script>

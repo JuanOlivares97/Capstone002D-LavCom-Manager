@@ -23,7 +23,7 @@ async function addArticuloRecibirRopaLimpiaLav() {
     `;
     document.getElementById('recibir_ropa_limpia_lav_container').appendChild(newRow);
 
-    const response = await fetch('/clothes/get-clothes');
+    const response = await fetch('/laundry-manager/clothes/get-clothes');
     const articulos = await response.json();
 
     const selectArticulo = newRow.querySelector('select');
@@ -73,7 +73,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         if (articulosData.length !== 0) {
-            const response = await fetch('/clothes/recibir-ropa-limpia', {
+            const response = await fetch('/laundry-manager/clothes/recibir-ropa-limpia', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
