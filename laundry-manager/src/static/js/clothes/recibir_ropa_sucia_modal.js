@@ -63,40 +63,53 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (select.value && input.value) {
                 articulosData.push({
                     id: index + 1,
-                    articuloId: select.value,
+                    id_articulo: select.value,
                     cantidad: input.value
                 });
             }
         });
 
-        let data = {
-            rut_usuario_1: recibir_ropa_sucia_form.querySelector("input[name='rut_usuario_1']").value,
+        let registro_data = {
+            // rut_usuario_1: recibir_ropa_sucia_form.querySelector("input[name='rut_usuario_1']").value,
             rut_usuario_2: recibir_ropa_sucia_form.querySelector("select[name='rut_usuario_2']").value,
-            servicio: recibir_ropa_sucia_form.querySelector("select[name='unidad_sigcom']").value,
+            id_unidad_sigcom: recibir_ropa_sucia_form.querySelector("select[name='unidad_sigcom']").value,
             articulos: articulosData
         };
 
         if (articulosData.length !== 0) {
-            try {
-                console.log(data); // Add this line to inspect the data object
-                const response = await fetch('http://localhost:3000/clothes/recibir-sucia-unidad-sigcom', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(data)
+            const response = await fetch('/clothes/recibir-sucia-unidad-sigcom', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(registro_data)
+            })
+            const data = await response.json();
+            if (!data.success) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: data.message
                 });
-
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-
-                const result = await response.json(); // Added await here to process the response
-                console.log('Registro creado exitosamente:', result);
-            } catch (error) {
-                console.error('Error al crear el registro:', error);
+                return;
             }
+            Swal.fire({
+                icon: 'success',
+                title: 'Éxito',
+                text: data.message
+            })
+            .then(() => {
+                modal.classList.add('hidden');
+                e.target.reset();
+                document.getElementById('recibir_ropa_limpia_lav_container').innerHTML = '';
+            })
+            return;
         }
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Debe ingresar al menos un artículo'
+        });
     });
 
     const modal = document.querySelector('#recibir_ropa_sucia_modal');
