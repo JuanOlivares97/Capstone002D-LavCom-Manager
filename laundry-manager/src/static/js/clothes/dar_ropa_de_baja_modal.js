@@ -50,7 +50,10 @@ function updateRowNumbersDarRopaDeBaja() {
 
 document.addEventListener('DOMContentLoaded', async () => {
     const dar_ropa_de_baja_form = document.getElementById('dar_ropa_de_baja_form');
-    dar_ropa_de_baja_form.addEventListener('submit', function (e) {
+    const modal = document.querySelector('#dar_ropa_de_baja_modal');
+    const closeModal = document.querySelector('#closeModalDarRopaDeBaja');
+
+    dar_ropa_de_baja_form.addEventListener('submit', async function (e) {
         e.preventDefault();
         const articulosData = [];
         const filas = document.querySelectorAll('#dar_ropa_de_baja_container > div');
@@ -61,13 +64,13 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (select.value && input.value) {
                 articulosData.push({
                     id: index + 1,
-                    articuloId: select.value,
+                    id_articulo: select.value,
                     cantidad: input.value
                 });
             }
         });
 
-        let data = {
+        let registro_data = {
             rut_usuario_1: dar_ropa_de_baja_form.querySelector("input[name='rut_usuario_1']").value,
             tipo_dada_de_baja: dar_ropa_de_baja_form.querySelector("select[name='tipo_dada_de_baja']").value,
             id_unidad_sigcom: dar_ropa_de_baja_form.querySelector("select[name='unidad_sigcom']").value,
@@ -76,13 +79,40 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         if (articulosData.length !== 0) {
-            alert(JSON.stringify(data));
+            const response = await fetch('/clothes/dar-ropa-baja', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(registro_data)
+            })
+            const data = await response.json();
+            if (!data.success) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: data.message
+                });
+                return;
+            }
+            Swal.fire({
+                icon: 'success',
+                title: 'Éxito',
+                text: data.message
+            })
+            .then(() => {
+                modal.classList.add('hidden');
+                e.target.reset();
+                document.getElementById('dar_ropa_de_baja_container').innerHTML = '';
+            })
+            return;
         }
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Debe ingresar al menos un artículo'
+        });
     });
-    
-    
-    const modal = document.querySelector('#dar_ropa_de_baja_modal');
-    const closeModal = document.querySelector('#closeModalDarRopaDeBaja');
     
     closeModal.addEventListener('click', () => {
         modal.classList.add('opacity-0');
@@ -102,21 +132,23 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 document.addEventListener('DOMContentLoaded', function () {
     const tipoDadaDeBajaSelect = document.getElementById('tipo_dada_de_baja');
-    const UnidadSigcomSelect = document.getElementById('unidad_sigcom_db');
+    const unidadSigcomSelect = document.getElementById('unidad_sigcom_db');
 
-    function toggleUnidadSigcomSelectDarRopaDeBaja() {
-        if (tipoDadaDeBajaSelect.value === '2') {
-            UnidadSigcomSelect.disabled = true;
-            UnidadSigcomSelect.value = '';
-            UnidadSigcomSelect.classList.add('bg-gray-200', 'cursor-not-allowed');
-        } else {
-            UnidadSigcomSelect.disabled = false;
-            UnidadSigcomSelect.classList.remove('bg-gray-200', 'cursor-not-allowed');
+    if (tipoDadaDeBajaSelect && unidadSigcomSelect) {
+        function toggleUnidadSigcomSelectDarRopaDeBaja() {
+            if (tipoDadaDeBajaSelect.value === '8') {
+                unidadSigcomSelect.disabled = true;
+                unidadSigcomSelect.value = '';
+                unidadSigcomSelect.classList.add('bg-gray-200', 'cursor-not-allowed');
+            } else {
+                unidadSigcomSelect.disabled = false;
+                unidadSigcomSelect.classList.remove('bg-gray-200', 'cursor-not-allowed');
+            }
         }
+
+        tipoDadaDeBajaSelect.addEventListener('change', toggleUnidadSigcomSelectDarRopaDeBaja);
+
+        // Verificación inicial
+        toggleUnidadSigcomSelectDarRopaDeBaja();
     }
-
-    tipoDadaDeBajaSelect.addEventListener('change', toggleUnidadSigcomSelectDarRopaDeBaja);
-
-    // Initial check
-    toggleUnidadSigcomSelectDarRopaDeBaja();
 });
