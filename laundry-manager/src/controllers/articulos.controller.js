@@ -330,9 +330,10 @@ async function recibirRopaLimpia(req, res) {
         var fecha = new Date();
         fecha = tempo.format(fecha, "YYYY-MM-DD HH:mm:ss A", "cl");
         const data = req.body;
+        const rut_usuario_1 = req.cookies["rutLogueado"];
         const result = await prisma.registro.create({
             data: {
-                rut_usuario_1: parseInt(data.rut_usuario_1),
+                rut_usuario_1: parseInt(rut_usuario_1),
                 id_tipo_registro: 4,
                 detalle_registro: {
                     create: data.articulos.map(a => {
@@ -348,12 +349,12 @@ async function recibirRopaLimpia(req, res) {
         })
 
         if (!result) {
-            return res.status(400).json({ message: "Error creating registro" });
+            return res.status(400).json({ message: "Error creando registro", success: false });
         }   
 
-        return res.status(200).json({ message: "Registro creado exitosamente" });
+        return res.status(200).json({ message: "Registro creado exitosamente", success: true });
     } catch (error) {
-        return res.status(500).json({ message: "Internal server error" });
+        return res.status(500).json({ message: "Internal server error", success: false, error });
     }
 }
 
