@@ -50,7 +50,10 @@ function updateRowNumbersDeclararPerdida() {
 
 document.addEventListener('DOMContentLoaded', async () => {
     const declarar_perdida_form = document.getElementById('declarar_perdida_form');
-    declarar_perdida_form.addEventListener('submit', function (e) {
+    const modal = document.querySelector('#declarar_perdida_modal');
+    const closeModal = document.querySelector('#closeModalDeclararPerdida');
+    
+    declarar_perdida_form.addEventListener('submit', async function (e) {
         e.preventDefault();
         const articulosData = [];
         const filas = document.querySelectorAll('#declarar_perdida_container > div');
@@ -60,14 +63,14 @@ document.addEventListener('DOMContentLoaded', async () => {
             const input = fila.querySelector('input');
             if (select.value && input.value) {
                 articulosData.push({
-                    articuloId: select.value,
+                    id_articulo: select.value,
                     cantidad: input.value
                 });
             }
         });
 
-        let data = {
-            rut_usuario_1: declarar_perdida_form.querySelector("input[name='rut_usuario_1']").value,
+        let registro_data = {
+            // rut_usuario_1: declarar_perdida_form.querySelector("input[name='rut_usuario_1']").value,
             tipo_perdida: declarar_perdida_form.querySelector("select[name='tipo_perdida']").value,
             id_unidad_sigcom: declarar_perdida_form.querySelector("select[name='unidad_sigcom']").value,
             observaciones: declarar_perdida_form.querySelector("textarea[name='observaciones']").value,
@@ -75,13 +78,40 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         if (articulosData.length !== 0) {
-            alert(JSON.stringify(data));
+            const response = await fetch('/clothes/declarar-perdida', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(registro_data)
+            })
+            const data = await response.json();
+            if (!data.success) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: data.message
+                });
+                return;
+            }
+            Swal.fire({
+                icon: 'success',
+                title: 'Éxito',
+                text: data.message
+            })
+            .then(() => {
+                modal.classList.add('hidden');
+                e.target.reset();
+                document.getElementById('declarar_perdida_container').innerHTML = '';
+            })
+            return;
         }
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Debe ingresar al menos un artículo'
+        });
     });
-    
-    
-    const modal = document.querySelector('#declarar_perdida_modal');
-    const closeModal = document.querySelector('#closeModalDeclararPerdida');
     
     closeModal.addEventListener('click', () => {
         modal.classList.add('opacity-0');
