@@ -69,7 +69,7 @@ async function registrationLunch(req, res) {
         });
 
         console.log('Emitting lunchRegistered event:', nuevaColacion);
-        req.app.get('socketio').emit('lunchRegistered', nuevaColacion);
+        req.app.get('socketio').emit('/lunchRegistered', nuevaColacion);
 
         return res.status(200).json({ message: 'Colacion Ingresada exitosamente' });
     } catch (error) {
@@ -82,12 +82,11 @@ async function registrationLunch(req, res) {
 async function renderLunchList(req, res) {
     try {
         const tipoUsuario = req.cookies['tipo_usuario'];
-        const todayStart = moment().startOf('day').toDate();
+        const today = moment().format('YYYY-MM-DD');
         const lunches = await prisma.Colacion.findMany({
             where: {
-                FechaSolicitud: {
-                    gte: todayStart,
-                },
+                FechaSolicitud: new Date(today),
+                Estado: 0
             },
             orderBy: {
                 FechaSolicitud: 'asc',

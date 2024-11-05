@@ -6,8 +6,9 @@ const path = require('path');
 const cookieParser = require('cookie-parser');
 const fs = require('fs');
 const http = require('http').createServer(app); // HTTP server for Socket.io
-const io = require('socket.io')(http); // Attach Socket.io to the HTTP server
-
+const io = require('socket.io')(http, {
+    path: '/food-manager/socket.io'  // Asegúrate de que coincida con el path en el cliente y proxy
+  });
 // Configuración de EJS y layouts
 app.use(expressLayout);
 app.set('layout', '_template');

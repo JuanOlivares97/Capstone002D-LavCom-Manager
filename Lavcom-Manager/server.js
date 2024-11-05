@@ -11,7 +11,11 @@ app.get('/', (req, res) => {
 });
 
 // Redirigir las peticiones a los servicios correspondientes
-app.use('/food-manager', createProxyMiddleware({ target: 'http://localhost:3000', changeOrigin: true, ws: true }));
+app.use('/food-manager', createProxyMiddleware({
+  target: 'http://localhost:3000',  // Dirección del servidor de food-manager
+  changeOrigin: true,
+  ws: true,  // Habilitar WebSockets en el proxy
+}));
 app.use('/laundry-manager', createProxyMiddleware({ target: 'http://localhost:4000', changeOrigin: true }));
 
 

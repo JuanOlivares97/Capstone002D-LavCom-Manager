@@ -51,12 +51,12 @@ async function login(req, res) {
         if (!isPasswordValid) {
             return res.status(401).json({ message: "Rut o contraseña incorrectos", success: false });
         }
+        
+        const hashName = await bcrypt.hash(user.NombreFuncionario, 10);
 
         const token_data = {
             id_usuario: user.IdFuncionario,
-            rut: `${user.RutFuncionario}-${user.DvFuncionario}`,
-            nombre: user.NombreFuncionario,
-            tipo_usuario: user.IdTipoFuncionario
+            nombre: hashName,
         }
         const token = jwt.sign(token_data, process.env.JWT_SECRET, { expiresIn: "8h" });
 
@@ -103,7 +103,7 @@ async function sendPwdEmail(req, res) {
     try {
         const email = req.body.email;
         const rutCompleto = req.body.rutCompleto;
-    
+
         const [RutFuncionario, DvFuncionario] = rutCompleto.split('-');
 
         const user = await prisma.Funcionario.findUnique({
@@ -175,11 +175,12 @@ async function changePwd(req, res) {
 
 async function logout(req, res) {
     try {
-        res.clearCookie("token");
-        res.clearCookie("logged-in");
-        res.clearCookie("tipo_usuario");
-        res.clearCookie("rutLogueado");
-        res.clearCookie("dvLogueado");
+        res.clearCookie("token", { path: '/food-manager' });  // Asegúrate de que la ruta sea la misma
+        res.clearCookie("logged-in", { path: '/food-manager' });
+        res.clearCookie("tipo_usuario", { path: '/food-manager' });
+        res.clearCookie("rutLogueado", { path: '/food-manager' });
+        res.clearCookie("dvLogueado", { path: '/food-manager' });
+
         return res.status(200).json({ message: "Has cerrado sesión", success: true });
     } catch (error) {
         return res.status(500).json({ message: "Internal server error", success: false });

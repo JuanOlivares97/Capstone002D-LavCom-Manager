@@ -6,9 +6,8 @@
         <li class="p-4 bg-gray-50 rounded-lg shadow-md">
           <strong>RUT:</strong>
           <%= lunch.RutSolicitante %> -
-            <strong>Menú:</strong> Menú <%= lunch.Menu %> -
-              <strong>Hora:</strong>
-              <%= new Date(lunch.FechaSolicitud).toLocaleTimeString('es-ES', { hour: '2-digit' , minute: '2-digit' }) %>
+            <strong>Menú:</strong> Menú <%= lunch.Menu %>
+          <button class="justify-end">Entregado</button>
         </li>
         <% }); %>
     </ul>
@@ -18,10 +17,14 @@
     import { io } from "https://cdn.socket.io/4.3.0/socket.io.esm.min.js";
 
     // Connect to the reverse proxy port, which is 8080
-    const socket = io();
+    const socket = io('http://localhost:8080/food-manager', {
+      path: '/food-manager/socket.io',  // Asegura que el path es correcto
+      transports: ['websocket'],        // Preferir WebSocket sobre polling
+    });
 
     // Listen for the lunchRegistered event
     socket.on('lunchRegistered', function (lunch) {
+      console.log('Received lunchRegistered event:', lunch);
       const list = document.getElementById('lunchList');
       const item = document.createElement('li');
       item.className = 'p-4 bg-gray-50 rounded-lg shadow-md';
