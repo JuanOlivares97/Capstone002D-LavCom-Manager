@@ -54,7 +54,7 @@ async function login(req, res) {
         res.cookie("logged-in", true, { path: "/" });
         res.cookie("tipo_usuario", user.id_tipo_usuario, { path: "/" });
         res.cookie("rutLogueado", user.rut_usuario, { path: "/" });
-        res.cookie("dvLogueado", user.dv_usuario, { path: "/" });
+        res.cookie("nombreLogueado", user.nombre, { path: "/" });
         return res.status(200).json({ message: "Has iniciado sesión, bienvenido", success: true, user });
     } catch (error) {
         return res.status(500).json({ message: "Internal server error", success: false });

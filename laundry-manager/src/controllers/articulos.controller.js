@@ -3,7 +3,8 @@ const tempo = require("@formkit/tempo");
 
 async function renderHome(req, res) {
     try {
-        const rutLogueado = req.cookies["rutLogueado"] + "-" + req.cookies["dvLogueado"];
+        const rutLogueado = req.cookies["rutLogueado"]
+        const nombreLogueado = req.cookies["nombreLogueado"]
         const usuarios = await prisma.usuarios.findMany({
             where: {
                 borrado: false,
@@ -11,7 +12,7 @@ async function renderHome(req, res) {
         });
         const unidades_sigcom = await prisma.unidad_sigcom.findMany();
         const tipo_user = req.cookies["tipo_usuario"];
-        res.render("clothes/home", { usuarios, unidades_sigcom, tipo_usuario: parseInt(tipo_user), rutLogueado });
+        res.render("clothes/home", { usuarios, unidades_sigcom, tipo_usuario: parseInt(tipo_user), rutLogueado, nombreLogueado });
     } catch (error) {
         return res.status(500).json({ message: "Internal server error" });
     }
