@@ -1,4 +1,5 @@
 const prisma = require('../server/prisma');
+const moment = require('moment');
 
 async function totalFuncionariosHabilitados(req, res) {
   try {
@@ -14,7 +15,7 @@ async function totalFuncionariosHabilitados(req, res) {
 async function totalFuncionariosConfirmadosAlmuerzo(req, res) {
   try {
     const count = await prisma.Colacion.count({
-      where: { Retirado: 0, FechaSolicitud: new Date() }
+      where: { Estado: 0, FechaSolicitud: new Date() }
     });
     res.json({ totalFuncionariosConfirmadosAlmuerzo: count });
   } catch (error) {
@@ -25,7 +26,7 @@ async function totalFuncionariosConfirmadosAlmuerzo(req, res) {
 async function totalFuncionariosAlmorzaron(req, res) {
   try {
     const count = await prisma.Colacion.count({
-      where: { Retirado: 1, FechaSolicitud: new Date() }
+      where: { Estado: 1, FechaSolicitud: new Date() }
     });
     res.json({ totalFuncionariosAlmorzaron: count });
   } catch (error) {
@@ -105,7 +106,7 @@ async function renderDashboard(req, res) {
       date.setDate(today.getDate() - i);
       return date.toISOString().split('T')[0];
     }).reverse();
-
+    const hoy = moment().format('YYYY-MM-DD');
     // Promesas para KPIs diarios y datos históricos
     const [
       funcionariosHabilitados,
@@ -120,8 +121,8 @@ async function renderDashboard(req, res) {
       distribucionRegimen
     ] = await Promise.all([
       prisma.Funcionario.count({ where: { Habilitado: "S" } }),
-      prisma.Colacion.count({ where: { Retirado: 0, FechaSolicitud: today } }),
-      prisma.Colacion.count({ where: { Retirado: 1, FechaSolicitud: today } }),
+      prisma.Colacion.count({ where: { Estado: 0, FechaSolicitud: new Date(hoy) } }),
+      prisma.Colacion.count({ where: { Estado: 1, FechaSolicitud: new Date(hoy) } }),
       prisma.Hospitalizado.count(),
       prisma.Hospitalizado.count({ where: { FechaFinAyuno: { lt: today } } }),
       prisma.Hospitalizado.count({ where: { FechaIngreso: today } }),
@@ -130,7 +131,7 @@ async function renderDashboard(req, res) {
       // Colaciones confirmadas y pacientes en ayuno por día
       Promise.all(days.map(async (day) => ({
         day,
-        confirmados: await prisma.Colacion.count({ where: { Retirado: 0, FechaSolicitud: new Date(day) } }),
+        confirmados: await prisma.Colacion.count({ where: { Estado: 0, FechaSolicitud: new Date(day) } }),
         ayuno: await prisma.Hospitalizado.count({ where: { FechaFinAyuno: { lt: new Date(day) } } })
       }))),
 
