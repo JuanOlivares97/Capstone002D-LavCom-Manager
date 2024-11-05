@@ -50,7 +50,10 @@ function updateRowNumbersEntregarServicios() {
 
 document.addEventListener('DOMContentLoaded', async () => {
     const entregar_ropa_unidad_sigcom_form = document.getElementById('entregar_ropa_unidad_sigcom_form');
-    entregar_ropa_unidad_sigcom_form.addEventListener('submit', function (e) {
+    const modal = document.querySelector('#entregar_ropa_unidad_sigcom_modal');
+    const closeModal = document.querySelector('#closeModalEntregarRopaUnidadSigcom');
+
+    entregar_ropa_unidad_sigcom_form.addEventListener('submit', async function (e) {
         e.preventDefault();
         const articulosData = [];
         const filas = document.querySelectorAll('#entregar_ropa_unidad_sigcom_container > div');
@@ -60,28 +63,52 @@ document.addEventListener('DOMContentLoaded', async () => {
             const input = fila.querySelector('input');
             if (select.value && input.value) {
                 articulosData.push({
-                    articuloId: select.value,
+                    id_articulo: select.value,
                     cantidad: input.value
                 });
             }
         });
 
-        let data = {
-            rut_usuario_1: entregar_ropa_unidad_sigcom_form.querySelector("input[name='rut_usuario_1']").value,
+        let registro_data = {
+            //rut_usuario_1: entregar_ropa_unidad_sigcom_form.querySelector("input[name='rut_usuario_1']").value,
             rut_usuario_2: entregar_ropa_unidad_sigcom_form.querySelector("select[name='rut_usuario_2']").value,
             id_unidad_sigcom: entregar_ropa_unidad_sigcom_form.querySelector("select[name='unidad_sigcom']").value,
             articulos: articulosData
         }
 
         if (articulosData.length !== 0) {
-            console.log(JSON.stringify(data, null, 2));
-            alert(JSON.stringify(data));
+            const response = await fetch('/clothes/entregar-unidad-sigcom', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(registro_data)
+            })
+            const data = await response.json();
+            if (!data.success) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: data.message
+                });
+                return;
+            }
+            Swal.fire({
+                icon: 'success',
+                title: 'Éxito',
+                text: data.message
+            })
+            .then(() => {
+                modal.classList.add('hidden');
+            })
+            return;
         }
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Debe ingresar al menos un artículo'
+        });
     });
-    
-    
-    const modal = document.querySelector('#entregar_ropa_unidad_sigcom_modal');
-    const closeModal = document.querySelector('#closeModalEntregarRopaUnidadSigcom');
     
     closeModal.addEventListener('click', () => {
         modal.classList.add('opacity-0');
