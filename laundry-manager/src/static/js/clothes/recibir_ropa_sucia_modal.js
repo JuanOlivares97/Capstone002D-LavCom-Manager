@@ -101,7 +101,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             .then(() => {
                 modal.classList.add('hidden');
                 e.target.reset();
-                document.getElementById('recibir_ropa_limpia_lav_container').innerHTML = '';
+                document.getElementById('recibir_ropa_sucia_container').innerHTML = '';
             })
             return;
         }
