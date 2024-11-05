@@ -100,6 +100,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             })
             .then(() => {
                 modal.classList.add('hidden');
+                e.target.reset();
+                document.getElementById('entregar_ropa_unidad_sigcom_container').innerHTML = '';
             })
             return;
         }
@@ -107,7 +109,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             icon: 'error',
             title: 'Error',
             text: 'Debe ingresar al menos un artículo'
-        });
+        })
     });
     
     closeModal.addEventListener('click', () => {
