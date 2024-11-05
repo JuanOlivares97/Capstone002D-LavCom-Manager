@@ -1,0 +1,33 @@
+<body class="bg-gray-100">
+  <div class="container mx-auto py-8">
+    <h1 class="text-3xl font-bold text-center mb-6 text-gray-800">Listado de Colaciones</h1>
+    <ul id="lunchList" class="bg-white shadow rounded-lg p-6 space-y-4">
+      <% lunches.forEach(function(lunch) { %>
+        <li class="p-4 bg-gray-50 rounded-lg shadow-md">
+          <strong>RUT:</strong>
+          <%= lunch.RutSolicitante %> -
+            <strong>Menú:</strong> Menú <%= lunch.Menu %> -
+              <strong>Hora:</strong>
+              <%= new Date(lunch.FechaSolicitud).toLocaleTimeString('es-ES', { hour: '2-digit' , minute: '2-digit' }) %>
+        </li>
+        <% }); %>
+    </ul>
+  </div>
+
+  <script type="module">
+    import { io } from "https://cdn.socket.io/4.3.0/socket.io.esm.min.js";
+
+    // Connect to the reverse proxy port, which is 8080
+    const socket = io();
+
+    // Listen for the lunchRegistered event
+    socket.on('lunchRegistered', function (lunch) {
+      const list = document.getElementById('lunchList');
+      const item = document.createElement('li');
+      item.className = 'p-4 bg-gray-50 rounded-lg shadow-md';
+      item.innerHTML = '<strong>RUT:</strong> ' + lunch.RutSolicitante +
+        ' - <strong>Menú:</strong> Menú ' + lunch.Menu +
+        ' - <strong>Hora:</strong> ' + new Date(lunch.FechaSolicitud).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+      list.appendChild(item);
+    });
+  </script>

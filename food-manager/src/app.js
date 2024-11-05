@@ -5,11 +5,8 @@ const expressLayout = require('express-ejs-layouts');
 const path = require('path');
 const cookieParser = require('cookie-parser');
 const fs = require('fs');
-const http = require('http').createServer(app);
-const io = require('socket.io')(http);
-const lunchController = require('./controllers/lunch.controller');
-
-
+const http = require('http').createServer(app); // HTTP server for Socket.io
+const io = require('socket.io')(http); // Attach Socket.io to the HTTP server
 
 // Configuración de EJS y layouts
 app.use(expressLayout);
@@ -17,21 +14,28 @@ app.set('layout', '_template');
 app.set('view engine', 'ejs');
 app.set('views', './src/views');
 
-
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.set('socketio', io);
+app.set('socketio', io); // Set Socket.io instance in app
+
+io.on('connection', (socket) => {
+    console.log('New client connected');
+    
+    socket.on('disconnect', () => {
+        console.log('Client disconnected');
+    });
+});
 
 // Servir archivos estáticos
-app.use(express.static(path.join(__dirname, "static")))
+app.use(express.static(path.join(__dirname, "static")));
+
+app.use(cookieParser());
 
 // Middleware de autenticación global (si es necesario)
 const { loginRequired } = require('./server/authentication');
 
-app.use(cookieParser());
-
-//Redireccionar a la página de dashboard
+// Redireccionar a la página de dashboard
 app.get('/', (req, res) => {
     res.redirect('/food-manager/dashboard/home');
 });
@@ -44,23 +48,12 @@ routeFiles.forEach(file => {
     const routeName = `/${file.replace('.routes.js', '')}`;
     
     // Aplicar middleware de autenticación a todas las rutas, excepto las de la carpeta 'auth'
-    if (routeName.startsWith('/auth')) {
+    if (routeName.startsWith('/auth') || routeName.startsWith('/totem')) {
         app.use(routeName, route);
     } else {
         app.use(routeName, loginRequired, route);
     }
 });
-
-// Rutas del tótem
-app.get('/totem', lunchController.renderTotem);
-
-app.post('/totem/check-in', lunchController.checkInLunch);
-
-// Ruta para registrar colación desde el tótem
-app.post('/totem/register-lunch', lunchController.registerLunchAtTotem);
-
-// Ruta para el listado de colaciones
-app.get('/lunch/list', lunchController.renderLunchList);
 
 // Manejo de errores 404
 app.use((req, res) => {
@@ -69,6 +62,6 @@ app.use((req, res) => {
 
 // Iniciar el servidor
 const port = process.env.PORT || 3000;
-app.listen(port, () => {
+http.listen(port, () => { // Use http.listen instead of app.listen
     console.log(`Server is running on http://localhost:${port}`);
 });
