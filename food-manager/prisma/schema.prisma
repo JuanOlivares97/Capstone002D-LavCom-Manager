@@ -11,7 +11,7 @@ model Colacion {
   IdColacion     Int        @id @default(autoincrement())
   RutSolicitante String     @db.VarChar(255)
   FechaSolicitud DateTime   @db.Date
-  Retirado       Int        @default(0)
+  Estado         Int        @default(0)
   Menu           Int
   IdTipoUnidad   Int
   TipoUnidad     TipoUnidad @relation(fields: [IdTipoUnidad], references: [IdTipoUnidad], onUpdate: Restrict, map: "fk_colacion_unidad")
