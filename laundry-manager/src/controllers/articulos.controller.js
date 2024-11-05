@@ -206,11 +206,15 @@ async function declararPerdida(req, res) {
     try {
         var fecha = new Date();
         fecha = tempo.format(fecha, "YYYY-MM-DD HH:mm:ss A", "cl");
-        const data = req.body;
+        let data = req.body;
+        const rut_usuario_1 = req.cookies["rutLogueado"];
+        if (data.tipo_perdida === "5") {
+            data.id_unidad_sigcom = null;
+        }
         const resultado = await prisma.$transaction(async (prisma) => {
             const registro = await prisma.registro.create({
                 data: {
-                    rut_usuario_1: parseInt(data.rut_usuario_1),
+                    rut_usuario_1: parseInt(rut_usuario_1),
                     id_tipo_registro: parseInt(data.tipo_perdida),
                     id_unidad_sigcom: data.id_unidad_sigcom ? parseInt(data.id_unidad_sigcom) : null,
                     observacion: data.observaciones ? data.observaciones.toString() : null,
@@ -242,10 +246,14 @@ async function declararPerdida(req, res) {
             return registro;
         });
 
-        return res.status(200).json({ message: "Registro creado exitosamente", data: resultado });
+        if (!resultado) {
+            return res.status(400).json({ message: "Error creando registro", success: false });
+        }
+
+        return res.status(200).json({ message: "Registro creado exitosamente", success: true });
     } catch (error) {
         console.error(error);
-        return res.status(500).json({ message: "Internal server error", error: error.message });
+        return res.status(500).json({ message: "Internal server error", error, success: false });
     }
 }
 
