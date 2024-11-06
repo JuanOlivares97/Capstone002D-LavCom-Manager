@@ -97,25 +97,25 @@ model unidad_sigcom {
 }
 
 model usuarios {
-  id_usuario                                Int           @id @default(autoincrement())
-  rut_usuario                               Int           @unique(map: "rut_usuario_UNIQUE")
-  dv_usuario                                String        @db.VarChar(1)
-  nombre                                    String        @db.VarChar(255)
+  id_usuario                                Int            @id @default(autoincrement())
+  rut_usuario                               Int            @unique(map: "rut_usuario_UNIQUE")
+  dv_usuario                                String         @db.VarChar(1)
+  nombre                                    String         @db.VarChar(255)
   id_servicio                               Int
   id_tipo_contrato                          Int
   id_unidad_sigcom                          Int?
   id_estamento                              Int
   id_tipo_usuario                           Int
-  username                                  String        @unique(map: "username_UNIQUE") @db.VarChar(255)
-  pwd                                       String        @db.VarChar(255)
+  username                                  String         @unique(map: "username_UNIQUE") @db.VarChar(255)
+  pwd                                       String         @db.VarChar(255)
   borrado                                   Boolean
-  email                                     String?       @unique(map: "email_UNIQUE") @db.VarChar(255)
-  registro_registro_rut_usuario_1Tousuarios registro[]    @relation("registro_rut_usuario_1Tousuarios")
-  registro_registro_rut_usuario_2Tousuarios registro[]    @relation("registro_rut_usuario_2Tousuarios")
-  tipo_usuario                              tipo_usuario  @relation(fields: [id_tipo_usuario], references: [id_tipo_usuario], onDelete: NoAction, onUpdate: NoAction, map: "fk_tipo_usuario")
-  estamento                                 estamento     @relation(fields: [id_estamento], references: [id_estamento], onDelete: NoAction, onUpdate: NoAction, map: "usuario_estamento")
-  servicio                                  servicio      @relation(fields: [id_servicio], references: [id_servicio], onDelete: NoAction, onUpdate: NoAction, map: "usuario_servicio")
-  tipo_contrato                             tipo_contrato @relation(fields: [id_tipo_contrato], references: [id_tipo_contrato], onDelete: NoAction, onUpdate: NoAction, map: "usuario_tipo_contrato")
+  email                                     String?        @unique(map: "email_UNIQUE") @db.VarChar(255)
+  registro_registro_rut_usuario_1Tousuarios registro[]     @relation("registro_rut_usuario_1Tousuarios")
+  registro_registro_rut_usuario_2Tousuarios registro[]     @relation("registro_rut_usuario_2Tousuarios")
+  tipo_usuario                              tipo_usuario   @relation(fields: [id_tipo_usuario], references: [id_tipo_usuario], onDelete: NoAction, onUpdate: NoAction, map: "fk_tipo_usuario")
+  estamento                                 estamento      @relation(fields: [id_estamento], references: [id_estamento], onDelete: NoAction, onUpdate: NoAction, map: "usuario_estamento")
+  servicio                                  servicio       @relation(fields: [id_servicio], references: [id_servicio], onDelete: NoAction, onUpdate: NoAction, map: "usuario_servicio")
+  tipo_contrato                             tipo_contrato  @relation(fields: [id_tipo_contrato], references: [id_tipo_contrato], onDelete: NoAction, onUpdate: NoAction, map: "usuario_tipo_contrato")
   unidad_sigcom                             unidad_sigcom? @relation(fields: [id_unidad_sigcom], references: [id_unidad_sigcom], onDelete: NoAction, onUpdate: NoAction, map: "usuario_unidad_sigcom")
 
   @@index([id_tipo_usuario], map: "fk_tipo_usuario")
