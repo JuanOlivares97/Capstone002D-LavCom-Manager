@@ -39,7 +39,7 @@ async function getArticulos(req, res) {
         
         return res.status(200).json(articulosConSubgrupo);
     } catch (error) {
-        return res.status(500).json({ message: "Internal server error" + error });
+        return res.status(500).json({ message: "Internal server error", error });
     }
 }
 
