@@ -61,7 +61,7 @@ form.addEventListener("submit", async (e) => {
                 });
                 return;
             }
-            console.log(data_email.message)
+            
         }
     }
     Swal.fire({

@@ -18,7 +18,6 @@ app.set('view engine', 'ejs');
 app.set('views', './src/views');
 
 app.use(express.static(path.join(__dirname, "static")))
-console.log(path.join(__dirname, "static"));
 
 app.use('/auth', authRouter);
 app.use('/users', userRouter);
@@ -34,5 +33,5 @@ app.get("/template", (req, res) => {
 
 const port = process.env.PORT || 3000;
 app.listen(port, () => {
-    console.log(`Server is running http://localhost:${port}`);
+    console.log(`Server is running http://localhost:8080`);
 });

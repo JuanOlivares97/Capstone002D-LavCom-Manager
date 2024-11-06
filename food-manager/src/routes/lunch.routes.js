@@ -7,6 +7,8 @@ router.get('/list', lunchController.renderLunchList);
     
 router.post('/register-lunch', lunchController.registrationLunch);
 
+router.put('/update-lunch/:id', lunchController.registrarColacionRetirada);
+
 
 
 module.exports = router;

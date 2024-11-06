@@ -31,10 +31,15 @@ async function login(req, res) {
     try {
         const { rutCompleto, pwd } = req.body;
 
+        // Verificar si rutCompleto y pwd están presentes
+        if (!rutCompleto || !pwd) {
+            return res.status(400).json({ message: "RUT y contraseña son obligatorios", success: false });
+        }
+
         // Dividir el RUT en dos partes: número y dígito verificador
         const [RutFuncionario, DvFuncionario] = rutCompleto.split('-');
 
-        // Ahora puedes usar RutFuncionario y DvFuncionario en tu consulta
+        // Consulta al usuario
         const user = await prisma.Funcionario.findFirst({
             where: {
                 RutFuncionario: RutFuncionario,
@@ -42,24 +47,30 @@ async function login(req, res) {
             }
         });
 
-        if (!user) {
+        if (!user || !user.contrasena) {
             return res.status(401).json({ message: "Rut o contraseña incorrectos", success: false });
         }
 
+        // Verificación de contraseña
         const isPasswordValid = await bcrypt.compare(pwd, user.contrasena);
-
         if (!isPasswordValid) {
             return res.status(401).json({ message: "Rut o contraseña incorrectos", success: false });
         }
-        
+
+        // Hashear el nombre del usuario
+        if (!user.NombreFuncionario) {
+            return res.status(500).json({ message: "Error: Nombre de usuario no disponible", success: false });
+        }
         const hashName = await bcrypt.hash(user.NombreFuncionario, 10);
 
+        // Creación del token
         const token_data = {
             id_usuario: user.IdFuncionario,
             nombre: hashName,
-        }
+        };
         const token = jwt.sign(token_data, process.env.JWT_SECRET, { expiresIn: "8h" });
 
+        // Configuración de cookies
         res.cookie("token", token, { path: "/food-manager" });
         res.cookie("logged-in", true, { path: "/food-manager" });
         res.cookie("tipo_usuario", user.IdTipoFuncionario, { path: "/food-manager" });
@@ -68,9 +79,11 @@ async function login(req, res) {
 
         return res.status(200).json({ message: "Has iniciado sesión, bienvenido", success: true, user });
     } catch (error) {
-        return res.status(500).json({ message: "Internal server error" + error, success: false });
+        console.error("Error en el login:", error);
+        return res.status(500).json({ message: "Internal server error: " + error.message, success: false });
     }
 }
+
 
 async function setEmail(req, res) {
     try {

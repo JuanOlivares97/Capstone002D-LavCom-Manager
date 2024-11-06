@@ -91,7 +91,7 @@ async function createEmployee(req, res) {
             // Si el empleado ya existe, actualizar Habilitado a 'S'
             const updatedEmployee = await prisma.Funcionario.update({
                 where: {
-                    IdFuncionario: existingEmployee.id
+                    IdFuncionario: existingEmployee.IdFuncionario
                 },
                 data: {
                     Habilitado: 'S'

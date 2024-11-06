@@ -146,7 +146,6 @@ window.editUsuario = function (data) {
     const unidadSelect = document.querySelector("select[name='edittipoUnidad']");
     const estamentoSelect = document.querySelector("select[name='edittipoEstamento']");
     const funcionarioSelect = document.querySelector("select[name='edittipoFuncionario']");
-    console.log(data);
     // Verificar que los datos de RUT existan
     const rutCompleto = (data.RutFuncionario && data.DvFuncionario)
         ? `${data.RutFuncionario}-${data.DvFuncionario}`

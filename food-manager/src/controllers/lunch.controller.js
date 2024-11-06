@@ -37,12 +37,6 @@ async function registrationLunch(req, res) {
         
         const today = moment().format('YYYY-MM-DD');
 
-        const existingLunch = await prisma.Colacion.findFirst({
-            where: {
-                RutSolicitante: rutSolicitante,
-                FechaSolicitud: new Date(today)
-            },
-        });
 
         const funcionario = await prisma.Funcionario.findFirst({
             where: {
@@ -50,9 +44,9 @@ async function registrationLunch(req, res) {
                 DvFuncionario: dv
             }
         });
-
-        if (!funcionario) {
-            return res.status(404).json({ message: "Funcionario not found" });
+        
+        if (!funcionario || funcionario.Habilitado !== 'S') {
+            return res.status(404).json({ message: "Funcionario no habilitado" });
         }
         
         // Register the lunch
@@ -61,15 +55,13 @@ async function registrationLunch(req, res) {
                 RutSolicitante: rutSolicitante,
                 FechaSolicitud: new Date(today),
                 Menu: parseInt(menu),
-                Estado: 0,
+                Estado: 0, // 0 - Solicitado, 1 - Confirmado, 2 - Retirado
                 TipoUnidad: {
                     connect: { IdTipoUnidad: funcionario.IdTipoUnidad } // Connect to existing TipoUnidad by Id
                 }
             },
         });
 
-        console.log('Emitting lunchRegistered event:', nuevaColacion);
-        req.app.get('socketio').emit('/lunchRegistered', nuevaColacion);
 
         return res.status(200).json({ message: 'Colacion Ingresada exitosamente' });
     } catch (error) {
@@ -78,7 +70,6 @@ async function registrationLunch(req, res) {
     }
 }
 
-
 async function renderLunchList(req, res) {
     try {
         const tipoUsuario = req.cookies['tipo_usuario'];
@@ -86,7 +77,7 @@ async function renderLunchList(req, res) {
         const lunches = await prisma.Colacion.findMany({
             where: {
                 FechaSolicitud: new Date(today),
-                Estado: 0
+                Estado: 1 // Solo mostrar colaciones confirmadas
             },
             orderBy: {
                 FechaSolicitud: 'asc',
@@ -99,9 +90,40 @@ async function renderLunchList(req, res) {
     }
 }
 
+async function registrarColacionRetirada(req, res){
+    const idColacion = req.params.id
+    const today = moment().format('YYYY-MM-DD');
+    try {
+        const existingLunch = await prisma.Colacion.findFirst({
+            where: {
+                IdColacion: parseInt(idColacion),
+                FechaSolicitud: new Date(today)
+            },
+        });
+
+        if (!existingLunch) {
+            return res.status(404).json({ message: "Colación no encontrada" });
+        }
+
+        // Update the lunch
+        await prisma.Colacion.update({
+            where: {
+                IdColacion: parseInt(idColacion)
+            },
+            data: {
+                Estado: 2, // Retirada
+            },
+        });
+
+        return res.status(200).json({ message: 'Colación retirada exitosamente' });
+    } catch (error) {
+        return res.status(500).json({ message: 'Error al retirar la colación '});
+    }
+}
 
 module.exports = {
     renderHome,
     registrationLunch,
     renderLunchList,
+    registrarColacionRetirada
 };

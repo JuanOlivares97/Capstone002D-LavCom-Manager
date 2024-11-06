@@ -1,3 +1,13 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Listado de Colaciones</title>
+  <!-- Incluye los estilos necesarios -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+
 <body class="bg-gray-100">
   <div class="container mx-auto py-8">
     <h1 class="text-3xl font-bold text-center mb-6 text-gray-800">Listado de Colaciones</h1>
@@ -7,30 +17,80 @@
           <strong>RUT:</strong>
           <%= lunch.RutSolicitante %> -
             <strong>Menú:</strong> Menú <%= lunch.Menu %>
-          <button class="justify-end">Entregado</button>
+              <a href="javascript:void(0);" onclick="editarColacion('<%= lunch.IdColacion %>')"
+                class="text-blue-500 underline">Editar</a>
         </li>
         <% }); %>
     </ul>
   </div>
-
+  <script>
+    function editarColacion(idColacion) {
+      fetch(`/food-manager/lunch/update-lunch/${idColacion}`, {  // Eliminé una '/' extra
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        // Si necesitas enviar datos en el cuerpo de la solicitud, descomenta la siguiente línea y ajusta el contenido
+        // body: JSON.stringify({ /* tus datos aquí */ })
+      })
+        .then(response => {
+          if (response.ok) {
+            // Si la respuesta es exitosa
+            Swal.fire({
+              icon: 'success',
+              title: 'Edición Completa',
+              text: 'La colación se ha actualizado correctamente.',
+              confirmButtonText: 'OK'
+            });
+          } else {
+            // Si hubo un error en la respuesta
+            Swal.fire({
+              icon: 'error',
+              title: 'Error',
+              text: 'No se pudo actualizar la colación. Inténtelo de nuevo.',
+              confirmButtonText: 'OK'
+            });
+          }
+        })
+        .catch(error => {
+          // Si hay un problema con la conexión o el fetch
+          Swal.fire({
+            icon: 'error',
+            title: 'Error de Conexión',
+            text: 'Ocurrió un error de conexión. Inténtelo más tarde.',
+            confirmButtonText: 'OK'
+          });
+        });
+    }
+  </script>
   <script type="module">
     import { io } from "https://cdn.socket.io/4.3.0/socket.io.esm.min.js";
 
-    // Connect to the reverse proxy port, which is 8080
+    // Conectar al proxy inverso en el puerto 8080
     const socket = io('http://localhost:8080/food-manager', {
       path: '/food-manager/socket.io',  // Asegura que el path es correcto
       transports: ['websocket'],        // Preferir WebSocket sobre polling
     });
 
-    // Listen for the lunchRegistered event
+    socket.on('connect', () => {
+
+    });
+    // Escuchar el evento 'lunchRegistered'
     socket.on('lunchRegistered', function (lunch) {
-      console.log('Received lunchRegistered event:', lunch);
       const list = document.getElementById('lunchList');
       const item = document.createElement('li');
       item.className = 'p-4 bg-gray-50 rounded-lg shadow-md';
       item.innerHTML = '<strong>RUT:</strong> ' + lunch.RutSolicitante +
         ' - <strong>Menú:</strong> Menú ' + lunch.Menu +
-        ' - <strong>Hora:</strong> ' + new Date(lunch.FechaSolicitud).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+        ' <a href="javascript:void(0);" onclick="editarColacion(\'' + lunch.IdColacion + '\')" class="text-blue-500 underline">Editar</a>';
       list.appendChild(item);
     });
+
+
+    socket.on('disconnect', () => {
+    });
   </script>
+
+</body>
+
+</html>

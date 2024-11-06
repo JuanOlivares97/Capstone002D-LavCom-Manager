@@ -110,6 +110,7 @@ async function renderDashboard(req, res) {
     // Promesas para KPIs diarios y datos históricos
     const [
       funcionariosHabilitados,
+      funcionariosSolicitados,
       funcionariosConfirmados,
       funcionariosAlmorzaron,
       pacientesHospitalizados,
@@ -123,11 +124,12 @@ async function renderDashboard(req, res) {
       prisma.Funcionario.count({ where: { Habilitado: "S" } }),
       prisma.Colacion.count({ where: { Estado: 0, FechaSolicitud: new Date(hoy) } }),
       prisma.Colacion.count({ where: { Estado: 1, FechaSolicitud: new Date(hoy) } }),
+      prisma.Colacion.count({ where: { Estado: 2, FechaSolicitud: new Date(hoy) } }),
       prisma.Hospitalizado.count(),
       prisma.Hospitalizado.count({ where: { FechaFinAyuno: { lt: today } } }),
       prisma.Hospitalizado.count({ where: { FechaIngreso: today } }),
       prisma.Hospitalizado.count({ where: { FechaAlta: today } }),
-
+      
       // Colaciones confirmadas y pacientes en ayuno por día
       Promise.all(days.map(async (day) => ({
         day,
@@ -155,6 +157,7 @@ async function renderDashboard(req, res) {
     res.render('dashboard/home', {
       tipoUsuario: parseInt(tipoUsuario),
       funcionariosHabilitados,
+      funcionariosSolicitados,
       funcionariosConfirmados,
       funcionariosAlmorzaron,
       pacientesHospitalizados,

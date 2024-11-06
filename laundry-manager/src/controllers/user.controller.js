@@ -8,9 +8,7 @@ async function getUsuarios(req, res) {
             }
         });
         return res.json(users);
-    } catch (error) {
-        console.log(error);
-        
+    } catch (error) {        
         return res.status(500).json({ message: "Internal server error" });
     }
 }

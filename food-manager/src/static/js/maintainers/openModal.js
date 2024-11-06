@@ -224,7 +224,6 @@ document.getElementById('modalEditForm').addEventListener('submit', async functi
     const description = formData.get('description');
     const mantenedor = document.getElementById('modalEditTitle').textContent.split(' ')[1].toLowerCase();
     let endpoint, idField;
-    console.log(description);
     // Asigna el endpoint y el nombre del campo ID según el mantenedor seleccionado
     switch (mantenedor) {
         case 'estamento':

@@ -121,7 +121,6 @@ function searchByName(event) {
 
 function searchByRut() {
     const query = document.getElementById('rutInput').value.trim();
-    console.log(query);
     const cards = document.querySelectorAll('#cardGridPacientes > div');
     cards.forEach(card => {
         const rut = card.querySelector('#rutSpan').textContent.trim();

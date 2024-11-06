@@ -1,14 +1,18 @@
 const express = require('express');
 const app = express();
-
 const expressLayout = require('express-ejs-layouts');
 const path = require('path');
 const cookieParser = require('cookie-parser');
 const fs = require('fs');
-const http = require('http').createServer(app); // HTTP server for Socket.io
+const http = require('http').createServer(app); // HTTP server para Socket.io
 const io = require('socket.io')(http, {
-    path: '/food-manager/socket.io'  // Asegúrate de que coincida con el path en el cliente y proxy
-  });
+    path: '/food-manager/socket.io',
+    cors: {
+        origin: "http://localhost:8080",  // Ajusta esto según tu configuración
+        methods: ["GET", "POST"]
+    }
+});
+
 // Configuración de EJS y layouts
 app.use(expressLayout);
 app.set('layout', '_template');
@@ -17,21 +21,24 @@ app.set('views', './src/views');
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
 
-app.set('socketio', io); // Set Socket.io instance in app
+// Guardar la instancia de Socket.io en la aplicación
+app.set('socketio', io);
 
-io.on('connection', (socket) => {
-    console.log('New client connected');
-    
+// Definir el namespace '/food-manager'
+const foodManagerNamespace = io.of('/food-manager');
+
+foodManagerNamespace.on('connection', (socket) => {
+    console.log('New client connected to /food-manager');
+
     socket.on('disconnect', () => {
-        console.log('Client disconnected');
+        console.log('Client disconnected from /food-manager');
     });
 });
 
 // Servir archivos estáticos
 app.use(express.static(path.join(__dirname, "static")));
-
-app.use(cookieParser());
 
 // Middleware de autenticación global (si es necesario)
 const { loginRequired } = require('./server/authentication');
@@ -48,7 +55,7 @@ routeFiles.forEach(file => {
     const route = require(routePath);
     const routeName = `/${file.replace('.routes.js', '')}`;
     
-    // Aplicar middleware de autenticación a todas las rutas, excepto las de la carpeta 'auth'
+    // Aplicar middleware de autenticación a todas las rutas, excepto las de la carpeta 'auth' y 'totem'
     if (routeName.startsWith('/auth') || routeName.startsWith('/totem')) {
         app.use(routeName, route);
     } else {
@@ -63,6 +70,6 @@ app.use((req, res) => {
 
 // Iniciar el servidor
 const port = process.env.PORT || 3000;
-http.listen(port, () => { // Use http.listen instead of app.listen
+http.listen(port, () => { // Usar http.listen en lugar de app.listen
     console.log(`Server is running on http://localhost:${port}`);
 });

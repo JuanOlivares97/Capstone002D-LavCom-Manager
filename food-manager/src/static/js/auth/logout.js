@@ -6,7 +6,7 @@ const logoutButtons = [
 logoutButtons.forEach(button => {
     button.addEventListener('click', async (e) => {
         e.preventDefault(); // Prevenir la acción predeterminada del botón
-        console.log('Logout button clicked');
+
         const response = await fetch("/food-manager/auth/logout", {
             method: "POST",
             headers: {
