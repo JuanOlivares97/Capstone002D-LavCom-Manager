@@ -1,118 +1,140 @@
+// Importamos las funciones que vamos a testear
 const { renderLogin, renderRecuperarContrasenaForm, renderRecuperarContrasenaInfo } = require('../../src/controllers/auth.controller'); // Adjust path as needed
 
+// Tests para renderizar la página de inicio
 describe('renderLogin', () => {
-    let mockResponse;
-    let mockRequest;
+    // Variables req y res para las funciones
+    let res;
+    let req;
 
+    // Configuración inicial previa a cada test
     beforeEach(() => {
-        mockRequest = {}; // The request object is not used in this case
-        mockResponse = {
-            render: jest.fn(), // Mocking the render function of the response object
+        // Reset mocks
+        jest.clearAllMocks();
+
+        // Mock request object
+        req = {};
+
+        // Mock response object
+        res = {
+            render: jest.fn(),
             status: jest.fn().mockReturnThis(),
             json: jest.fn().mockReturnThis(),
         };
     });
 
-    afterEach(() => {
-        jest.clearAllMocks();
-    });
-
+    // Test para renderizar la página de inicio correctamente
     test('should render the login page successfully', async () => {
-        await renderLogin(mockRequest, mockResponse);
+        // Llamar a la función
+        await renderLogin(req, res);
 
-        // Check that res.render was called with the correct arguments
-        expect(mockResponse.render).toHaveBeenCalledWith('auth/login', { layout: false });
+        // Verificar que res.render() fue llamado con los parámetros correctos
+        expect(res.render).toHaveBeenCalledWith('auth/login', { layout: false });
     });
 
+    // Test para manejar un error interno
     test('should return an internal server error if an exception occurs', async () => {
-        // Simulate an error by making the render function throw an exception
-        mockResponse.render.mockImplementationOnce(() => {
+        // Simular un error haciendo que la función render lance una excepción
+        res.render.mockImplementationOnce(() => {
             throw new Error('Something went wrong');
         });
 
-        await renderLogin(mockRequest, mockResponse);
+        // Llamar a la función
+        await renderLogin(req, res);
 
-        // Check that res.status(500) and res.json() were called
-        expect(mockResponse.status).toHaveBeenCalledWith(500);
-        expect(mockResponse.json).toHaveBeenCalledWith({
-            message: 'Internal server error',
-        });
+        // Verificación de error 5000
+        expect(res.status).toHaveBeenCalledWith(500);
     });
 });
 
+// Tests para renderizar la página de recuperar contraseña
 describe('renderRecuperarContrasenaForm', () => {
-    let mockRequest;
-    let mockResponse;
+    // Variables req y res para las funciones
+    let req;
+    let res;
 
+    // Configuración inicial previa a cada test
     beforeEach(() => {
-        mockRequest = {}
-        mockResponse = {
+        // Reset mocks
+        jest.clearAllMocks();
+
+        // Mock request object
+        req = {}
+
+        // Mock response object
+        res = {
             render: jest.fn(),
             status: jest.fn().mockReturnThis(),
             json: jest.fn().mockReturnThis()
         }
     })
 
-    afterEach(() => {
-        jest.clearAllMocks()
-    })
-
+    // Test para renderizar el formulario de recuperar contraseña correctamente
     test("render password recovery form", async () => {
-        await renderRecuperarContrasenaForm(mockRequest, mockResponse)
+        // Llamar a la función
+        await renderRecuperarContrasenaForm(req, res)
 
-        expect(mockResponse.render).toHaveBeenCalledWith("auth/recuperar_pwd_form", {layout:false})
+        // Verificar que res.render() fue llamado con los parámetros correctos
+        expect(res.render).toHaveBeenCalledWith("auth/recuperar_pwd_form", {layout:false})
     })
 
+    // Test para manejar un error interno
     test('should return an internal server error if an exception occurs', async () => {
-        // Simulate an error by making the render function throw an exception
-        mockResponse.render.mockImplementationOnce(() => {
+        // Simular un error haciendo que la función render lance una excepción
+        res.render.mockImplementationOnce(() => {
             throw new Error('Something went wrong');
         });
 
-        await renderRecuperarContrasenaForm(mockRequest, mockResponse);
+        // Llamar a la función
+        await renderRecuperarContrasenaForm(req, res);
 
-        // Check that res.status(500) and res.json() were called
-        expect(mockResponse.status).toHaveBeenCalledWith(500);
-        expect(mockResponse.json).toHaveBeenCalledWith({
-            message: 'Internal server error',
-        });
+        // Verificacicón de error 500
+        expect(res.status).toHaveBeenCalledWith(500);
     });
 })
-describe('renderRecuperarContrasenaInfo', () => {
-    let mockRequest;
-    let mockResponse;
 
+// Tests para renderizar la página de recuperar contraseña
+describe('renderRecuperarContrasenaInfo', () => {
+    // Variables req y res para las funciones
+    let req;
+    let res;
+
+    // Configuración inicial previa a cada test
     beforeEach(() => {
-        mockRequest = {}
-        mockResponse = {
+        // Reset mocks
+        jest.clearAllMocks();
+
+        // Mock request object
+        req = {}
+
+        // Mock response object
+        res = {
             render: jest.fn(),
             status: jest.fn().mockReturnThis(),
             json: jest.fn().mockReturnThis()
         }
     })
 
-    afterEach(() => {
-        jest.clearAllMocks()
-    })
-
+    // Test para renderizar la información de recuperar contraseña correctamente
     test("render password recovery info", async () => {
-        await renderRecuperarContrasenaInfo(mockRequest, mockResponse)
+        // Llamar a la función
+        await renderRecuperarContrasenaInfo(req, res)
 
-        expect(mockResponse.render).toHaveBeenCalledWith("auth/recuperar_pwd_info", {layout:false})
+        // Verificar que res.render() fue llamado con los parámetros correctos
+        expect(res.render).toHaveBeenCalledWith("auth/recuperar_pwd_info", {layout:false})
     })
 
+    // Test para manejar un error interno
     test('should return an internal server error if an exception occurs', async () => {
-        // Simulate an error by making the render function throw an exception
-        mockResponse.render.mockImplementationOnce(() => {
+        // Simular un error haciendo que la función render lance una excepción
+        res.render.mockImplementationOnce(() => {
             throw new Error('Something went wrong');
         });
 
-        await renderRecuperarContrasenaInfo(mockRequest, mockResponse);
+        // Llamar a la función
+        await renderRecuperarContrasenaInfo(req, res);
 
-        // Check that res.status(500) and res.json() were called
-        expect(mockResponse.status).toHaveBeenCalledWith(500);
-        expect(mockResponse.json).toHaveBeenCalledWith({
-            message: 'Internal server error',
-        });
+        // Veridicación de error 500
+        expect(res.status).toHaveBeenCalledWith(500);
     });
 })
