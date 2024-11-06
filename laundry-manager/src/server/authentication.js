@@ -5,22 +5,22 @@ async function loginRequired(req, res, next) {
     try {
         const token = req.cookies["token"];
         if (!token) {
-            return res.redirect("/auth/login");
+            return res.redirect("/laundry-manager/auth/login");
         }
 
         // Verificar el token JWT
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         if (!decoded) {
-            return res.redirect("/auth/login");
+            return res.redirect("/laundry-manager/auth/login");
         }
 
         // Buscar el usuario en la base de datos
         const user = await prisma.usuarios.findUnique({
-            where: { id_usuario: decoded.id_usuario }
+            where: { id_usuario: decoded.id_usuario },
         });
 
         if (!user) {
-            return res.redirect("/auth/login");
+            return res.redirect("/laundry-manager/auth/login");
         }
 
         req.user = user; // Añadir el usuario al objeto req
@@ -32,5 +32,5 @@ async function loginRequired(req, res, next) {
 }
 
 module.exports = {
-    loginRequired
-}
+    loginRequired,
+};
