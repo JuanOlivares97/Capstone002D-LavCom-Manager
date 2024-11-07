@@ -71,5 +71,5 @@ app.use((req, res) => {
 // Iniciar el servidor
 const port = process.env.PORT || 3000;
 http.listen(port, () => { // Usar http.listen en lugar de app.listen
-    console.log(`Server is running on http://localhost:${port}`);
+    console.log(`Server is running on http://localhost:8080/food-manager`);
 });

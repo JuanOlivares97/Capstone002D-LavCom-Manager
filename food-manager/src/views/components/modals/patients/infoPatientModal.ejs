@@ -1,5 +1,5 @@
 <div id="patientModal"
-    class="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center hidden overflow-auto">
+    class=" z-10 fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center hidden overflow-auto">
     <div class="bg-white rounded-lg shadow-xl max-w-6xl w-full p-6 relative overflow-y-auto max-h-screen">
         <!-- Botón para cerrar el modal -->
         <button class="absolute top-2 right-2 text-gray-500 hover:text-gray-800" onclick="closeModal()">
@@ -206,7 +206,7 @@
         <!-- Botones -->
         <div class="flex gap-4 justify-center">
             <div class="mt-6 flex justify-end">
-                <button onclick="closeModal()"
+                <button onclick="closeModalInfo()"
                     class="px-4 py-2 bg-gray-200 text-gray-800 rounded-md shadow-sm hover:bg-gray-300">Cerrar</button>
             </div>
             <div class="mt-6 flex justify-end">
@@ -217,11 +217,7 @@
                 <button onclick="toggleLogs()"
                     class="px-4 py-2 bg-red-200 text-gray-800 rounded-md shadow-sm hover:bg-gray-300">Ver Logs</button>
             </div>
-            <div class="mt-6 flex justify-end">
-                <button id="altaModal"
-                    class="px-4 py-2 bg-blue-200 text-white-800 rounded-md shadow-sm hover:bg-blue-300">Dar alta
-                    paciente</button>
-            </div>
+            
         </div>
     </div>
 </div>

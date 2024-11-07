@@ -1,4 +1,4 @@
-<div id="addPatientModal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center ">
+<div id="addPatientModal" class="z-10 hidden fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center ">
     <div class="bg-white rounded-lg shadow-xl max-w-6xl w-full p-5 relative overflow-y-auto max-h-screen">
 
         <!-- Título del modal -->
@@ -20,20 +20,23 @@
                 <input type="text" id="apellidom" name="apellidom" class=" my-2 w-full p-2 border rounded" required>
 
                 <label class="block font-medium text-gray-700 mt-1">Fecha de Nacimiento</label>
-                <input type="date" id="FechaNacimiento" name="FechaNacimiento" class=" my-2 w-full p-2 border rounded" required>
+                <input type="date" id="FechaNacimiento" name="FechaNacimiento" class=" my-2 w-full p-2 border rounded"
+                    required>
 
                 <label class="block font-medium text-gray-700 mt-1">Observaciones Generales</label>
-                <textarea type="text" id="observacionesgenerales" name="observacionesgenerales" class=" my-2 w-full p-2 border rounded h-48 " required></textarea>
+                <textarea type="text" id="observacionesgenerales" name="observacionesgenerales"
+                    class=" my-2 w-full p-2 border rounded h-48 " required></textarea>
             </div>
 
             <div>
-                
+
                 <label class="block font-medium text-gray-700 mt-1">Fecha de Ingreso</label>
-                <input type="date" id="fechaIngreso" name="fechaIngreso" class=" my-2 w-full p-2 border rounded" required>
+                <input type="date" id="fechaIngreso" name="fechaIngreso" class=" my-2 w-full p-2 border rounded"
+                    required>
 
                 <label class="block font-medium text-gray-700 mt-1">Rut</label>
                 <input type="text" id="rut" name="rut" class=" my-2 w-full p-2 border rounded" required>
-                
+
                 <label class="block font-medium text-gray-700 mt-1">Telefono</label>
                 <input type="number" id="Telefonos" name="Telefonos" class=" my-2 w-full p-2 border rounded" required>
 
@@ -45,7 +48,8 @@
                 <input type="email" id="Correo" name="Correo" class=" my-2 w-full p-2 border rounded" required>
 
                 <label class="block font-medium text-gray-700 mt-1">Observaciones Nutricionista</label>
-                <textarea type="text" id="observacionesnutricionista" name="observacionesnutricionista" class=" my-2 w-full p-2 border rounded h-48" required></textarea>
+                <textarea type="text" id="observacionesnutricionista" name="observacionesnutricionista"
+                    class=" my-2 w-full p-2 border rounded h-48" required></textarea>
             </div>
 
             <div>
@@ -95,11 +99,35 @@
         <!-- Botones -->
         <div class="flex gap-4 justify-center">
             <div class="my-3 flex justify-end">
-                <button id="addPaciente" class="px-4 py-2 bg-green-200 text-white-800 rounded-md shadow-sm hover:bg-gray-300">Ingresar Paciente</button>
+                <button id="addPaciente"
+                    class="px-4 py-2 bg-green-200 text-white-800 rounded-md shadow-sm hover:bg-gray-300">Ingresar
+                    Paciente</button>
             </div>
             <div class="my-3 flex justify-end">
-                <button id="closeModalAddPatient" class="px-4 py-2 bg-red-200 text-white-800 rounded-md shadow-sm hover:bg-gray-300">Cancelar Ingreso</button>
+                <button id="closeModalAddPatient"
+                    class="px-4 py-2 bg-red-200 text-white-800 rounded-md shadow-sm hover:bg-gray-300">Cancelar
+                    Ingreso</button>
             </div>
         </div>
     </div>
 </div>
+
+
+<script>
+function formatRUTInput(inputElement) {
+        inputElement.addEventListener('input', () => {
+            let rut = inputElement.value.replace(/\./g, '').replace(/-/g, '');
+
+            // Extraer el cuerpo y el dígito verificador
+            const cuerpo = rut.slice(0, -1);
+            const dv = rut.slice(-1);
+
+            // Actualizar el valor del input sin puntos, solo con guion
+            inputElement.value = `${cuerpo}-${dv}`;
+        });
+    }
+
+    // Llamar a la función en el input de RUT
+    const rutInputElement = document.getElementById('rut');
+    formatRUTInput(rutInputElement);
+    </script>

@@ -9,7 +9,8 @@ router.get('/movements/:id', patientController.getMovimientosPaciente)
 
 router.post('/create-paciente', patientController.createPaciente)
 
-
+router.put('/change-fasting-date/:id', patientController.changeFastingDate)
+router.put('/indicar-alta/:id', patientController.indicarAlta)
 router.put('/move-service/:id', patientController.movePatientService)
 router.put('/change-regimen/:id', patientController.changeRegimen)
 router.put('/change-observations-sala/:id', patientController.changeObservacionesGenerales)

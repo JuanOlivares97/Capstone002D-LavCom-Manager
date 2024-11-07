@@ -44,6 +44,9 @@ async function login(req, res) {
             where: {
                 RutFuncionario: RutFuncionario,
                 DvFuncionario: DvFuncionario
+            },
+            include: {
+                TipoFuncionario: true 
             }
         });
 
@@ -192,8 +195,7 @@ async function logout(req, res) {
         res.clearCookie("logged-in", { path: '/food-manager' });
         res.clearCookie("tipo_usuario", { path: '/food-manager' });
         res.clearCookie("rutLogueado", { path: '/food-manager' });
-        res.clearCookie("dvLogueado", { path: '/food-manager' });
-
+        res.clearCookie("dvLogueado", { path: '/food-manager' });   
         return res.status(200).json({ message: "Has cerrado sesión", success: true });
     } catch (error) {
         return res.status(500).json({ message: "Internal server error", success: false });

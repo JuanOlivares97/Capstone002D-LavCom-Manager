@@ -152,7 +152,8 @@ async function renderDashboard(req, res) {
         }
       })
     ]);
-
+    const tipoUsuariostr = req.cookies['tipo_usuarioStr']
+    const nombreUsuario = req.cookies['NombreUsuario']
     const tipoUsuario = req.cookies['tipo_usuario']
     res.render('dashboard/home', {
       tipoUsuario: parseInt(tipoUsuario),
@@ -167,7 +168,9 @@ async function renderDashboard(req, res) {
       days,
       tendenciasColaciones,
       ingresosAltasSemana,
-      distribucionRegimen
+      distribucionRegimen,
+      tipoUsuariostr,
+      nombreUsuario
     });
   } catch (error) {
     res.status(500).json({ error: error.message });

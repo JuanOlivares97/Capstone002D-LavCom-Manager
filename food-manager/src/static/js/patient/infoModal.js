@@ -1,4 +1,4 @@
-function openModal(paciente) {
+function openModalInfo(paciente) {
     // Llenar los campos con los datos del paciente
     document.getElementById('idPaciente').value = paciente.IdHospitalizado;  // Asignar el ID al campo de input
     document.getElementById('infoCama').value = paciente.CodigoCama || ''; // Asignar el valor al campo de input
@@ -84,7 +84,7 @@ async function toggleLogs() {
         logMovimientosPaciente.classList.add('hidden');
     }
 }
-function closeModal() {
+function closeModalInfo() {
     // Ocultar el modal
     document.getElementById('patientModal').classList.add('hidden');
 }

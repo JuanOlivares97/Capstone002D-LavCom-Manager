@@ -33,14 +33,14 @@ function tieneAcceso(tiposPermitidos, tipoUsuario) {
             <% secciones.forEach(seccion => { %>
                 <% if (tieneAcceso(seccion.tipos, tipoUsuario)) { %>
                     <li class="mb-4">
-                        <a href=<%=seccion.endpoint%> class="flex items-center p-2 text-black hover:bg-white rounded transition duration-300">
+                        <a href="<%= seccion.endpoint %>" class="flex items-center p-2 text-black hover:bg-white rounded transition duration-300">
                             <%- include(seccion.icon) %>
                             <span class="ml-2 sidebar-text"><%= seccion.label %></span>
                         </a>
                     </li>
                 <% } %>
             <% }) %>
-
+    
             <!-- Otras secciones sin lógica compleja -->
             <li class="mb-4">
                 <a href="/food-manager/lunch/home" class="flex items-center p-2 text-black hover:bg-white rounded transition duration-300">
@@ -55,7 +55,12 @@ function tieneAcceso(tiposPermitidos, tipoUsuario) {
                 </a>
             </li>
         </ul>
+        
     </nav>
+    
+    <!-- User info fixed at the bottom -->
+    
+    
 </aside>
 <!-- Contenido Principal -->
 <div class="flex-1 flex flex-col">

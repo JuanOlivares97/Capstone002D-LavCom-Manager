@@ -129,9 +129,14 @@ model TipoServicio {
   IdTipoServicio                                           Int             @id @default(autoincrement())
   DescTipoServicio                                         String          @db.VarChar(255)
   Habilitado                                               String          @default("S") @db.Char(1)
+  tipo                                                     String          @db.VarChar(255)
+  IdTipoUnidad                                             Int
   Funcionario                                              Funcionario[]
   Hospitalizado_Hospitalizado_IdTipoServicioToTipoServicio Hospitalizado[] @relation("Hospitalizado_IdTipoServicioToTipoServicio")
   Hospitalizado_Hospitalizado_ServicioAltaToTipoServicio   Hospitalizado[] @relation("Hospitalizado_ServicioAltaToTipoServicio")
+  TipoUnidad                                               TipoUnidad      @relation(fields: [IdTipoUnidad], references: [IdTipoUnidad], onUpdate: Restrict, map: "fk_servicio_unidad")
+
+  @@index([IdTipoUnidad], map: "fk_servicio_unidad")
 }
 
 model TipoUnidad {
@@ -142,6 +147,7 @@ model TipoUnidad {
   Funcionario    Funcionario[]
   Hospitalizado  Hospitalizado[]
   Reportes       Reportes[]
+  TipoServicio   TipoServicio[]
 }
 
 model TipoVia {

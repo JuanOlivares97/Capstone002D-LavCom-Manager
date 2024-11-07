@@ -17,7 +17,7 @@
     <% if (!mostrarMenu) { %>
       <h2 class="text-2xl font-bold mb-4">Ingresar Rut del Empleado</h2>
       <form action="/food-manager/totem/check-in" method="POST">
-        <input type="text" name="rutSolicitante" placeholder="Ingrese el Rut" class="w-full bg-white border border-gray-300 rounded-md py-2 px-3 mb-4" required>
+        <input type="text" id="rutSolicitante" name="rutSolicitante" placeholder="Ingrese el Rut" class="w-full bg-white border border-gray-300 rounded-md py-2 px-3 mb-4" required>
         <button type="submit" class="bg-blue-500 text-white py-2 px-4 rounded">Ingresar</button>
       </form>
     <% } else { %>
@@ -47,3 +47,21 @@
     <% } %>
   </div>
 </div>
+<script>
+  function formatRUTInput(inputElement) {
+          inputElement.addEventListener('input', () => {
+              let rut = inputElement.value.replace(/\./g, '').replace(/-/g, '');
+  
+              // Extraer el cuerpo y el dígito verificador
+              const cuerpo = rut.slice(0, -1);
+              const dv = rut.slice(-1);
+  
+              // Actualizar el valor del input sin puntos, solo con guion
+              inputElement.value = `${cuerpo}-${dv}`;
+          });
+      }
+  
+      // Llamar a la función en el input de RUT
+      const rutInputElement = document.getElementById('rutSolicitante');
+      formatRUTInput(rutInputElement);
+      </script>

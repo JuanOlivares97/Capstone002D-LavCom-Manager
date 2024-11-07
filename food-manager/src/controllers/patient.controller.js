@@ -1,99 +1,117 @@
 const prisma = require('../server/prisma');
 const {
-    getServicio,
-    getUnidad,
-    getVia,
-    getRegimen } = require('./maintainer.controller');
+  getServicio,
+  getUnidad,
+  getVia,
+  getRegimen
+} = require('./maintainer.controller');
+const moment = require('moment-timezone');
 
 async function renderHome(req, res) {
-    try {
-        // Obtener los servicios y otros datos
-        const servicios = await getServicio();
-        const unidades = await getUnidad();
-        const vias = await getVia();
-        const regimen = await getRegimen();
+  try {
+    const [servicios, unidades, vias, regimen] = await Promise.all([
+      getServicio(),
+      getUnidad(),
+      getVia(),
+      getRegimen()
+    ]);
 
-        // Obtener los pacientes
-        const pacientes = await prisma.Hospitalizado.findMany({
-            where: {
-                OR: [
-                    { FechaAlta: null },
-                    { FechaAlta: { gt: new Date() } }
-                ]
-            },
-            include: {
-                TipoRegimen: true,
-                TipoUnidad: true,
-                TipoVia: true,
-                logMovimientosPaciente: true
-            }
-        });
+    // Obtener los pacientes con las condiciones especificadas
+    const pacientes = await prisma.Hospitalizado.findMany({
+      where: {
+        OR: [
+          { FechaAlta: null },
+          { FechaAlta: { gt: new Date() } }
+        ]
+      },
+      include: {
+        TipoRegimen: true,
+        TipoUnidad: true,
+        TipoVia: true,
+        logMovimientosPaciente: true
+      }
+    });
 
-        // Obtener el inicio y fin del día actual en UTC
-        const startOfToday = new Date();
-        startOfToday.setUTCHours(0, 0, 0, 0);
+    // Obtener la fecha actual en la zona horaria de Chile y definir el inicio y fin del día
+    const startOfTodayChile = moment().tz('America/Santiago').startOf('day');
+    const endOfTodayChile = moment().tz('America/Santiago').endOf('day');
 
-        const startOfTomorrow = new Date(startOfToday);
-        startOfTomorrow.setUTCDate(startOfToday.getUTCDate() + 1);
+    // Convertir el inicio y fin del día a UTC para comparar con fechas en UTC en la base de datos
+    const startOfTodayUTC = startOfTodayChile.clone().utc().toDate();
+    const endOfTodayUTC = endOfTodayChile.clone().utc().toDate();
 
-        // Promesas para KPIs diarios y datos históricos
-        const [
-            pacientesHospitalizados,
-            pacientesEnAyuno,
-            ingresosHoy,
-            altasHoy,
-        ] = await Promise.all([
-            prisma.Hospitalizado.count(),
-            prisma.Hospitalizado.count({
-                where: {
-                    FechaFinAyuno: { lt: startOfToday }
-                }
-            }),
-            prisma.Hospitalizado.count({
-                where: {
-                    FechaIngreso: {
-                        gte: startOfToday,
-                        lt: startOfTomorrow
-                    }
-                }
-            }),
-            prisma.Hospitalizado.count({
-                where: {
-                    FechaAlta: {
-                        gte: startOfToday,
-                        lt: startOfTomorrow
-                    }
-                }
-            }),
-        ]);
+    // KPIs diarios y datos históricos comparando solo fechas
+    const [
+      pacientesHospitalizados,
+      pacientesEnAyuno,
+      ingresosHoy,
+      altasHoy
+    ] = await Promise.all([
+      prisma.Hospitalizado.count({
+        where: {
+          OR: [
+            { FechaAlta: null },
+            { FechaAlta: { gt: new Date() } }
+          ]
+        }
+      }),
+      prisma.Hospitalizado.count({
+        where: {
+          FechaFinAyuno: {
+            // Comparamos si la fecha de fin de ayuno es posterior o igual al inicio del día actual en Chile (UTC)
+            gte: startOfTodayUTC
+          },
+          FechaAlta: null
+        }
+      }),
+      prisma.Hospitalizado.count({
+        where: {
+          FechaIngreso: {
+            gte: startOfTodayChile,
+            lte: endOfTodayChile
+          }
+        }
+      }),
+      prisma.Hospitalizado.count({
+        where: {
+          FechaAlta: {
+            gte: startOfTodayUTC,
+            lte: endOfTodayUTC
+          }
+        }
+      })
+    ]);
 
-        // Añadir la edad a cada paciente
-        const pacientesConEdad = pacientes.map(paciente => ({
-            ...paciente,
-            edad: calcularEdad(paciente.FechaNacimiento)
-        }));
+    // Calcular la edad y determinar el estado de Ayuno para cada paciente
+    const pacientesConDatos = pacientes.map(paciente => ({
+      ...paciente,
+      edad: calcularEdad(paciente.FechaNacimiento),
+      enAyuno: paciente.FechaFinAyuno
+        ? moment(paciente.FechaFinAyuno).isAfter(moment())
+        : false
+    }));
 
-        // Renderizar la vista y pasar los datos
-        res.render('patient/home', {
-            tipoUsuario: 1,
-            pacientes: pacientesConEdad,
-            servicios,
-            unidades,
-            vias,
-            regimen,
-            pacientesHospitalizados,
-            pacientesEnAyuno,
-            ingresosHoy,
-            altasHoy,
-        });
-    } catch (error) {
-        console.error('Error en renderHome:', error);
-        return res.status(500).json({ message: "Internal server error " + error });
-    }
+    // Renderizar la vista y pasar los datos
+    res.render('patient/home', {
+      tipoUsuario: 1,
+      pacientes: pacientesConDatos,
+      servicios,
+      unidades,
+      vias,
+      regimen,
+      pacientesHospitalizados,
+      pacientesEnAyuno,
+      ingresosHoy,
+      altasHoy
+    });
+  } catch (error) {
+    console.error('Error en renderHome:', error);
+    return res.status(500).json({ message: "Internal server error: " + error });
+  }
 }
 
 
-
+    
 
 async function getPacientes(req, res) {
     try {
@@ -484,6 +502,95 @@ async function changeVia(req, res) {
     }
 }
 
+async function indicarAlta(req, res) {
+    try {
+        const idPaciente = parseInt(req.params.id);
+
+        // Obtener la fecha actual como objeto Date
+        const today = new Date(); // Esto generará la fecha de hoy en formato Date
+
+        const paciente = await prisma.Hospitalizado.findFirst({
+            where: {
+                IdHospitalizado: idPaciente
+            }
+        });
+
+        if (!paciente) {
+            return res.status(404).json({ message: 'Paciente no encontrado' });
+        }
+
+        const newPaciente = await prisma.Hospitalizado.update({
+            where: {
+                IdHospitalizado: idPaciente
+            },
+            data: {
+                FechaAlta: today, // Usar el objeto Date
+                CodigoCamaAlta: req.body.CodigoCamaAlta ? parseInt(req.body.CodigoCamaAlta) : null, // Convertir a int si es necesario
+                ServicioAlta: req.body.ServicioAlta ? parseInt(req.body.ServicioAlta) : null, // Convertir a int si es necesario
+                ObservacionesAlta: req.body.ObservacionesAlta || null
+            }
+        });
+
+        // Crear un log de ingreso
+        await prisma.logMovimientosPaciente.create({
+            data: {
+                descripcionLog: 'Paciente es dado de alta, sus observaciones son las siguientes: ' + req.body.ObservacionesAlta,
+                idPaciente: newPaciente.IdHospitalizado,
+                fechaLog: today  // Fecha actual
+            }
+        });
+
+        return res.status(200).json({ message: 'Paciente indicado como alta', paciente: newPaciente });
+
+    } catch (error) {
+        console.error('Error interno:', error);
+        return res.status(500).json({ message: "Error interno del servidor", error: error.message });
+    }
+}
+
+async function changeFastingDate(req, res) {
+    try {
+        const idPaciente = parseInt(req.params.id);
+
+        const newFastingDate = new Date(req.body.fastingDate);
+
+        // Verificar si la fecha es válida
+        if (!newFastingDate) {
+            return res.status(400).json({ message: 'La fecha de ayuno no puede ser vacía' });
+        }
+
+        // Verificar si la fecha es válida
+        if (!moment(newFastingDate, 'YYYY-MM-DD', true).isValid()) {
+            return res.status(400).json({ message: 'La fecha de ayuno no es válida' });
+        }
+
+        const paciente = await prisma.Hospitalizado.update({
+            where: {
+                IdHospitalizado: idPaciente
+            },
+            data: {
+                FechaFinAyuno: newFastingDate
+            }
+        });
+        if (!paciente) {
+            return res.status(404).json({ message: 'Paciente no encontrado' });
+        }
+
+        // Crear un log de ingreso
+        await prisma.logMovimientosPaciente.create({
+            data: {
+                descripcionLog: 'Paciente se ha indicado como ayuno hasta el día ' + newFastingDate,
+                idPaciente: paciente.IdHospitalizado,
+                fechaLog: new Date()  // Fecha actual
+            }
+        });
+
+        return res.status(200).json({ message: 'Paciente indicado como ayuno hasta el día ' + newFastingDate, paciente: paciente });
+    } catch (error) {
+        return res.status(500).json({ message: "Internal server error " + error });
+    }
+}
+
 
 module.exports = {
     renderHome,
@@ -495,5 +602,7 @@ module.exports = {
     changeObservacionesAlta,
     changeObservacionesNutricionista,
     changeObservacionesGenerales,
-    changeVia
+    changeVia,
+    indicarAlta,
+    changeFastingDate
 }
