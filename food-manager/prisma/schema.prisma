@@ -54,10 +54,10 @@ model Hospitalizado {
   RutHospitalizado                                        String                   @db.VarChar(11)
   DvHospitalizado                                         String                   @db.VarChar(1)
   NombreHospitalizado                                     String                   @db.VarChar(255)
-  FechaNacimiento                                         DateTime                 @db.Date
-  FechaIngreso                                            DateTime                 @db.Date
+  FechaNacimiento                                         DateTime                 @db.DateTime(0)
+  FechaIngreso                                            DateTime                 @db.DateTime(0)
   ObservacionesNutricionista                              String?                  @db.VarChar(255)
-  FechaAlta                                               DateTime?                @db.Date
+  FechaAlta                                               DateTime?                @db.DateTime(0)
   ObservacionesAlta                                       String?                  @db.VarChar(255)
   ServicioAlta                                            Int?
   CodigoCamaAlta                                          Int?
@@ -65,7 +65,7 @@ model Hospitalizado {
   IdTipoUnidad                                            Int?
   IdTipoVia                                               Int?
   IdTipoRegimen                                           Int
-  FechaFinAyuno                                           DateTime?                @db.Date
+  FechaFinAyuno                                           DateTime?                @db.DateTime(0)
   ApellidoP                                               String                   @db.VarChar(255)
   ApellidoM                                               String                   @db.VarChar(255)
   Telefono                                                Int?

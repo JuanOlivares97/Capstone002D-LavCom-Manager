@@ -4,8 +4,14 @@
         <!-- Título del modal -->
         <h2 id="modalNombre" class="text-2xl font-bold text-gray-800 mb-6 text-center m-4">Ingresar Paciente</h2>
 
+        <div>
+            <label class="block font-medium text-gray-700 mt-1">Rut</label>
+            <input type="text" id="rut" name="rut" class="my-2 w-full p-2 border rounded" required>
+            <!-- Contenedor para listar coincidencias de pacientes -->
+            <div id="patientList" class="my-2 p-2 border rounded bg-gray-100 hidden"></div>
+        </div>
         <!-- Contenido del modal -->
-        <div class="grid grid-cols-3 gap-6">
+        <div id="additionalFields" class="grid grid-cols-3 gap-6 hidden">
             <div>
                 <label class="block font-medium text-gray-700 mt-1">Numero de Cama</label>
                 <input type="number" id="cama" name="cama" class=" my-2 w-full p-2 border rounded" required>
@@ -29,14 +35,6 @@
             </div>
 
             <div>
-
-                <label class="block font-medium text-gray-700 mt-1">Fecha de Ingreso</label>
-                <input type="date" id="fechaIngreso" name="fechaIngreso" class=" my-2 w-full p-2 border rounded"
-                    required>
-
-                <label class="block font-medium text-gray-700 mt-1">Rut</label>
-                <input type="text" id="rut" name="rut" class=" my-2 w-full p-2 border rounded" required>
-
                 <label class="block font-medium text-gray-700 mt-1">Telefono</label>
                 <input type="number" id="Telefonos" name="Telefonos" class=" my-2 w-full p-2 border rounded" required>
 
@@ -114,20 +112,110 @@
 
 
 <script>
-function formatRUTInput(inputElement) {
-        inputElement.addEventListener('input', () => {
-            let rut = inputElement.value.replace(/\./g, '').replace(/-/g, '');
+    let debounceTimeout;
 
-            // Extraer el cuerpo y el dígito verificador
-            const cuerpo = rut.slice(0, -1);
-            const dv = rut.slice(-1);
+    function formatRUTInput(inputElement) {
+        inputElement.addEventListener('input', async () => {
+            clearTimeout(debounceTimeout); // Limpiar el timeout anterior
 
-            // Actualizar el valor del input sin puntos, solo con guion
-            inputElement.value = `${cuerpo}-${dv}`;
+            debounceTimeout = setTimeout(async () => { // Espera 300ms antes de ejecutar la búsqueda
+                let rut = inputElement.value.replace(/\./g, '').replace(/-/g, '');
+                const cuerpo = rut.slice(0, -1);
+                const dv = rut.slice(-1);
+                inputElement.value = `${cuerpo}-${dv}`;
+
+                // Verificar si el RUT tiene al menos 4 caracteres antes de buscar coincidencias
+                if (rut.length >= 4) {
+                    const rutParcial = `${cuerpo}`;
+                    const coincidencias = await buscarPacientesPorRutParcial(rutParcial);
+
+                    if (coincidencias.length > 0) {
+                        // Mostrar lista de coincidencias
+                        mostrarCoincidencias(coincidencias);
+                    } else {
+                        // Si no hay coincidencias, mostrar los campos adicionales
+                        document.getElementById('additionalFields').classList.remove('hidden');
+                        document.getElementById('patientList').classList.add('hidden');
+                    }
+                }
+            }, 300); // Tiempo de debounce de 300ms
         });
     }
 
-    // Llamar a la función en el input de RUT
+    // Función para buscar pacientes con RUT parcial
+    async function buscarPacientesPorRutParcial(rutParcial) {
+        try {
+            const response = await fetch(`/food-manager/patient/searc-patient/${rutParcial}`);
+            if (!response.ok) throw new Error("Error al buscar pacientes");
+            const pacientes = await response.json();
+            return pacientes;
+        } catch (error) {
+            console.error("Error al buscar pacientes:", error);
+            return [];
+        }
+    }
+
+    // Función para mostrar la lista de coincidencias
+    function mostrarCoincidencias(pacientes) {
+        const patientList = document.getElementById('patientList');
+        patientList.innerHTML = ''; // Limpiar la lista de coincidencias
+
+        if (pacientes.length > 0) {
+            pacientes.forEach(paciente => {
+                const item = document.createElement('div');
+                item.textContent = `${paciente.IdHospitalizado} -- ${paciente.NombreHospitalizado} - ${paciente.RutHospitalizado}-${paciente.DvHospitalizado}`;
+
+                // Agregar evento de clic al div del paciente
+                item.addEventListener('click', async () => {
+                    const RutCompleto = `${paciente.RutHospitalizado}-${paciente.DvHospitalizado}`;
+                    await enviarPeticionCreatePatient(RutCompleto);
+                });
+
+                patientList.appendChild(item);
+            });
+            patientList.classList.remove('hidden');
+        } else {
+            patientList.classList.add('hidden');
+        }
+    }
+
+    // Función para enviar la petición POST
+    async function enviarPeticionCreatePatient(RutCompleto) {
+    const addPatientModal = document.getElementById('addPatientModal');
+    try {
+        const response = await fetch('/food-manager/patient/create-paciente', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ RutCompleto: RutCompleto })
+        });
+
+        if (!response.ok) throw new Error('Error al enviar la solicitud');
+
+        const result = await response.json();
+        addPatientModal.classList.add('hidden');
+        console.log('Paciente creado o reingresado:', result);
+
+        // SweetAlert de éxito
+        Swal.fire({
+            icon: 'success',
+            title: 'Éxito',
+            text: 'Paciente creado o reingresado exitosamente',
+            confirmButtonText: 'Aceptar'
+        });
+    } catch (error) {
+        console.error('Error al crear o reingresar paciente:', error);
+
+        // SweetAlert de error
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Hubo un error al crear o reingresar el paciente',
+            confirmButtonText: 'Aceptar'
+        });
+    }
+}
+
+    // Inicializar la función en el input de RUT
     const rutInputElement = document.getElementById('rut');
     formatRUTInput(rutInputElement);
-    </script>
+</script>

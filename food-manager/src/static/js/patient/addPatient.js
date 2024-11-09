@@ -1,20 +1,20 @@
 document.addEventListener('DOMContentLoaded', () => {
     // Elementos del DOM
-    const addPatientModal = document.getElementById('addPatientModal');
     const addPacienteButton = document.getElementById('addPaciente');
     const closeModalButton = document.getElementById('closeModalAddPatient');
+    const addPatientModal = document.getElementById('addPatientModal');
 
-    // Mostrar el modal (agregar la lógica para abrir el modal si es necesario)
+    // Función para abrir el modal (puedes agregar lógica adicional aquí si es necesario)
     function openModal() {
         addPatientModal.classList.remove('hidden');
     }
 
-    // Cerrar el modal
+    // Función para cerrar el modal
     function closeModal() {
         addPatientModal.classList.add('hidden');
     }
 
-    // Añadir evento de click al botón para ingresar el paciente
+    // Evento de clic para el botón de ingresar paciente
     addPacienteButton.addEventListener('click', async (event) => {
         event.preventDefault();
 
@@ -23,9 +23,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const nombre = document.getElementById('nombre').value;
         const apellidop = document.getElementById('apellidop').value;
         const apellidom = document.getElementById('apellidom').value;
-        const fechaNacimiento = document.getElementById('FechaNacimiento').value; // Mantener como string
-        const fechaIngreso = document.getElementById('fechaIngreso').value; // Mantener como string
-        const rut = document.getElementById('rut').value.split('-'); // Separar Rut y Dv
+        const fechaNacimiento = document.getElementById('FechaNacimiento').value;
+        const RutCompleto = document.getElementById('rut').value; // Obtén el valor del RUT completo
         const telefono = document.getElementById('Telefonos').value;
         const direccion = document.getElementById('Direccion').value;
         const correo = document.getElementById('Correo').value;
@@ -36,16 +35,14 @@ document.addEventListener('DOMContentLoaded', () => {
         const via = document.getElementById('Via').value;
         const regimen = document.getElementById('Regimen').value;
 
-        // Crear el objeto paciente con los datos recopilados
+        // Crear objeto paciente
         const paciente = {
             CodigoCama: parseInt(cama),
-            RutHospitalizado: rut[0], // Rut sin el dígito verificador
-            DvHospitalizado: rut[1], // Dígito verificador
+            RutCompleto, // Incluye el RUT completo
             NombreHospitalizado: nombre,
             ApellidoP: apellidop,
             ApellidoM: apellidom,
-            FechaNacimiento: fechaNacimiento, // Mantener como string para convertirlo en el backend
-            FechaIngreso: fechaIngreso, // Mantener como string para convertirlo en el backend
+            FechaNacimiento: fechaNacimiento,
             Telefono: parseInt(telefono),
             Direccion: direccion,
             Correo: correo,
@@ -61,9 +58,7 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             const response = await fetch('/food-manager/patient/create-paciente', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(paciente)
             });
 
@@ -75,7 +70,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     text: data.message,
                     confirmButtonText: 'Ok'
                 }).then(() => {
-                    // Cerrar el modal y recargar la página
                     closeModal();
                     window.location.reload();
                 });
@@ -99,7 +93,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Añadir evento al botón para cerrar el modal
+    // Evento de clic para cerrar el modal
     closeModalButton.addEventListener('click', (event) => {
         event.preventDefault();
         closeModal();

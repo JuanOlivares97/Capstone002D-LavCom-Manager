@@ -87,7 +87,7 @@ async function renderHome(req, res) {
       ...paciente,
       edad: calcularEdad(paciente.FechaNacimiento),
       enAyuno: paciente.FechaFinAyuno
-        ? moment(paciente.FechaFinAyuno).isAfter(moment())
+        ? moment(paciente.FechaFinAyuno).isAfter(startOfTodayUTC)
         : false
     }));
 
@@ -110,8 +110,24 @@ async function renderHome(req, res) {
   }
 }
 
+async function getPaciente(req,res){
+    const rutCompleto = req.params.rut;
+    const [rut,dv]= rutCompleto.split('-')
+    try {
+        const paciente = await prisma.Hospitalizado.findMany({
+            where: {
+                OR: [
+                    { RutHospitalizado: rut },
+                    { DvHospitalizado: dv }
+                ]
+            }
+        });
 
-    
+        return res.status(200).json(paciente);
+    } catch (error) {
+        return res.status(500).json({ message: "Internal server error " + error });
+    }
+}
 
 async function getPacientes(req, res) {
     try {
@@ -139,47 +155,59 @@ async function getPacientes(req, res) {
 
 async function createPaciente(req, res) {
     try {
-        // Verificar si el paciente ya existe en la base de datos
+        // Verificar si `Rut` está presente en el cuerpo de la solicitud
+        const rutCompleto = req.body.RutCompleto;
+        if (!rutCompleto) {
+            return res.status(400).json({ message: 'El campo Rut es obligatorio' });
+        }
+
+        // Extraer `rut` y `dv` del `RutCompleto`
+        const [rut, dv] = rutCompleto.split('-');
+        if (!rut || !dv) {
+            return res.status(400).json({ message: 'Formato de RUT inválido' });
+        }
+
+        // Buscar paciente existente
         const pacienteExistente = await prisma.Hospitalizado.findFirst({
             where: {
-                RutHospitalizado: req.body.RutHospitalizado, // Buscar por el Rut
-                DvHospitalizado: req.body.DvHospitalizado // Buscar por el Dv
+                RutHospitalizado: rut,
+                DvHospitalizado: dv
             }
         });
 
+        const fechaIngreso = new Date().toISOString();
+
         if (pacienteExistente) {
-            // Si el paciente ya existe, actualizamos la fecha de ingreso y creamos un log de reingreso
+            // Actualizar fecha de ingreso para paciente existente
             const pacienteActualizado = await prisma.Hospitalizado.update({
-                where: {
-                    IdHospitalizado: pacienteExistente.IdHospitalizado
-                },
-                data: {
-                    FechaIngreso: new Date(req.body.FechaIngreso)  // Convertir la fecha de ingreso
-                }
+                where: { IdHospitalizado: pacienteExistente.IdHospitalizado },
+                data: { FechaIngreso: fechaIngreso,
+                    FechaAlta: null
+                 }
             });
 
-            // Crear un log de reingreso
+            // Crear log de reingreso
             await prisma.logMovimientosPaciente.create({
                 data: {
                     descripcionLog: 'Paciente Reingresa al Hospital',
                     idPaciente: pacienteActualizado.IdHospitalizado,
-                    fechaLog: new Date()  // Fecha actual
+                    fechaLog: new Date()
                 }
             });
 
             return res.status(200).json({ message: 'Paciente reingresado exitosamente', paciente: pacienteActualizado });
         } else {
-            // Si el paciente no existe, creamos uno nuevo
+            // Crear nuevo paciente
             const nuevoPaciente = await prisma.Hospitalizado.create({
                 data: {
                     CodigoCama: parseInt(req.body.CodigoCama),
-                    RutHospitalizado: req.body.RutHospitalizado,
-                    DvHospitalizado: req.body.DvHospitalizado, // Cambié a string para manejar el dígito verificador
+                    RutHospitalizado: rut,
+                    DvHospitalizado: dv,
                     NombreHospitalizado: req.body.NombreHospitalizado,
                     ApellidoP: req.body.ApellidoP,
                     ApellidoM: req.body.ApellidoM,
-                    FechaNacimiento: new Date(req.body.FechaNacimiento), // Convertir la fecha de nacimiento
-                    FechaIngreso: new Date(req.body.FechaIngreso), // Convertir la fecha de ingreso
+                    FechaNacimiento: new Date(req.body.FechaNacimiento),
+                    FechaIngreso: fechaIngreso,
                     Telefono: parseInt(req.body.Telefono),
                     Direccion: req.body.Direccion,
                     Correo: req.body.Correo,
@@ -192,12 +220,12 @@ async function createPaciente(req, res) {
                 }
             });
 
-            // Crear un log de ingreso
+            // Crear log de ingreso
             await prisma.logMovimientosPaciente.create({
                 data: {
                     descripcionLog: 'Paciente Hace Ingreso al Hospital',
                     idPaciente: nuevoPaciente.IdHospitalizado,
-                    fechaLog: new Date()  // Fecha actual
+                    fechaLog: new Date()
                 }
             });
 
@@ -205,7 +233,7 @@ async function createPaciente(req, res) {
         }
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: 'Error al crear o reingresar el paciente' });
+        res.status(500).json({ message: 'Error al crear o reingresar el paciente: ' + error.message });
     }
 }
 
@@ -591,7 +619,6 @@ async function changeFastingDate(req, res) {
     }
 }
 
-
 module.exports = {
     renderHome,
     getPacientes,
@@ -604,5 +631,6 @@ module.exports = {
     changeObservacionesGenerales,
     changeVia,
     indicarAlta,
-    changeFastingDate
+    changeFastingDate,
+    getPaciente
 }

@@ -150,7 +150,7 @@
 
                         <!-- Fasting Date Information -->
                         <div id="fastingDate-<%= paciente.IdHospitalizado %>" class="text-sm text-gray-600">
-                            <% if (paciente.FechaFinAyuno) { %>
+                            <% if (paciente.enAyuno===true) { %>
                                 <% 
                                     // Convert FechaFinAyuno to Date object
                                     const fastingDate = new Date(paciente.FechaFinAyuno); 
@@ -173,11 +173,13 @@
                                 Dar Alta
                             </button>
 
-                            <!-- Button to trigger the fasting date modal with SweetAlert -->
+                            <% if (paciente.enAyuno===true) { %>
+                                <!-- Button to trigger the fasting date modal with SweetAlert -->
                             <button onclick="openFastingDateModal(<%= paciente.IdHospitalizado %>); event.stopPropagation();"
                                 class="w-full my-1 px-4 py-2 bg-blue-200 rounded-md shadow-sm hover:bg-blue-300">
                                 Indicar Ayuno
                             </button>
+                            <% } %>
                         </div>
                     </div>
                     <% }) %>
@@ -235,7 +237,7 @@ async function openFastingDateModal(idPaciente) {
     const { value: fastingDate } = await Swal.fire({
         title: 'Seleccione la fecha de ayuno',
         html: `
-            <input type="date" id="fastingDateInput" class="swal2-input" placeholder="aaaa-mm-dd" required>
+            <input type="datetime-local" id="fastingDateInput" class="swal2-input" placeholder="aaaa-mm-dd" required>
         `,
         focusConfirm: false,
         showCancelButton: true,

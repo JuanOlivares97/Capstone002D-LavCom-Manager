@@ -5,7 +5,7 @@ const router = Router();
 router.get('/home', patientController.renderHome)
 router.get('/get-pacientes', patientController.getPacientes)
 router.get('/movements/:id', patientController.getMovimientosPaciente)
-
+router.get('/searc-patient/:rut', patientController.getPaciente)
 
 router.post('/create-paciente', patientController.createPaciente)
 
