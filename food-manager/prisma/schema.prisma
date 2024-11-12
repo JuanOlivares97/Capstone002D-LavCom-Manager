@@ -24,8 +24,8 @@ model Funcionario {
   RutFuncionario       String          @db.VarChar(20)
   DvFuncionario        String          @db.Char(1)
   NombreFuncionario    String          @db.VarChar(255)
-  FechaInicioContrato  DateTime?       @db.Date
-  FechaTerminoContrato DateTime?       @db.Date
+  FechaInicioContrato  DateTime?       @db.DateTime(0)
+  FechaTerminoContrato DateTime?       @db.DateTime(0)
   Habilitado           String?         @default("S") @db.Char(1)
   correo               String?         @db.VarChar(100)
   contrasena           String?         @db.VarChar(255)
@@ -39,6 +39,7 @@ model Funcionario {
   TipoServicio         TipoServicio    @relation(fields: [IdTipoServicio], references: [IdTipoServicio], map: "fk_funcionario_servicio")
   TipoFuncionario      TipoFuncionario @relation(fields: [IdTipoFuncionario], references: [IdTipoFuncionario], map: "fk_funcionario_tipo_funcionario")
   TipoUnidad           TipoUnidad      @relation(fields: [IdTipoUnidad], references: [IdTipoUnidad], map: "fk_funcionario_unidad")
+  error_log            error_log[]
 
   @@unique([RutFuncionario, DvFuncionario], map: "unique_rut_dv")
   @@index([IdTipoContrato], map: "fk_funcionario_contrato")
@@ -164,4 +165,16 @@ model logMovimientosPaciente {
   Hospitalizado  Hospitalizado @relation(fields: [idPaciente], references: [IdHospitalizado], onUpdate: Restrict, map: "fk_paciente_log")
 
   @@index([idPaciente], map: "fk_paciente_log")
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model error_log {
+  id_error      Int         @id @default(autoincrement())
+  id_usuario    Int
+  tipo_error    String      @db.VarChar(30)
+  mensaje_error String      @db.LongText
+  ruta_error    String      @db.VarChar(40)
+  Funcionario   Funcionario @relation(fields: [id_usuario], references: [IdFuncionario], onUpdate: Restrict, map: "fk_user_error")
+
+  @@index([id_usuario], map: "fk_user_error")
 }

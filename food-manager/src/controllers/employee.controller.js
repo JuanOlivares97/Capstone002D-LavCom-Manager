@@ -67,17 +67,15 @@ async function createEmployee(req, res) {
             tipoFuncionario,
         } = req.body;
 
-        const fechaInicioContrato = ((req.body.fechaInicioContrato));
-        const fechaTerminoContrato = ((req.body.fechaTerminoContrato));
+        const fechaInicioContrato = req.body.FechaInicioContrato ? new Date(req.body.FechaInicioContrato) : null;
+        const fechaTerminoContrato = req.body.FechaTerminoContrato ? new Date(req.body.FechaTerminoContrato) : null;
 
-        // Verificación básica del formato de RutCompleto
         if (!RutCompleto || !RutCompleto.includes('-')) {
             return res.status(400).json({ message: "El RUT debe estar en el formato correcto (12345678-9)." });
         }
 
         const [rut_usuario, dv_usuario] = RutCompleto.split('-');
 
-        // Verificar si el empleado ya existe en la base de datos
         const existingEmployee = await prisma.Funcionario.findUnique({
             where: {
                 RutFuncionario_DvFuncionario: {
@@ -88,7 +86,6 @@ async function createEmployee(req, res) {
         });
 
         if (existingEmployee) {
-            // Si el empleado ya existe, actualizar Habilitado a 'S'
             const updatedEmployee = await prisma.Funcionario.update({
                 where: {
                     IdFuncionario: existingEmployee.IdFuncionario
@@ -104,10 +101,8 @@ async function createEmployee(req, res) {
             });
         }
 
-        // Crear la contraseña
         const password = await bcrypt.hash(rut_usuario + dv_usuario, 10);
 
-        // Crear un nuevo empleado si no existe
         const funcionario = await prisma.Funcionario.create({
             data: {
                 NombreFuncionario: nombre_usuario.toUpperCase(),
@@ -115,8 +110,8 @@ async function createEmployee(req, res) {
                 DvFuncionario: dv_usuario,
                 contrasena: password,
                 Habilitado: 'S',
-                fechaInicioContrato: fechaInicioContrato, // Formato 'YYYY-MM-DD'
-                fechaTerminoContrato: fechaTerminoContrato, // Formato 'YYYY-MM-DD'
+                FechaInicioContrato: fechaInicioContrato,
+                FechaTerminoContrato: fechaTerminoContrato,
                 TipoEstamento: {
                     connect: {
                         IdTipoEstamento: parseInt(tipoEstamento)
@@ -147,10 +142,11 @@ async function createEmployee(req, res) {
 
         res.status(201).json(funcionario);
     } catch (error) {
-        console.error(error); // Para ayudar en la depuración
+        console.error(error);
         res.status(500).json({ message: "Internal server error: " + error.message });
     }
 }
+
 
 
 
