@@ -1,11 +1,12 @@
-function showHome(req, res) {
+function renderHome(req, res) {
     try {
-        return res.render("dashboard/home");
+        const tipo_user = req.cookies["tipo_usuario"];
+        return res.render("dashboard/home", { tipo_usuario: parseInt(tipo_user) });
     } catch (error) {
         return res.status(500).json({ message: "Internal server error" });
     }
 }
 
  module.exports = {
-    showHome
+    renderHome
 }

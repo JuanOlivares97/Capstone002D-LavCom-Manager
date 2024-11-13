@@ -1,80 +1,62 @@
-<div style="z-index: 9999;" id="modal_crear_usuario" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden opacity-0 transition-opacity duration-300">
+<div id="crear_usuario_modal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden opacity-0 transition-opacity duration-300">
     <div class="bg-white rounded-lg shadow-2xl p-8 max-w-3xl w-full">
         <h2 class="text-2xl font-bold mb-6 text-center text-black">Crear Usuario</h2>
         <form>
             <div class="mb-4 flex">
                 <div class="flex-1 mr-2">
                     <label for="rut_usuario" class="block text-black mb-2">RUT Usuario</label>
-                    <input type="text" id="rut_usuario" class="w-full p-2 border rounded" placeholder="Ingrese RUT"
-                        required>
-                </div>
-                <div class="flex-none">
-                    <label for="dv_usuario" class="block text-black mb-2">DV</label>
-                    <input type="text" id="dv_usuario" class="w-16 p-2 border rounded" placeholder="DV" maxlength="1"
+                    <input type="text" id="rut_usuario" name="rut_usuario"  class="w-full p-2 border rounded" placeholder="Ingrese RUT, Ejemplo xxxxxxxx-x"
                         required>
                 </div>
             </div>
             <div class="mb-4">
                 <label for="nombre" class="block text-black mb-2">Nombre</label>
-                <input type="text" id="nombre" class="w-full p-2 border rounded" placeholder="Ingrese Nombre" required>
+                <input type="text" id="nombre" name="nombre" class="w-full p-2 border rounded" placeholder="Ingrese Nombre" required>
             </div>
             <div class="mb-4 grid grid-cols-3 gap-2">
                 <div>
                     <label class="block text-black mb-2">Servicio</label>
-                    <select class="w-full p-2 border rounded" required>
-                        <option value="">Seleccione un servicio</option>
-                        <option value="1">Servicio 1</option>
-                        <option value="2">Servicio 2</option>
-                        <option value="3">Servicio 3</option>
+                    <select class="w-full p-2 border rounded" required name="servicio">
+                        <% servicios.forEach(s => { %>
+                        <option value="<%= s.id_servicio %>"><%= s.desc_servicio %></option>
+                        <% }) %>
                     </select>
                 </div>
                 <div>
                     <label class="block text-black mb-2">Tipo Contrato</label>
-                    <select class="w-full p-2 border rounded" required>
-                        <option value="">Seleccione un tipo de contrato</option>
-                        <option value="1">Contrato 1</option>
-                        <option value="2">Contrato 2</option>
-                        <option value="3">Contrato 3</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block text-black mb-2">Unidad SIGCOM</label>
-                    <select class="w-full p-2 border rounded" required>
-                        <option value="">Seleccione una unidad</option>
-                        <option value="1">Unidad 1</option>
-                        <option value="2">Unidad 2</option>
-                        <option value="3">Unidad 3</option>
+                    <select class="w-full p-2 border rounded" required name="tipo_contrato">
+                        <% tipo_contrato.forEach(tc => { %>
+                        <option value="<%= tc.id_tipo_contrato %>"><%= tc.tipo_contrato %></option>
+                        <% }) %>
                     </select>
                 </div>
             </div>
             <div class="mb-4 grid grid-cols-2 gap-2">
                 <div>
                     <label class="block text-black mb-2">Estamento</label>
-                    <select class="w-full p-2 border rounded" required>
-                        <option value="">Seleccione un estamento</option>
-                        <option value="1">Estamento 1</option>
-                        <option value="2">Estamento 2</option>
-                        <option value="3">Estamento 3</option>
+                    <select class="w-full p-2 border rounded" required name="estamento">
+                        <% estamentos.forEach(e => { %>
+                        <option value="<%= e.id_estamento %>"><%= e.desc_estamento %></option>
+                        <% }) %>
                     </select>
                 </div>
                 <div>
                     <label class="block text-black mb-2">Tipo Usuario</label>
-                    <select class="w-full p-2 border rounded" required>
-                        <option value="">Seleccione un tipo de usuario</option>
-                        <option value="1">Tipo 1</option>
-                        <option value="2">Tipo 2</option>
-                        <option value="3">Tipo 3</option>
+                    <select class="w-full p-2 border rounded" required name="tipo_usuario">
+                        <% tipos_usuario.forEach(tu => { %>
+                        <option value="<%= tu.id_tipo_usuario %>"><%= tu.tipo_usuario %></option>
+                        <% }) %>
                     </select>
                 </div>
             </div>
             <div class="mb-4">
                 <label for="username" class="block text-black mb-2">Username</label>
-                <input type="text" id="username" class="w-full p-2 border rounded" placeholder="Ingrese Username"
+                <input type="text" id="username" name="username" class="w-full p-2 border rounded" placeholder="Ingrese Username"
                     required>
             </div>
             <div class="mb-6">
                 <label for="pwd" class="block text-black mb-2">Contraseña</label>
-                <input type="password" id="pwd" class="w-full p-2 border rounded" placeholder="Ingrese Contraseña"
+                <input type="password" id="pwd" name="pwd" class="w-full p-2 border rounded" placeholder="Ingrese Contraseña"
                     required>
             </div>
             <button type="submit" class="w-full bg-green-500 text-white p-2 rounded hover:bg-green-400">Crear

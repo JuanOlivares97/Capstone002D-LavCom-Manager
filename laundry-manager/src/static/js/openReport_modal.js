@@ -21,6 +21,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    toggleModal('#modal_crear_usuario','#openModalAddUser','#closeModalAddUser')
-    toggleModal('#modal_editar_usuario','#openModalEditUser','#closeModalEditUser')
+    //toggleModal('#modal_crear_usuario','#openModalAddUser','#closeModalAddUser')
+    //toggleModal('#modal_editar_usuario','#openModalEditUser','#closeModalEditUser')
 });

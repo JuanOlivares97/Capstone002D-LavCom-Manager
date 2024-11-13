@@ -1,79 +1,67 @@
-<div  style="z-index: 9999;" id="modal_editar_usuario" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden opacity-0 transition-opacity duration-300">
-    <div class="bg-white rounded-lg shadow-2xl p-8 max-w-3xl w-full">
+<div id="editar_usuario_modal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden opacity-0 transition-opacity duration-300 max-h-screen overflow-y-auto">
+    <div class="bg-white rounded-lg shadow-2xl p-8 max-w-3xl w-full ">
         <h2 class="text-2xl font-bold mb-6 text-center text-black"> </h2>
         <form>
+            <input type="hidden" name="id_usuario" value="">
+            <input type="hidden" name="rowIndex" value="">
             <div class="mb-4 flex">
                 <div class="flex-1 mr-2">
                     <label for="rut_usuario" class="block text-black mb-2">RUT Usuario</label>
-                    <input type="text" id="erut_usuario" class="w-full p-2 border rounded" placeholder="Ingrese RUT, Ejemplo xxxxxxxx-x"
+                    <input type="text" id="erut_usuario" name="erut_usuario" class="w-full p-2 border rounded" placeholder="Ingrese RUT, Ejemplo xxxxxxxx-x"
                         required>
                 </div>
             </div>
             <div class="mb-4">
                 <label for="nombre" class="block text-black mb-2">Nombre</label>
-                <input type="text" id="enombre" class="w-full p-2 border rounded" placeholder="Ingrese Nombre" required>
+                <input type="text" id="enombre" name="enombre" class="w-full p-2 border rounded" placeholder="Ingrese Nombre" required>
             </div>
             <div class="mb-4 grid grid-cols-3 gap-2">
                 <div>
                     <label class="block text-black mb-2">Servicio</label>
-                    <select id="eservicio" class="w-full p-2 border rounded" required>
-                        <option value="">Seleccione un servicio</option>
-                        <option value="1">Servicio 1</option>
-                        <option value="2">Servicio 2</option>
-                        <option value="3">Servicio 3</option>
+                    <select class="w-full p-2 border rounded" required name="eservicio" id="eservicio">
+                        <% servicios.forEach(s => { %>
+                        <option value="<%= s.id_servicio %>"><%= s.desc_servicio %></option>
+                        <% }) %>
                     </select>
                 </div>
                 <div>
                     <label class="block text-black mb-2">Tipo Contrato</label>
-                    <select id="etipo_contrato" class="w-full p-2 border rounded" required>
-                        <option value="">Seleccione un tipo de contrato</option>
-                        <option value="1">Contrato 1</option>
-                        <option value="2">Contrato 2</option>
-                        <option value="3">Contrato 3</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block text-black mb-2">Unidad SIGCOM</label>
-                    <select id="eunidad_sigcom" class="w-full p-2 border rounded" required>
-                        <option value="">Seleccione una unidad</option>
-                        <option value="1">Unidad 1</option>
-                        <option value="2">Unidad 2</option>
-                        <option value="3">Unidad 3</option>
+                    <select class="w-full p-2 border rounded" required name="etipo_contrato" id="etipo_contrato">
+                        <% tipo_contrato.forEach(tc => { %>
+                        <option value="<%= tc.id_tipo_contrato %>"><%= tc.tipo_contrato %></option>
+                        <% }) %>
                     </select>
                 </div>
             </div>
             <div class="mb-4 grid grid-cols-2 gap-2">
                 <div>
                     <label class="block text-black mb-2">Estamento</label>
-                    <select id="eestamento" class="w-full p-2 border rounded" required>
-                        <option value="">Seleccione un estamento</option>
-                        <option value="1">Estamento 1</option>
-                        <option value="2">Estamento 2</option>
-                        <option value="3">Estamento 3</option>
+                    <select class="w-full p-2 border rounded" required name="eestamento" id="eestamento">
+                        <% estamentos.forEach(e => { %>
+                        <option value="<%= e.id_estamento %>"><%= e.desc_estamento %></option>
+                        <% }) %>
                     </select>
                 </div>
                 <div>
                     <label class="block text-black mb-2">Tipo Usuario</label>
-                    <select id="etipo_usuario" class="w-full p-2 border rounded" required>
-                        <option value="">Seleccione un tipo de usuario</option>
-                        <option value="1">Tipo 1</option>
-                        <option value="2">Tipo 2</option>
-                        <option value="3">Tipo 3</option>
+                    <select class="w-full p-2 border rounded" required name="etipo_usuario" id="etipo_usuario">
+                        <% tipos_usuario.forEach(tu => { %>
+                        <option value="<%= tu.id_tipo_usuario %>"><%= tu.tipo_usuario %></option>
+                        <% }) %>
                     </select>
                 </div>
             </div>
             <div class="mb-4">
                 <label for="username" class="block text-black mb-2">Username</label>
-                <input type="text" id="eusername" class="w-full p-2 border rounded" placeholder="Ingrese Username"
+                <input type="text" id="eusername" name="eusername" class="w-full p-2 border rounded" placeholder="Ingrese Username"
                     required>
             </div>
             <div class="mb-6">
                 <label for="pwd" class="block text-black mb-2">Contraseña</label>
-                <input type="password" id="epwd" class="w-full p-2 border rounded" placeholder="Ingrese Contraseña"
+                <input type="password" id="epwd" name="epwd" class="w-full p-2 border rounded" placeholder="Ingrese Contraseña"
                     required>
             </div>
-            <button type="submit" class="w-full bg-green-500 text-white p-2 rounded hover:bg-green-400">Crear
-                Usuario</button>
+            <button type="submit" class="w-full bg-green-500 text-white p-2 rounded hover:bg-green-400">Guardar Cambios</button>
         </form>
         <div class="mt-4 text-center">
             <button id="closeModalEditUser" class="w-full bg-red-500 text-white p-2 rounded hover:bg-red-400">Cancelar</button>

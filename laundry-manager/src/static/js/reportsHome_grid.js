@@ -4,7 +4,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const modal = document.querySelector(idModal);
         const openModal = document.querySelector(btnAbrirModal);
         const closeModal = document.querySelector(btnCerrarModal);
-
+        
         if (!modal || !openModal || !closeModal) return;
 
         let gridInitialized = false; // Variable para verificar si el grid ya ha sido inicializado
@@ -99,63 +99,70 @@ document.addEventListener('DOMContentLoaded', async () => {
         anchor.click();
         window.URL.revokeObjectURL(url);
     }
-
+    
+    const response = await fetch('/laundry-manager/reports/get-report');
+    const generalReport = await response.json();
 
     // Segundo grid: Stock General
     toggleModal(
-        '#modal_stock_general',
-        '#openModalReporteGeneral',
-        '#closeModalReporteGeneral',
-        "#gridForReportsStockGeneral",
-        "#ExportGeneralToExcel",
+        '#modal_stock_general', 
+        '#openModalReporteGeneral', 
+        '#closeModalReporteGeneral', 
+        "#gridForReportsStockGeneral", 
+        "#ExportGeneralToExcel", 
+        generalReport, 
         [
-            { id: 1, servicio: "Lavado", fecha: "2024-09-16", usuario: "Juan Pérez", estado: "Entregado" },
-            { id: 2, servicio: "Planchado", fecha: "2024-09-16", usuario: "María Gómez", estado: "Entregado" }
-        ],
-        [
-            { headerName: "ID", field: "id", flex: 1 },
-            { headerName: "Servicio", field: "servicio", flex: 1 },
-            { headerName: "Fecha", field: "fecha", flex: 1 },
-            { headerName: "Usuario", field: "usuario", flex: 1 },
-            { headerName: "Estado", field: "estado", flex: 1 }
+            { headerName: "Articulo", field: "id_articulo", flex: 1 },
+            { headerName: "Ropa Limpia en Ropería", field: "roperia_limpio", flex: 1 },
+            { headerName: "Ropa en Servicios", field: "ropa_servicios", flex: 1 },
+            { headerName: "Ropa sucia en Ropería", field: "roperia_sucio", flex: 1 },
+            { headerName: "Ropa en Tránsito", field: "en_lavanderia", flex: 1 },
+            { headerName: "Pérdidas Totales", field: "perdidas_totales", flex: 1 },
+            { headerName: "Bajas Totales", field: "bajas_totales", flex: 1 }
         ],
         'Reporte Stock General',  // Nombre de la hoja
         'stock_general.xlsx'      // Nombre del archivo
     );
+
+    
+    const responseServices = await fetch('/laundry-manager/reports/get-services-report');
+    const servicesReport = await responseServices.json();
 
     // Tercer Grid: Reporte de Ropa en Servicios
     toggleModal(
         '#modal_ropa_servicios',
         '#openModalRopaServicios',
         '#closeModalRopaServicios',
-        "#gridForReportRopaServicios",
-        "#ExportRopaServicios",
-        [],
+        "#gridForReportRopaServicios", 
+        "#ExportRopaServicios", 
+        servicesReport,  
         [
-            { headerName: "Articulo", field: "id", flex: 1 },
-            { headerName: "Ropa Limpia en Ropería", field: "ropa_limpia_roperia", flex: 1 },
-            { headerName: "Ropa en Servicios", field: "ropa_servicios", flex: 1 },
-            { headerName: "Ropa sucia en Ropería", field: "ropa_sucia_roperia", flex: 1 },
-            { headerName: "Ropa en Tránsito", field: "ropa_transito", flex: 1 },
-            { headerName: "Pérdidas Totales", field: "perdida_Total", flex: 1 },
-            { headerName: "Bajas Totales", field: "baja_total", flex: 1 }
+            { headerName: "Articulo", field: "id_articulo", flex: 1 },
+            { headerName: "Ropa Limpia en Ropería", field: "nombre_articulo", flex: 1 },
+            { headerName: "Ropa en Servicios", field: "unidad_sigcom", flex: 1 },
+            { headerName: "Ropa sucia en Ropería", field: "ropa_servicios", flex: 1 }
         ],
         'Ropa en Servicios',  // Nombre de la hoja
         'stock_en_servicios.xlsx'      // Nombre del archivo
     );
+
+    const responseServicesDown = await fetch('/laundry-manager/reports/get-bajas-services');
+    const servicesDownReport = await responseServicesDown.json();
+
+    
 
     // Cuarto Grid: Reporte de Stock de Ropa Sucia en Ropería
     toggleModal(
         '#modal_ropa_sucia_roperia',
         '#openModalRopaSuciaRoperia',
         '#closeModalRopaSuciaRoperia',
-        "#gridForReporteRopaSuciaRoperia",
-        "#ExportRopaSuciaToExcel",
-        [],
+        "#gridForReporteRopaSuciaRoperia", 
+        "#ExportRopaSuciaToExcel", 
+        generalReport,
         [
-            { headerName: "#", field: "id" },
-            { headerName: "Articulo", field: "articulo", flex: 1 },
-            { headerName: "Ropa Sucia Roperia", field: "sucia_roperia", flex: 1 },
+            { headerName: "#", field: "id_articulo" },
+            { headerName: "Articulo", field: "nombre_articulo", flex: 1 },
+            { headerName: "Ropa Sucia Roperia", field: "roperia_sucio", flex: 1 },
         ],
         'Ropa Sucia en Roperia',  // Nombre de la hoja
         'ropa_sucia_en_roperia.xlsx'      // Nombre del archivo
@@ -166,103 +173,75 @@ document.addEventListener('DOMContentLoaded', async () => {
         '#modal_ropa_transito',
         '#openModalRopaTransito',
         '#closeModalRopatransito',
-        "#gridForReporteRopaTransito",
-        "#ExportRopatransito",
-        [],
+        "#gridForReporteRopaTransito", 
+        "#ExportRopatransito", 
+        generalReport,
         [
-            { headerName: "#", field: "id" },
-            { headerName: "Articulo", field: "articulo", flex: 1 },
-            { headerName: "Ropa en Lavanderia Externa", field: "ropa_transito", flex: 1 },
+            { headerName: "#", field: "id_articulo" },
+            { headerName: "Articulo", field: "nombre_articulo", flex: 1 },
+            { headerName: "Ropa en Lavanderia Externa", field: "en_lavanderia", flex: 1 },
         ],
         'Stock de Ropa en Transito',  // Nombre de la hoja
         'ropa_en_transito.xlsx'      // Nombre del archivo
     );
+
+    const response3 = await fetch('/laundry-manager/reports/get-bajas-perdidas');
+    const ropaBajaPerdidas = await response3.json();
 
     // Sexto Grid: Reporte de de Bajas y Perdidas del Mes
     toggleModal(
         '#modal_ropa_baja',
         '#openModalRopaBaja',
         '#closeModalRopaBaja',
-        "#gridForReporteBajasPerdidas",
-        "#ExportRopaBaja",
-        [],
+        "#gridForReporteBajasPerdidas", 
+        "#ExportRopaBaja", 
+        ropaBajaPerdidas,
         [
-            { headerName: "#", field: "id" },
-            { headerName: "Articulo", field: "articulo", flex: 1 },
-            { headerName: "Perdidas", field: "perdidas", flex: 1 },
-            { headerName: "bajas", field: "perdidas", flex: 1 },
+            { headerName: "#", field: "id_articulo" },
+            { headerName: "Articulo", field: "nombre_articulo", flex: 1 },
+            { headerName: "Perdidas", field: "perdidas_totales", flex: 1 },
+            { headerName: "bajas", field: "bajas_totales", flex: 1 },
 
         ],
         'Ropa dada De baja',  // Nombre de la hoja
         'ropa_de_baja.xlsx'      // Nombre del archivo
     );
 
-    const response = await fetch('/users/get-users');
-    const users = await response.json();
+    // Septimo Grid: Reporte de Ropa de Baja en Servicios
+    toggleModal(
+        '#modal_ropa_baja_servicios', 
+        '#openModalRopaBajaServicios', 
+        '#closeModalRopaBajaServicios',
+        "#gridForReportRopaBajaServicios", 
+        "#ExportRopaBajaServicios", 
+        servicesDownReport,  
+        [
+            { headerName: "Mes y año", field: "mes_anio", flex: 1 },
+            { headerName: "ID", field: "id_articulo", flex: 1 },
+            { headerName: "Articulo", field: "nombre_articulo", flex: 1 },
+            { headerName: "Unidad Sigcom", field: "unidad_sigcom", flex: 1 },
+            { headerName: "Ropa Baja en Servicios", field: "ropa_baja_servicios", flex: 1 }
+        ],
+        'Baja en Servicios',  // Nombre de la hoja
+        'baja_en_servicios.xlsx'      // Nombre del archivo
+    );
 
-    createGrid('#gridForUsers', '#downloadUsers', users, [
-        { headerName: "#", field: "id_usuario" },
-        {
-            headerName: "Rut",
-            valueGetter: function (params) {
-                // Concatenar rut_usuario con dv_usuario
-                return `${params.data.rut_usuario}-${params.data.dv_usuario}`;
-            }
-        },
-        { headerName: "Nombre", field: "nombre", flex: 1 },
-        {
-            headerName: "Acciones",
-            field: "actions",
-            cellRenderer: function (params) {
-                return `
-                <button id="openModalEditUser" class="edit bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 text-sm rounded mr-1" onclick="editUser(${JSON.stringify(params.data).replace(/"/g, '&quot;')})">Editar</button>
-            `;
-            }
-        }
-    ]);
-
-    window.editUser = function (data) {
-        const modal = document.getElementById('modal_editar_usuario');
-
-        // Título del modal
-        const modalTitle = modal.getElementsByTagName("h2")[0];
-        modalTitle.innerText = `Editar Usuario con RUT: ${data.rut_usuario}-${data.dv_usuario}`;
-
-        // Campos del formulario
-        const rutInput = modal.querySelector("input[id='erut_usuario']");
-        const nombreInput = modal.querySelector("input[id='enombre']");
-        const servicioInput = modal.querySelector("select[id='eservicio']");
-        const contratoInput = modal.querySelector("select[id='etipo_contrato']");
-        const sigcomInput = modal.querySelector("select[id='eunidad_sigcom']");
-        const estamentoInput = modal.querySelector("select[id='eestamento']");
-        const tipoUsuarioInput = modal.querySelector("select[id='etipo_usuario']");
-        const usernameInput = modal.querySelector("input[id='eusername']");
-        const passwordInput = modal.querySelector("input[id='epwd']");
-
-        // Asignar valores de los datos
-        rutInput.value = `${data.rut_usuario}-${data.dv_usuario}`;
-        nombreInput.value = data.nombre;
-        servicioInput.value = data.id_servicio;
-        contratoInput.value = data.id_tipo_contrato;
-        sigcomInput.value = data.id_unidad_sigcom;
-        estamentoInput.value = data.id_estamento;
-        tipoUsuarioInput.value = data.id_tipo_usuario;
-        usernameInput.value = data.username;
-        passwordInput.value = data.pwd;
-
-        modal.classList.remove('hidden');
-        setTimeout(() => {
-            modal.classList.remove('opacity-0');
-        }, 10);
-    }
-    const modal = document.getElementById('modal_editar_usuario');
-    const closeModal = document.querySelector('#closeModalEditUser');
-
-    closeModal.addEventListener('click', () => {
-        modal.classList.add('opacity-0');
-        setTimeout(() => {
-            modal.classList.add('hidden');
-        }, 300); // Duration should match the CSS transition duration
-    });
-
+    // Septimo Grid: Reporte de Ropa de Baja en Servicios
+    toggleModal(
+        '#modal_ropa_baja_servicios', 
+        '#openModalRopaBajaServicios', 
+        '#closeModalRopaBajaServicios',
+        "#gridForReportRopaBajaServicios", 
+        "#ExportRopaBajaServicios", 
+        servicesDownReport,  
+        [
+            { headerName: "Mes y año", field: "mes_anio", flex: 1 },
+            { headerName: "ID", field: "id_articulo", flex: 1 },
+            { headerName: "Articulo", field: "nombre_articulo", flex: 1 },
+            { headerName: "Unidad Sigcom", field: "unidad_sigcom", flex: 1 },
+            { headerName: "Ropa Baja en Servicios", field: "ropa_baja_servicios", flex: 1 }
+        ],
+        'Baja en Servicios',  // Nombre de la hoja
+        'baja_en_servicios.xlsx'      // Nombre del archivo
+    );
 });
