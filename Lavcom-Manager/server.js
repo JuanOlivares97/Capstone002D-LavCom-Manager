@@ -9,6 +9,7 @@ const PORT = 8080;
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
 });
+app.use(express.static(path.join(__dirname, "static")))
 
 // Redirigir las peticiones a los servicios correspondientes
 app.use('/food-manager', createProxyMiddleware({ target: 'http://localhost:3000', changeOrigin: true, ws: true }));
