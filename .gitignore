@@ -5,3 +5,6 @@
 **/.env
 
 /.idx
+
+# Ignorar reportes de pruebas unitarias
+**/test-results
