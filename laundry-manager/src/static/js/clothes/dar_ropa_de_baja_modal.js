@@ -79,7 +79,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         if (articulosData.length !== 0) {
-            const response = await fetch('/laundry-manager/laundry-manager/clothes/dar-ropa-baja', {
+            const response = await fetch('/laundry-manager/clothes/dar-ropa-baja', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
