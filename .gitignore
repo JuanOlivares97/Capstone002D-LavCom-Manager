@@ -4,4 +4,3 @@
 # Ignorar todos los archivos .env
 **/.env
 
-/.idx

@@ -1,0 +1,221 @@
+<div id="addPatientModal" class="z-10 hidden fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center ">
+    <div class="bg-white rounded-lg shadow-xl max-w-6xl w-full p-5 relative overflow-y-auto max-h-screen">
+
+        <!-- Título del modal -->
+        <h2 id="modalNombre" class="text-2xl font-bold text-gray-800 mb-6 text-center m-4">Ingresar Paciente</h2>
+
+        <div>
+            <label class="block font-medium text-gray-700 mt-1">Rut</label>
+            <input type="text" id="rut" name="rut" class="my-2 w-full p-2 border rounded" required>
+            <!-- Contenedor para listar coincidencias de pacientes -->
+            <div id="patientList" class="my-2 p-2 border rounded bg-gray-100 hidden"></div>
+        </div>
+        <!-- Contenido del modal -->
+        <div id="additionalFields" class="grid grid-cols-3 gap-6 hidden">
+            <div>
+                <label class="block font-medium text-gray-700 mt-1">Numero de Cama</label>
+                <input type="number" id="cama" name="cama" class=" my-2 w-full p-2 border rounded" required min="1">
+
+                <label class="block font-medium text-gray-700 mt-1">Nombres</label>
+                <input type="text" id="nombre" name="nombre" class=" my-2 w-full p-2 border rounded" required>
+
+                <label class="block font-medium text-gray-700 mt-1">Apellido Paterno</label>
+                <input type="text" id="apellidop" name="apellidop" class=" my-2 w-full p-2 border rounded" required>
+
+                <label class="block font-medium text-gray-700 mt-1">Apellido Materno</label>
+                <input type="text" id="apellidom" name="apellidom" class=" my-2 w-full p-2 border rounded" required>
+
+                <label class="block font-medium text-gray-700 mt-1">Fecha de Nacimiento</label>
+                <input type="date" id="FechaNacimiento" name="FechaNacimiento" class=" my-2 w-full p-2 border rounded"
+                    required>
+
+                <label class="block font-medium text-gray-700 mt-1">Observaciones Generales</label>
+                <textarea type="text" id="observacionesgenerales" name="observacionesgenerales"
+                    class=" my-2 w-full p-2 border rounded h-48 " required></textarea>
+            </div>
+
+            <div>
+                <label class="block font-medium text-gray-700 mt-1">Telefono</label>
+                <input type="number" id="Telefonos" name="Telefonos" class=" my-2 w-full p-2 border rounded" required>
+
+                <label class="block font-medium text-gray-700 mt-1">Dirección</label>
+                <input type="text" id="Direccion" name="Direccion" class=" my-2 w-full p-2 border rounded" required>
+
+
+                <label class="block font-medium text-gray-700 mt-1">Correo</label>
+                <input type="email" id="Correo" name="Correo" class=" my-2 w-full p-2 border rounded" required>
+
+                <label class="block font-medium text-gray-700 mt-1">Observaciones Nutricionista</label>
+                <textarea type="text" id="observacionesnutricionista" name="observacionesnutricionista"
+                    class=" my-2 w-full p-2 border rounded h-48" required></textarea>
+            </div>
+
+            <div>
+                <label for="subgrupo" class="block font-medium text-gray-700 mt-1">Tipo de Servicio</label>
+                <select id="Servicio" name="Servicio" class="my-2 w-full p-2 border rounded" required>
+                    <option value="" disabled selected>Seleccione</option>
+                    <% servicios.forEach(servicio=> { %>
+                        <option value="<%= servicio.IdTipoServicio %>">
+                            <%= servicio.DescTipoServicio %>
+                        </option>
+                        <% }) %>
+                </select>
+
+                <label for="subgrupo" class="block font-medium text-gray-700 mt-1">Tipo de Unidad</label>
+                <select id="Unidad" name="Unidad" class="my-2 w-full p-2 border rounded" required>
+                    <option value="" disabled selected>Seleccione</option>
+                    <% unidades.forEach(unidad=> { %>
+                        <option value="<%= unidad.IdTipoUnidad %>">
+                            <%= unidad.DescTipoUnidad %>
+                        </option>
+                        <% }) %>
+                </select>
+
+                <label for="subgrupo" class="block font-medium text-gray-700 mt-1">Tipo de Via</label>
+                <select id="Via" name="Via" class="my-2 w-full p-2 border rounded" required>
+                    <option value="" disabled selected>Seleccione</option>
+                    <% vias.forEach(via=> { %>
+                        <option value="<%= via.IdTipoVia %>">
+                            <%= via.DescTipoVia %>
+                        </option>
+                        <% }) %>
+                </select>
+
+                <label for="subgrupo" class="block font-medium text-gray-700 mt-1">Tipo de Regimen</label>
+                <select id="Regimen" name="Regimen" class="my-2 w-full p-2 border rounded" required>
+                    <option value="" disabled selected>Seleccione</option>
+                    <% regimen.forEach(reg=> { %>
+                        <option value="<%= reg.IdTipoRegimen %>">
+                            <%= reg.DescTipoRegimen%>
+                        </option>
+                        <% }) %>
+                </select>
+            </div>
+
+        </div>
+
+        <!-- Botones -->
+        <div class="flex gap-4 justify-center">
+            <div class="my-3 flex justify-end">
+                <button id="addPaciente"
+                    class="px-4 py-2 bg-green-200 text-white-800 rounded-md shadow-sm hover:bg-gray-300">Ingresar
+                    Paciente</button>
+            </div>
+            <div class="my-3 flex justify-end">
+                <button id="closeModalAddPatient"
+                    class="px-4 py-2 bg-red-200 text-white-800 rounded-md shadow-sm hover:bg-gray-300">Cancelar
+                    Ingreso</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    let debounceTimeout;
+
+    function formatRUTInput(inputElement) {
+        inputElement.addEventListener('input', async () => {
+            clearTimeout(debounceTimeout); // Limpiar el timeout anterior
+
+            debounceTimeout = setTimeout(async () => { // Espera 300ms antes de ejecutar la búsqueda
+                let rut = inputElement.value.replace(/\./g, '').replace(/-/g, '');
+                const cuerpo = rut.slice(0, -1);
+                const dv = rut.slice(-1);
+                inputElement.value = `${cuerpo}-${dv}`;
+
+                // Verificar si el RUT tiene al menos 4 caracteres antes de buscar coincidencias
+                if (rut.length >= 4) {
+                    const rutParcial = `${cuerpo}`;
+                    const coincidencias = await buscarPacientesPorRutParcial(rutParcial);
+
+                    if (coincidencias.length > 0) {
+                        // Mostrar lista de coincidencias
+                        mostrarCoincidencias(coincidencias);
+                    } else {
+                        // Si no hay coincidencias, mostrar los campos adicionales
+                        document.getElementById('additionalFields').classList.remove('hidden');
+                        document.getElementById('patientList').classList.add('hidden');
+                    }
+                }
+            }, 300); // Tiempo de debounce de 300ms
+        });
+    }
+
+    // Función para buscar pacientes con RUT parcial
+    async function buscarPacientesPorRutParcial(rutParcial) {
+        try {
+            const response = await fetch(`/food-manager/patient/searc-patient/${rutParcial}`);
+            if (!response.ok) throw new Error("Error al buscar pacientes");
+            const pacientes = await response.json();
+            return pacientes;
+        } catch (error) {
+            console.error("Error al buscar pacientes:", error);
+            return [];
+        }
+    }
+
+    // Función para mostrar la lista de coincidencias
+    function mostrarCoincidencias(pacientes) {
+        const patientList = document.getElementById('patientList');
+        patientList.innerHTML = ''; // Limpiar la lista de coincidencias
+
+        if (pacientes.length > 0) {
+            pacientes.forEach(paciente => {
+                const item = document.createElement('div');
+                item.textContent = `${paciente.IdHospitalizado} -- ${paciente.NombreHospitalizado} - ${paciente.RutHospitalizado}-${paciente.DvHospitalizado}`;
+
+                // Agregar evento de clic al div del paciente
+                item.addEventListener('click', async () => {
+                    const RutCompleto = `${paciente.RutHospitalizado}-${paciente.DvHospitalizado}`;
+                    await enviarPeticionCreatePatient(RutCompleto);
+                });
+
+                patientList.appendChild(item);
+            });
+            patientList.classList.remove('hidden');
+        } else {
+            patientList.classList.add('hidden');
+        }
+    }
+
+    // Función para enviar la petición POST
+    async function enviarPeticionCreatePatient(RutCompleto) {
+    const addPatientModal = document.getElementById('addPatientModal');
+    try {
+        const response = await fetch('/food-manager/patient/create-paciente', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ RutCompleto: RutCompleto })
+        });
+
+        if (!response.ok) throw new Error('Error al enviar la solicitud');
+
+        const result = await response.json();
+        addPatientModal.classList.add('hidden');
+        console.log('Paciente creado o reingresado:', result);
+
+        // SweetAlert de éxito
+        Swal.fire({
+            icon: 'success',
+            title: 'Éxito',
+            text: 'Paciente creado o reingresado exitosamente',
+            confirmButtonText: 'Aceptar'
+        });
+    } catch (error) {
+        console.error('Error al crear o reingresar paciente:', error);
+
+        // SweetAlert de error
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Hubo un error al crear o reingresar el paciente',
+            confirmButtonText: 'Aceptar'
+        });
+    }
+}
+
+    // Inicializar la función en el input de RUT
+    const rutInputElement = document.getElementById('rut');
+    formatRUTInput(rutInputElement);
+</script>

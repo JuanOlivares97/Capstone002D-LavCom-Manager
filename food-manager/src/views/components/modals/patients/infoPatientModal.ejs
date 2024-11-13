@@ -1,0 +1,223 @@
+<div id="patientModal"
+    class=" z-10 fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center hidden overflow-auto">
+    <div class="bg-white rounded-lg shadow-xl max-w-6xl w-full p-6 relative overflow-y-auto max-h-screen">
+        <!-- Botón para cerrar el modal -->
+        <button class="absolute top-2 right-2 text-gray-500 hover:text-gray-800" onclick="closeModal()">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                class="w-6 h-6">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+        </button>
+
+        <!-- Título del modal -->
+        <h2 id="modalNombre" class="text-2xl font-bold text-gray-800 mb-6"></h2>
+        <input type="number" id="idPaciente" name="idPaciente" hidden>
+        <!-- Contenido del modal -->
+        <div class="grid grid-cols-3 gap-4">
+            <div>
+                <div>
+                    <label class="block font-medium text-gray-700 my-2">Numero de Cama</label>
+                    <input type="number" id="infoCama" name="infoCama" class="my-2 w-full p-2 border rounded">
+                </div>
+
+                <div>
+                    <label class="block font-medium text-gray-700 my-2">Nombres</label>
+                    <input type="text" id="infoNombre" name="infoNombre" class="my-2 w-full p-2 border rounded"
+                        readonly>
+                </div>
+
+                <div>
+                    <label class="block font-medium text-gray-700 my-2">Apellido Paterno</label>
+                    <input type="text" id="InfoApellido1" name="InfoApellido1" class="my-2 w-full p-2 border rounded"
+                        readonly>
+                </div>
+
+                <div>
+                    <label class="block font-medium text-gray-700 my-2">Apellido Materno</label>
+                    <input type="text" id="infoApellido2" name="infoApellido2" class="my-2 w-full p-2 border rounded"
+                        readonly>
+                </div>
+
+                <div>
+                    <label class="block font-medium text-gray-700 my-2">Fecha de Nacimiento</label>
+                    <input type="date" id="infoFechaNacimiento" name="infoFechaNacimiento"
+                        class="my-2 w-full p-2 border rounded" readonly>
+                </div>
+
+                <div>
+                    <label class="block font-medium text-gray-700 my-2">Observaciones Generales</label>
+                    <textarea type="text" id="infoObservacionesGenerales" name="infoObservacionesGenerales"
+                        class="my-2 w-full p-2 border rounded h-48"></textarea>
+                    <button id="changeObservacionesGenerales"
+                        class="px-4 py-2 bg-blue-200 text-gray-800 rounded-md shadow-sm hover:bg-gray-300 w-full">
+                        Cambiar Observaciones Generales
+                    </button>
+                </div>
+            </div>
+
+            <div>
+
+                <div>
+                    <label class="block font-medium text-gray-700 my-2">Fecha de Ingreso</label>
+                    <input type="date" id="infoFechaIngreso" name="infoFechaIngreso"
+                        class="my-2 w-full p-2 border rounded" readonly>
+                </div>
+
+                <div>
+                    <label class="block font-medium text-gray-700 my-2">Rut</label>
+                    <input type="text" id="infoRut" name="infoRut" class="my-2 w-full p-2 border rounded" readonly>
+                </div>
+
+                <div>
+                    <label class="block font-medium text-gray-700 my-2">Telefono</label>
+                    <input type="number" id="infoTelefonos" name="infoTelefonos" class="my-2 w-full p-2 border rounded"
+                        readonly>
+                </div>
+
+                <div>
+                    <label class="block font-medium text-gray-700 my-2">Dirección</label>
+                    <input type="text" id="infoDireccion" name="infoDireccion" class="my-2 w-full p-2 border rounded"
+                        readonly>
+                </div>
+
+                <div>
+                    <label class="block font-medium text-gray-700 my-2">Correo</label>
+                    <input type="email" id="infoCorreo" name="infoCorreo" class="my-2 w-full p-2 border rounded"
+                        readonly>
+
+                </div>
+                <div>
+                    <label class="block font-medium text-gray-700 my-2">Observaciones Nutricionista</label>
+                    <textarea type="text" id="infoObservacionesNutricionista" name="infoObservacionesNutricionista"
+                        class="my-2 w-full p-2 border rounded h-48"></textarea>
+                    <button id="changeObservacionesNutricionista"
+                        class="px-4 py-2 bg-blue-200 text-gray-800 rounded-md shadow-sm hover:bg-gray-300 w-full">Cambiar
+                        Observaciones Nutricionista</button>
+                </div>
+            </div>
+
+            <div>
+                <div>
+                    <label for="infoServicio" class="block font-medium text-gray-700 my-2">Tipo de Servicio</label>
+                    <select id="infoServicio" name="infoServicio" class="my-2 w-full p-2 border rounded" required>
+                        <option value="no-usar" disabled selected>Seleccione</option>
+                        <% servicios.forEach(servicio=> { %>
+                            <option value="<%= servicio.IdTipoServicio %>">
+                                <%= servicio.DescTipoServicio %>
+                            </option>
+                            <% }) %>
+                    </select>
+                    <button id="changeServicio"
+                        class="px-4 py-2 bg-blue-200 text-gray-800 rounded-md shadow-sm hover:bg-gray-300 w-full">Cambiar
+                        Servicio</button>
+                </div>
+
+                <div>
+                    <label for="infoUnidad" class="block font-medium text-gray-700 my-2">Tipo de Unidad</label>
+                    <select id="infoUnidad" name="infoUnidad" class="my-2 w-full p-2 border rounded" required>
+                        <option value="no-usar" disabled selected>Seleccione</option>
+                        <% unidades.forEach(unidad=> { %>
+                            <option value="<%= unidad.IdTipoUnidad %>">
+                                <%= unidad.DescTipoUnidad %>
+                            </option>
+                            <% }) %>
+                    </select>
+                </div>
+
+                <div>
+                    <label for="infoVia" class="block font-medium text-gray-700 my-2">Tipo de Via</label>
+                    <select id="infoVia" name="infoVia" class="my-2 w-full p-2 border rounded" required>
+                        <option value="no-usar" disabled selected>Seleccione</option>
+                        <% vias.forEach(via=> { %>
+                            <option value="<%= via.IdTipoVia %>">
+                                <%= via.DescTipoVia %>
+                            </option>
+                            <% }) %>
+                    </select>
+                    <button id="changeVia"
+                        class="px-4 py-2 bg-blue-200 text-gray-800 rounded-md shadow-sm hover:bg-gray-300 w-full">Cambiar
+                        Via</button>
+                </div>
+
+                <div>
+                    <label for="infoRegimen" class="block font-medium text-gray-700 my-2">Tipo de Regimen</label>
+                    <select id="infoRegimen" name="infoRegimen" class="my-2 w-full p-2 border rounded" required>
+                        <option value="no-usar" disabled selected>Seleccione</option>
+                        <% regimen.forEach(reg=> { %>
+                            <option value="<%= reg.IdTipoRegimen %>">
+                                <%= reg.DescTipoRegimen%>
+                            </option>
+                            <% }) %>
+                    </select>
+                    <button id="changeRegimen"
+                        class="px-4 py-2 bg-blue-200 text-gray-800 rounded-md shadow-sm hover:bg-gray-300 w-full">Cambiar
+                        Regimen</button>
+                </div>
+            </div>
+            <div class="hidden">
+                <div>
+                    <label class="block font-medium text-gray-700 my-2">Fecha de Alta</label>
+                    <input type="date" id="infoFechaAlta" name="infoFechaAlta" class="my-2 w-full p-2 border rounded"
+                        readonly>
+                </div>
+
+                <div>
+                    <label class="block font-medium text-gray-700 my-2">Nro Cama de Alta</label>
+                    <input type="number" id="infoNroCama" name="infoNroCama" class="my-2 w-full p-2 border rounded"
+                        readonly>
+                </div>
+
+                <div class="">
+                    <label class="block font-medium text-gray-700 my-2">Servicio de Alta</label>
+                    <select id="infoServicioAlta" name="infoServicioAlta" class="my-2 w-full p-2 border rounded"
+                        required>
+                        <option value="" disabled selected>Seleccione</option>
+                        <% servicios.forEach(servicio=> { %>
+                            <option value="<%= servicio.IdTipoServicio %>">
+                                <%= servicio.DescTipoServicio %>
+                            </option>
+                            <% }) %>
+                    </select>
+                    <button id="changeServicioAlta"
+                        class="px-4 py-2 bg-blue-200 text-gray-800 rounded-md shadow-sm hover:bg-gray-300 w-full">Cambiar
+                        Servicio de Alta</button>
+                </div>
+
+                <div>
+                    <label class="block font-medium text-gray-700 my-2">Observaciones de Alta</label>
+                    <textarea type="text" id="infoObservacionesAlta" name="infoObservacionesAlta"
+                        class="my-2 w-full p-2 border rounded h-48" readonly></textarea>
+                    <button id="changeObservacionesAlta"
+                        class="px-4 py-2 bg-blue-200 text-gray-800 rounded-md shadow-sm hover:bg-gray-300 w-full">Cambiar
+                        Observaciones de Alta</button>
+                </div>
+            </div>
+        </div>
+        <div id="logMovimientosPaciente" class="hidden mt-6 p-4 bg-gray-100 rounded-lg">
+            <h3 class="text-xl font-bold text-gray-800 mb-4">Movimientos del Paciente</h3>
+            <div class="timeline max-h-60 overflow-y-auto">
+                <!-- Aquí se mostrarán los movimientos del paciente -->
+                <ul id="movimientosList" class="space-y-3">
+
+                </ul>
+            </div>
+        </div>
+
+        <!-- Botones -->
+        <div class="flex gap-4 justify-center">
+            <div class="mt-6 flex justify-end">
+                <button onclick="closeModalInfo()"
+                    class="px-4 py-2 bg-gray-200 text-gray-800 rounded-md shadow-sm hover:bg-gray-300">Cerrar</button>
+            </div>
+            <div class="mt-6 flex justify-end">
+                <button
+                    class="px-4 py-2 bg-blue-200 text-gray-800 rounded-md shadow-sm hover:bg-gray-300">Editar</button>
+            </div>
+            <div class="mt-6 flex justify-end">
+                <button onclick="toggleLogs()"
+                    class="px-4 py-2 bg-red-200 text-gray-800 rounded-md shadow-sm hover:bg-gray-300">Ver Logs</button>
+            </div>
+            
+        </div>
+    </div>
+</div>
