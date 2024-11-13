@@ -11,17 +11,10 @@ app.get('/', (req, res) => {
 });
 
 // Redirigir las peticiones a los servicios correspondientes
-app.use('/food-manager', createProxyMiddleware({
-  target: 'http://localhost:3000',  // Dirección del servidor de food-manager
-  changeOrigin: true,
-  ws: true,  // Habilitar WebSockets en el proxy
-  // Eliminé pathRewrite ya que no es necesario
-}));
-app.use('/laundry-manager', createProxyMiddleware({ 
-  target: 'http://localhost:4000', 
-  changeOrigin: true 
-}));
+app.use('/food-manager', createProxyMiddleware({ target: 'http://localhost:3000', changeOrigin: true, ws: true }));
+app.use('/laundry-manager', createProxyMiddleware({ target: 'http://localhost:4000', changeOrigin: true }));
+
 
 app.listen(PORT, () => {
-  console.log(`Server is running http://localhost:${PORT}`);
+  console.log(`Servidor principal escuchando en el puerto ${PORT}`);
 });
