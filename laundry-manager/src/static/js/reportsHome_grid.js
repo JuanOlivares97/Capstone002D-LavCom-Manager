@@ -39,6 +39,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         // Verifica si ya existe un grid en este div
         if (gridDiv.childElementCount > 0) {
+            console.log("Grid ya creado");
             return; // Si ya existe un grid, no lo creamos de nuevo
         }
 
