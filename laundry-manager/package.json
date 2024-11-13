@@ -4,7 +4,7 @@
   "description": "Un proyecto para el Hospital de Melipilla, modulo Lavanderia",
   "main": "app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest",
     "dev": "node --watch --env-file .env src/app.js",
     "css": "tailwindcss -i ./src/static/css/input.css -o ./src/static/css/tailwind.css"
   },
@@ -24,6 +24,8 @@
   },
   "devDependencies": {
     "autoprefixer": "^10.4.20",
+    "jest": "^29.7.0",
+    "jest-stare": "^2.5.2",
     "postcss": "^8.4.47",
     "prisma": "^5.19.1",
     "tailwindcss": "^3.4.14"
