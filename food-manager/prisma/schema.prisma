@@ -8,11 +8,15 @@ datasource db {
 }
 
 model Colacion {
-  IdColacion     Int      @id @default(autoincrement())
-  RutSolicitante String   @db.VarChar(255)
-  FechaSolicitud DateTime @db.Date
-  Retirado       Int      @default(0)
+  IdColacion     Int        @id @default(autoincrement())
+  RutSolicitante String     @db.VarChar(255)
+  FechaSolicitud DateTime   @db.Date
+  Estado         Int        @default(0)
   Menu           Int
+  IdTipoUnidad   Int
+  TipoUnidad     TipoUnidad @relation(fields: [IdTipoUnidad], references: [IdTipoUnidad], onUpdate: Restrict, map: "fk_colacion_unidad")
+
+  @@index([IdTipoUnidad], map: "fk_colacion_unidad")
 }
 
 model Funcionario {
@@ -20,8 +24,8 @@ model Funcionario {
   RutFuncionario       String          @db.VarChar(20)
   DvFuncionario        String          @db.Char(1)
   NombreFuncionario    String          @db.VarChar(255)
-  FechaInicioContrato  DateTime?       @db.Date
-  FechaTerminoContrato DateTime?       @db.Date
+  FechaInicioContrato  DateTime?       @db.DateTime(0)
+  FechaTerminoContrato DateTime?       @db.DateTime(0)
   Habilitado           String?         @default("S") @db.Char(1)
   correo               String?         @db.VarChar(100)
   contrasena           String?         @db.VarChar(255)
@@ -35,6 +39,7 @@ model Funcionario {
   TipoServicio         TipoServicio    @relation(fields: [IdTipoServicio], references: [IdTipoServicio], map: "fk_funcionario_servicio")
   TipoFuncionario      TipoFuncionario @relation(fields: [IdTipoFuncionario], references: [IdTipoFuncionario], map: "fk_funcionario_tipo_funcionario")
   TipoUnidad           TipoUnidad      @relation(fields: [IdTipoUnidad], references: [IdTipoUnidad], map: "fk_funcionario_unidad")
+  error_log            error_log[]
 
   @@unique([RutFuncionario, DvFuncionario], map: "unique_rut_dv")
   @@index([IdTipoContrato], map: "fk_funcionario_contrato")
@@ -50,10 +55,10 @@ model Hospitalizado {
   RutHospitalizado                                        String                   @db.VarChar(11)
   DvHospitalizado                                         String                   @db.VarChar(1)
   NombreHospitalizado                                     String                   @db.VarChar(255)
-  FechaNacimiento                                         DateTime                 @db.Date
-  FechaIngreso                                            DateTime                 @db.Date
+  FechaNacimiento                                         DateTime                 @db.DateTime(0)
+  FechaIngreso                                            DateTime                 @db.DateTime(0)
   ObservacionesNutricionista                              String?                  @db.VarChar(255)
-  FechaAlta                                               DateTime?                @db.Date
+  FechaAlta                                               DateTime?                @db.DateTime(0)
   ObservacionesAlta                                       String?                  @db.VarChar(255)
   ServicioAlta                                            Int?
   CodigoCamaAlta                                          Int?
@@ -61,7 +66,7 @@ model Hospitalizado {
   IdTipoUnidad                                            Int?
   IdTipoVia                                               Int?
   IdTipoRegimen                                           Int
-  FechaFinAyuno                                           DateTime?                @db.Date
+  FechaFinAyuno                                           DateTime?                @db.DateTime(0)
   ApellidoP                                               String                   @db.VarChar(255)
   ApellidoM                                               String                   @db.VarChar(255)
   Telefono                                                Int?
@@ -69,11 +74,11 @@ model Hospitalizado {
   Direccion                                               String                   @db.VarChar(255)
   ObservacionesSala                                       String?                  @db.VarChar(255)
   Diagnostico                                             String?                  @db.VarChar(255)
-  TipoRegimen                                             TipoRegimen              @relation(fields: [IdTipoRegimen], references: [IdTipoRegimen], onUpdate: Restrict, map: "fk_Regimen")
-  TipoServicio_Hospitalizado_IdTipoServicioToTipoServicio TipoServicio?            @relation("Hospitalizado_IdTipoServicioToTipoServicio", fields: [IdTipoServicio], references: [IdTipoServicio], onDelete: Restrict, onUpdate: Restrict, map: "fk_Servicio")
-  TipoServicio_Hospitalizado_ServicioAltaToTipoServicio   TipoServicio?            @relation("Hospitalizado_ServicioAltaToTipoServicio", fields: [ServicioAlta], references: [IdTipoServicio], onDelete: Restrict, onUpdate: Restrict, map: "fk_ServicioAlta")
-  TipoUnidad                                              TipoUnidad?              @relation(fields: [IdTipoUnidad], references: [IdTipoUnidad], onDelete: Restrict, onUpdate: Restrict, map: "fk_Unidad")
-  TipoVia                                                 TipoVia?                 @relation(fields: [IdTipoVia], references: [IdTipoVia], onDelete: Restrict, onUpdate: Restrict, map: "fk_Via")
+  TipoRegimen                                             TipoRegimen              @relation(fields: [IdTipoRegimen], references: [IdTipoRegimen], onUpdate: Restrict, map: "fk_hospitalizado_regimen")
+  TipoServicio_Hospitalizado_IdTipoServicioToTipoServicio TipoServicio?            @relation("Hospitalizado_IdTipoServicioToTipoServicio", fields: [IdTipoServicio], references: [IdTipoServicio], onDelete: Restrict, onUpdate: Restrict, map: "fk_hospitalizado_servicio")
+  TipoServicio_Hospitalizado_ServicioAltaToTipoServicio   TipoServicio?            @relation("Hospitalizado_ServicioAltaToTipoServicio", fields: [ServicioAlta], references: [IdTipoServicio], onDelete: Restrict, onUpdate: Restrict, map: "fk_hospitalizado_servicioalta")
+  TipoUnidad                                              TipoUnidad?              @relation(fields: [IdTipoUnidad], references: [IdTipoUnidad], onDelete: Restrict, onUpdate: Restrict, map: "fk_hospitalizado_unidad")
+  TipoVia                                                 TipoVia?                 @relation(fields: [IdTipoVia], references: [IdTipoVia], onDelete: Restrict, onUpdate: Restrict, map: "fk_hospitalizado_via")
   logMovimientosPaciente                                  logMovimientosPaciente[]
 
   @@unique([RutHospitalizado, DvHospitalizado], map: "unique_rut_dv_paciente")
@@ -85,12 +90,15 @@ model Hospitalizado {
 }
 
 model Reportes {
-  IdReporte              Int @id @default(autoincrement())
+  IdReporte              Int        @id @default(autoincrement())
   IdTipoUnidad           Int
-  RacionesFuncionarios   Int @default(0)
-  RacionesHospitalizados Int @default(0)
+  RacionesFuncionarios   Int        @default(0)
+  RacionesHospitalizados Int        @default(0)
   Anio                   Int
   Mes                    Int
+  TipoUnidad             TipoUnidad @relation(fields: [IdTipoUnidad], references: [IdTipoUnidad], onUpdate: Restrict, map: "fk_reportes_unidad")
+
+  @@index([IdTipoUnidad], map: "fk_reportes_unidad")
 }
 
 model TipoContrato {
@@ -122,17 +130,25 @@ model TipoServicio {
   IdTipoServicio                                           Int             @id @default(autoincrement())
   DescTipoServicio                                         String          @db.VarChar(255)
   Habilitado                                               String          @default("S") @db.Char(1)
+  tipo                                                     String          @db.VarChar(255)
+  IdTipoUnidad                                             Int
   Funcionario                                              Funcionario[]
   Hospitalizado_Hospitalizado_IdTipoServicioToTipoServicio Hospitalizado[] @relation("Hospitalizado_IdTipoServicioToTipoServicio")
   Hospitalizado_Hospitalizado_ServicioAltaToTipoServicio   Hospitalizado[] @relation("Hospitalizado_ServicioAltaToTipoServicio")
+  TipoUnidad                                               TipoUnidad      @relation(fields: [IdTipoUnidad], references: [IdTipoUnidad], onUpdate: Restrict, map: "fk_servicio_unidad")
+
+  @@index([IdTipoUnidad], map: "fk_servicio_unidad")
 }
 
 model TipoUnidad {
   IdTipoUnidad   Int             @id @default(autoincrement())
   DescTipoUnidad String          @db.VarChar(255)
   Habilitado     String          @default("S") @db.Char(1)
+  Colacion       Colacion[]
   Funcionario    Funcionario[]
   Hospitalizado  Hospitalizado[]
+  Reportes       Reportes[]
+  TipoServicio   TipoServicio[]
 }
 
 model TipoVia {
@@ -149,4 +165,16 @@ model logMovimientosPaciente {
   Hospitalizado  Hospitalizado @relation(fields: [idPaciente], references: [IdHospitalizado], onUpdate: Restrict, map: "fk_paciente_log")
 
   @@index([idPaciente], map: "fk_paciente_log")
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model error_log {
+  id_error      Int         @id @default(autoincrement())
+  id_usuario    Int
+  tipo_error    String      @db.VarChar(30)
+  mensaje_error String      @db.LongText
+  ruta_error    String      @db.VarChar(40)
+  Funcionario   Funcionario @relation(fields: [id_usuario], references: [IdFuncionario], onUpdate: Restrict, map: "fk_user_error")
+
+  @@index([id_usuario], map: "fk_user_error")
 }

@@ -1,0 +1,127 @@
+<div class="flex justify-center py-2">
+        <label class="text-lg px-4 py-2 text-gray-700 hover:bg-indigo-500 hover:text-white rounded filtro-link" data-filter="Estamento">Estamentos</label>
+        <label class="text-lg px-4 py-2 text-gray-700 hover:bg-indigo-500 hover:text-white rounded filtro-link" data-filter="Unidad">Unidades Signom</label>
+        <label class="text-lg px-4 py-2 text-gray-700 hover:bg-indigo-500 hover:text-white rounded filtro-link" data-filter="Servicios">Servicios</label>
+        <label class="text-lg px-4 py-2 text-gray-700 hover:bg-indigo-500 hover:text-white rounded filtro-link" data-filter="Contratos">Contratos</label>
+        <label class="text-lg px-4 py-2 text-gray-700 hover:bg-indigo-500 hover:text-white rounded filtro-link" data-filter="Vias">Vias de Alimentacion</label>
+        <label class="text-lg px-4 py-2 text-gray-700 hover:bg-indigo-500 hover:text-white rounded filtro-link" data-filter="Perfiles">Perfiles de Funcionarios</label>
+        <label class="text-lg px-4 py-2 text-gray-700 hover:bg-indigo-500 hover:text-white rounded filtro-link" data-filter="Regimen">Regimen</label>
+    </div>
+
+
+    <div id="cardGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-5 p-6">
+        <!-- Tarjeta de agregar item en Estamentos -->
+        <div class="card-item addItem Estamento flex justify-center items-center bg-white rounded-lg shadow-lg p-5 cursor-pointer transition-transform duration-300 ease-in-out hover:transform hover:-translate-y-1">
+            <span class="text-gray-500 text-4xl font-bold">+</span>
+        </div>
+        <% Estamento.forEach(Estamentos => { %>
+            <div class="card-item Estamento flex flex-col gap-2 bg-white rounded-lg shadow-lg p-5 cursor-pointer transition-transform duration-300 ease-in-out hover:transform hover:-translate-y-1">
+                <label class="text-gray-800 font-bold text-xl mb-2 text-center">
+                    <%- Estamentos.DescTipoEstamento %>
+                </label>
+                <div class="flex-grow"></div>
+                <button class="bg-blue-500 text-white font-semibold py-2 px-4 rounded hover:bg-blue-600 transition-colors duration-200 mt-auto" onclick="editItem('<%- Estamentos.IdTipoEstamento %>', 'Estamento', '<%- Estamentos.DescTipoEstamento %>')">Editar</button>
+            </div>
+        <% }) %>
+        
+        <!-- Tarjeta de agregar item en Unidades -->
+        <div class="hidden card-item addItem  Unidad flex justify-center items-center bg-white rounded-lg shadow-lg p-5 cursor-pointer transition-transform duration-300 ease-in-out hover:transform hover:-translate-y-1">
+            <span class="text-gray-500 text-4xl font-bold">+</span>
+        </div>
+
+        <% Unidad.forEach(Unidades => { %>
+            <div class="hidden card-item Unidad flex flex-col gap-2 bg-white rounded-lg shadow-lg p-5 cursor-pointer transition-transform duration-300 ease-in-out hover:transform hover:-translate-y-1">
+                <label class="text-gray-800 font-bold text-xl mb-2 text-center">
+                    <%- Unidades.DescTipoUnidad %>
+                </label>
+                <div class="flex-grow"></div>
+                <button class="bg-blue-500 text-white font-semibold py-2 px-4 rounded hover:bg-blue-600 transition-colors duration-200 mt-auto" onclick="editItem('<%- Unidades.IdTipoUnidad %>', 'Unidad', '<%- Unidades.DescTipoUnidad %>')">Editar</button>
+                <button class="bg-red-500 text-white font-semibold py-2 px-4 rounded hover:bg-red-600 transition-colors duration-200 mt-auto" onclick="deleteItem('<%- Unidades.IdTipoUnidad %>', 'Unidad')">Eliminar</button>
+            </div>
+        <% }) %>
+        
+            
+        <!-- Tarjeta de agregar item en Servicios -->
+        <div class="hidden card-item addItem Servicios flex justify-center items-center bg-white rounded-lg shadow-lg p-5 cursor-pointer transition-transform duration-300 ease-in-out hover:transform hover:-translate-y-1">
+            <span class="text-gray-500 text-4xl font-bold">+</span>
+        </div>
+
+        <% servicios.forEach(servicio => { %>
+            <div class="hidden card-item  Servicios flex flex-col gap-2 bg-white rounded-lg shadow-lg p-5 cursor-pointer transition-transform duration-300 ease-in-out hover:transform hover:-translate-y-1">
+                <label class="text-gray-800 font-bold text-xl mb-2 text-center">
+                    <%- servicio.DescTipoServicio %>
+                </label>
+                <div class="flex-grow"></div>
+                <button class="bg-blue-500 text-white font-semibold py-2 px-4 rounded hover:bg-blue-600 transition-colors duration-200 mt-auto" onclick="editItem('<%- servicio.IdTipoServicio %>', 'Servicios', '<%- servicio.DescTipoServicio %>')">Editar</button>
+                <button class="bg-red-500 text-white font-semibold py-2 px-4 rounded hover:bg-red-600 transition-colors duration-200 mt-auto" onclick="deleteItem('<%- servicio.IdTipoServicio %>', 'Servicios')">Eliminar</button>
+            </div>
+        <% }) %>
+        
+            
+        <!-- Tarjeta de agregar item en Vias -->
+        <div class="hidden card-item addItem  Vias flex justify-center items-center bg-white rounded-lg shadow-lg p-5 cursor-pointer transition-transform duration-300 ease-in-out hover:transform hover:-translate-y-1">
+            <span class="text-gray-500 text-4xl font-bold">+</span>
+        </div>
+
+        <% Via.forEach(Vias => { %>
+            <div class="hidden card-item Vias flex flex-col gap-2 bg-white rounded-lg shadow-lg p-5 cursor-pointer transition-transform duration-300 ease-in-out hover:transform hover:-translate-y-1">
+                <label class="text-gray-800 font-bold text-xl mb-2 text-center">
+                    <%- Vias.DescTipoVia %>
+                </label>
+                <div class="flex-grow"></div>
+                <button class="bg-blue-500 text-white font-semibold py-2 px-4 rounded hover:bg-blue-600 transition-colors duration-200 mt-auto" onclick="editItem('<%- Vias.IdTipoVia %>', 'Via', '<%- Vias.DescTipoVia %>')">Editar</button>
+            </div>
+        <% }) %>
+        
+            
+        <!-- Tarjeta de agregar item en Contratos -->
+        <div class="hidden card-item addItem Contratos flex justify-center items-center bg-white rounded-lg shadow-lg p-5 cursor-pointer transition-transform duration-300 ease-in-out hover:transform hover:-translate-y-1">
+            <span class="text-gray-500 text-4xl font-bold">+</span>
+        </div>
+
+        <% Contrato.forEach(Contratos => { %>
+            <div class="hidden card-item Contratos flex flex-col gap-2 bg-white rounded-lg shadow-lg p-5 cursor-pointer transition-transform duration-300 ease-in-out hover:transform hover:-translate-y-1">
+                <label class="text-gray-800 font-bold text-xl mb-2 text-center">
+                    <%- Contratos.TipoContrato %>
+                </label>
+                <div class="flex-grow"></div>
+                <button class="bg-blue-500 text-white font-semibold py-2 px-4 rounded hover:bg-blue-600 transition-colors duration-200 mt-auto" onclick="editItem('<%- Contratos.IdTipoContrato %>', 'Contrato', '<%- Contratos.TipoContrato %>')">Editar</button>
+            </div>
+        <% }) %>
+        
+            
+        <!-- Tarjeta de agregar item en Regimen -->
+        <div class="hidden card-item addItem  Regimen flex justify-center items-center bg-white rounded-lg shadow-lg p-5 cursor-pointer transition-transform duration-300 ease-in-out hover:transform hover:-translate-y-1">
+            <span class="text-gray-500 text-4xl font-bold">+</span>
+        </div>
+
+        <% Regimen.forEach(Regimens => { %>
+            <div class="hidden card-item Regimen flex flex-col gap-2 bg-white rounded-lg shadow-lg p-5 cursor-pointer transition-transform duration-300 ease-in-out hover:transform hover:-translate-y-1">
+                <label class="text-gray-800 font-bold text-xl mb-2 text-center">
+                    <%- Regimens.DescTipoRegimen %>
+                </label>
+                <div class="flex-grow"></div>
+                <button class="bg-blue-500 text-white font-semibold py-2 px-4 rounded hover:bg-blue-600 transition-colors duration-200 mt-auto" onclick="editItem('<%- Regimens.IdTipoRegimen %>', 'Regimen', '<%- Regimens.DescTipoRegimen %>')">Editar</button>
+                <button class="bg-red-500 text-white font-semibold py-2 px-4 rounded hover:bg-red-600 transition-colors duration-200 mt-auto" onclick="deleteItem('<%- Regimens.IdTipoRegimen %>', 'Regimen')">Eliminar</button>
+            </div>
+        <% }) %>
+        
+        <!-- Tarjeta de agregar item en Perfiles -->
+        <div class="hidden card-item addItem Perfiles flex justify-center items-center bg-white rounded-lg shadow-lg p-5 cursor-pointer transition-transform duration-300 ease-in-out hover:transform hover:-translate-y-1">
+            <span class="text-gray-500 text-4xl font-bold">+</span>
+        </div>
+    
+        <% TipoFuncionario.forEach(TipoFuncionarios => { %>
+            <div class="hidden card-item Perfiles flex flex-col gap-2 bg-white rounded-lg shadow-lg p-5 cursor-pointer transition-transform duration-300 ease-in-out hover:transform hover:-translate-y-1">
+                <label class="text-gray-800 font-bold text-xl mb-2 text-center">
+                    <%- TipoFuncionarios.TipoPerfil %>
+                </label>
+                <div class="flex-grow"></div>
+                <button class="bg-blue-500 text-white font-semibold py-2 px-4 rounded hover:bg-blue-600 transition-colors duration-200 mt-auto" onclick="editItem('<%- TipoFuncionarios.IdTipoFuncionario %>', 'Perfiles', '<%- TipoFuncionarios.TipoPerfil %>')">Editar</button>
+            </div>
+        <% }) %>
+        
+    </div>
+    <%- include('../components/modals/maintainers/modalAddMaintainer') %>
+    <%- include('../components/modals/maintainers/modalEditMaintainer') %>
+    <script src="/food-manager/js/maintainers/openModal.js" defer></script>

@@ -1,0 +1,163 @@
+<!-- Modal -->
+<div id="modalReporteHospitalizados"
+    class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden">
+    <div class="bg-white rounded-lg shadow-lg p-6 w-3/6 h-5/6 overflow-auto">
+        <h2 class="text-2xl font-semibold mb-4 text-center">Rutas de Entrega por Unidad</h2>
+        <!-- Contenedor para los reportes -->
+        <div id="reportesContainer">
+            <!-- Aquí se renderizarán los reportes por unidad -->
+        </div>
+        <!-- Botones de paginación -->
+        <div class="mt-4 flex justify-between items-center">
+            <button id="prevPage" class="bg-gray-300 px-4 py-2 rounded disabled:opacity-50">Anterior</button>
+            <span id="currentPage" class="text-lg"></span>
+            <button id="nextPage" class="bg-gray-300 px-4 py-2 rounded disabled:opacity-50">Siguiente</button>
+        </div>
+        <!-- Botones de acción -->
+        <div class="mt-6 flex justify-end space-x-4">
+            <button id="printPDF" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-500">
+                Imprimir PDF
+            </button>
+            <button id="closeModalReporteHospitalizados"
+                class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-500">
+                Cerrar
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const openModalBtn = document.getElementById('openModalReporteDiario');
+        const closeModalBtn = document.getElementById('closeModalReporteHospitalizados');
+        const modal = document.getElementById('modalReporteHospitalizados');
+        const reportesContainer = document.getElementById('reportesContainer');
+        const prevPageBtn = document.getElementById('prevPage');
+        const nextPageBtn = document.getElementById('nextPage');
+        const currentPageSpan = document.getElementById('currentPage');
+        const printPDFBtn = document.getElementById('printPDF');
+
+        let currentPage = 1;
+        const pageSize = 10; // Ajusta el tamaño de página según tus necesidades
+
+        // Función para obtener y renderizar los reportes
+        async function fetchAndRenderReportes(page) {
+            try {
+                const response = await axios.get(`/food-manager/report/reporte-hospitalizados-diario?page=${page}&pageSize=${pageSize}`);
+                const data = response.data.data;
+                currentPage = page;
+
+                // Limpiar el contenedor
+                reportesContainer.innerHTML = '';
+
+                // Renderizar los reportes por unidad
+                for (const unidad in data) {
+                    const pacientes = data[unidad];
+
+                    const unidadDiv = document.createElement('div');
+                    unidadDiv.classList.add('mb-6');
+
+                    const unidadTitle = document.createElement('h3');
+                    unidadTitle.classList.add('text-xl', 'font-semibold', 'mb-2');
+                    unidadTitle.textContent = `Unidad: ${unidad}`;
+                    unidadDiv.appendChild(unidadTitle);
+
+                    const table = document.createElement('table');
+                    table.classList.add('min-w-full', 'text-left', 'text-base', 'text-black', 'whitespace-nowrap');
+
+                    // Table head
+                    const thead = document.createElement('thead');
+                    thead.classList.add('bg-gray-200');
+                    thead.innerHTML = `
+    <tr class="flex">
+        <th class="px-2 py-2 flex-1">Código de Cama</th>
+        <th class="px-2 py-2 flex-1">RUT Paciente</th>
+        <th class="px-2 py-2 flex-1">Nombre Paciente</th>
+        <th class="px-2 py-2 flex-1">Régimen</th>
+    </tr>
+`;
+                    table.appendChild(thead);
+
+                    // Table body
+                    const tbody = document.createElement('tbody');
+                    pacientes.forEach((paciente) => {
+                        const tr = document.createElement('tr');
+                        tr.classList.add('border-b', 'flex');
+
+                        tr.innerHTML = `
+        <td class="px-2 py-2 flex-1">${paciente.CodigoCama}</td>
+        <td class="px-2 py-2 flex-1">${paciente.RutPaciente}</td>
+        <td class="px-2 py-2 flex-1">${paciente.NombrePaciente}</td>
+        <td class="px-2 py-2 flex-1">${paciente.DescTipoRegimen}</td>
+    `;
+                        tbody.appendChild(tr);
+                    });
+                    table.appendChild(tbody);
+
+                    unidadDiv.appendChild(table);
+                    reportesContainer.appendChild(unidadDiv);
+                }
+
+                // Actualizar paginación
+                currentPageSpan.textContent = `Página ${currentPage}`;
+                prevPageBtn.disabled = currentPage === 1;
+                // Aquí podrías agregar lógica para deshabilitar nextPageBtn si es la última página
+            } catch (error) {
+                console.error('Error al obtener los reportes:', error);
+            }
+        }
+
+        // Eventos de los botones
+        openModalBtn.addEventListener('click', () => {
+            modal.classList.remove('hidden');
+            fetchAndRenderReportes(currentPage);
+        });
+
+        closeModalBtn.addEventListener('click', () => {
+            modal.classList.add('hidden');
+        });
+
+        prevPageBtn.addEventListener('click', () => {
+            if (currentPage > 1) {
+                fetchAndRenderReportes(currentPage - 1);
+            }
+        });
+
+        nextPageBtn.addEventListener('click', () => {
+            // Deberías verificar si hay más páginas disponibles
+            fetchAndRenderReportes(currentPage + 1);
+        });
+
+        // Función para imprimir el reporte en PDF
+        printPDFBtn.addEventListener('click', () => {
+            const modalContent = document.getElementById('reportesContainer')
+
+            html2canvas(modalContent, { scale: 1 }).then((canvas) => {
+                const imgData = canvas.toDataURL('image/png');
+                const { jsPDF } = window.jspdf;
+
+                const pdf = new jsPDF('p', 'pt', 'letter'); // Tamaño de página 'letter'
+                const pageWidth = pdf.internal.pageSize.getWidth();
+                const pageHeight = pdf.internal.pageSize.getHeight();
+                const padding = 20; // Valor de padding en puntos
+
+                const imgWidth = pageWidth - padding * 2;
+                const imgHeight = (canvas.height * imgWidth) / canvas.width;
+                let heightLeft = imgHeight;
+                let position = padding;
+
+                pdf.addImage(imgData, 'PNG', padding, position, imgWidth, imgHeight);
+                heightLeft -= pageHeight - padding * 2;
+
+                while (heightLeft > 0) {
+                    position = heightLeft - imgHeight + padding * 2;
+                    pdf.addPage();
+                    pdf.addImage(imgData, 'PNG', padding, position, imgWidth, imgHeight);
+                    heightLeft -= pageHeight - padding * 2;
+                }
+
+                pdf.save('ReporteHospitalizados.pdf');
+            });
+        });
+    });
+</script>
