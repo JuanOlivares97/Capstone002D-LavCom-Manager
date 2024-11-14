@@ -1,102 +1,6 @@
 const prisma = require('../server/prisma');
 const moment = require('moment');
 
-async function totalFuncionariosHabilitados(req, res) {
-  try {
-    const count = await prisma.Funcionario.count({
-      where: { Habilitado: "S" }
-    });
-    res.json({ totalFuncionariosHabilitados: count });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-}
-
-async function totalFuncionariosConfirmadosAlmuerzo(req, res) {
-  try {
-    const count = await prisma.Colacion.count({
-      where: { Estado: 0, FechaSolicitud: new Date() }
-    });
-    res.json({ totalFuncionariosConfirmadosAlmuerzo: count });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-}
-
-async function totalFuncionariosAlmorzaron(req, res) {
-  try {
-    const count = await prisma.Colacion.count({
-      where: { Estado: 1, FechaSolicitud: new Date() }
-    });
-    res.json({ totalFuncionariosAlmorzaron: count });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-}
-
-async function totalPacientesHospitalizados(req, res) {
-  try {
-    const count = await prisma.Hospitalizado.count();
-    res.json({ totalPacientesHospitalizados: count });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-}
-
-async function totalPacientesEnAyuno(req, res) {
-  try {
-    const count = await prisma.Hospitalizado.count({
-      where: { FechaFinAyuno: null }
-    });
-    res.json({ totalPacientesEnAyuno: count });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-}
-
-async function totalIngresosHoy(req, res) {
-  try {
-    const count = await prisma.Hospitalizado.count({
-      where: { FechaIngreso: new Date() }
-    });
-    res.json({ totalIngresosHoy: count });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-}
-
-async function totalAltasHoy(req, res) {
-  try {
-    const count = await prisma.Hospitalizado.count({
-      where: { FechaAlta: new Date() }
-    });
-    res.json({ totalAltasHoy: count });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-}
-
-async function totalRegimen(req, res) {
-  try {
-    const regimenCounts = await prisma.Hospitalizado.groupBy({
-      by: ['IdTipoRegimen'],
-      _count: {
-        IdTipoRegimen: true
-      }
-    });
-
-    res.json({
-      regimenCounts: regimenCounts.map(regimen => ({
-        IdTipoRegimen: regimen.IdTipoRegimen,
-        count: regimen._count.IdTipoRegimen
-      }))
-    });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-}
-
-
 async function renderDashboard(req, res) {
   try {
     // Obtener la fecha actual y los últimos 7 días en formato YYYY-MM-DD
@@ -178,13 +82,5 @@ async function renderDashboard(req, res) {
 }
 
 module.exports = {
-  renderDashboard,
-  totalFuncionariosHabilitados,
-  totalFuncionariosConfirmadosAlmuerzo,
-  totalFuncionariosAlmorzaron,
-  totalPacientesHospitalizados,
-  totalPacientesEnAyuno,
-  totalIngresosHoy,
-  totalAltasHoy,
-  totalRegimen
+  renderDashboard
 };
