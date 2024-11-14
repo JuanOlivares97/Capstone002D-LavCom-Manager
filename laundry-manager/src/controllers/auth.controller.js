@@ -112,7 +112,7 @@ async function sendPwdEmail(req, res) {
 
         await mailer.enviarCorreo(email, code.toString())
 
-        return res.redirect("/auth/recuperar-pwd-info")
+        return res.redirect("/laundry-manager/auth/recuperar-pwd-info")
     } catch (error) {
         return res.status(500).json({ message: "Internal server error", error})
     }
