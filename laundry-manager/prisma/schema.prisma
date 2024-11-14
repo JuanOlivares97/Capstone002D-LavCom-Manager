@@ -110,6 +110,7 @@ model usuarios {
   pwd                                       String         @db.VarChar(255)
   borrado                                   Boolean
   email                                     String?        @unique(map: "email_UNIQUE") @db.VarChar(255)
+  error_log                                 error_log[]
   registro_registro_rut_usuario_1Tousuarios registro[]     @relation("registro_rut_usuario_1Tousuarios")
   registro_registro_rut_usuario_2Tousuarios registro[]     @relation("registro_rut_usuario_2Tousuarios")
   tipo_usuario                              tipo_usuario   @relation(fields: [id_tipo_usuario], references: [id_tipo_usuario], onDelete: NoAction, onUpdate: NoAction, map: "fk_tipo_usuario")
@@ -123,4 +124,15 @@ model usuarios {
   @@index([id_servicio], map: "usuario_servicio")
   @@index([id_tipo_contrato], map: "usuario_tipo_contrato")
   @@index([id_unidad_sigcom], map: "usuario_unidad_sigcom")
+}
+
+model error_log {
+  id_error      Int      @id @default(autoincrement())
+  id_usuario    Int
+  tipo_error    String   @db.VarChar(30)
+  mensaje_error String   @db.LongText
+  ruta_error    String   @db.VarChar(40)
+  usuarios      usuarios @relation(fields: [id_usuario], references: [id_usuario], onUpdate: Restrict, map: "fk_user_error")
+
+  @@index([id_usuario], map: "fk_user_error")
 }
