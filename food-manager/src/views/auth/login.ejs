@@ -17,6 +17,7 @@
 </head>
 
 <body class="h-screen flex items-center justify-center">
+    <a href="/" class="absolute top-2 left-2 text-white font-bold flex items-center justify-center gap-2 border bg-red-500 border-black p-2 rounded-lg">Volver al inicio</a>
     <div class="bg-white shadow-lg rounded-2xl p-8 max-w-sm w-full border-2 border-black">
         <div class="flex justify-center mb-6">
             <%- include("../icons/logo_hospital") %>
@@ -24,8 +25,8 @@
         <h1 class="text-2xl mb-6 text-center text-black">Iniciar sesión</h1>
         <form id="login-form">
             <div class="mb-4">
-                <label for="RutCompleto" class="block text-black-700 mb-2">Rut de Usuario</label>
-                <input type="text" id="RutCompleto" name="RutCompleto" class="w-full p-2 border rounded-lg" placeholder="Ingrese su Rut">
+                <label for="username" class="block text-black-700 mb-2">Rut de Usuario</label>
+                <input type="text" id="username" name="username" class="w-full p-2 border rounded-lg" placeholder="Ingrese su Rut">
             </div>
             <div class="mb-6">
                 <label for="pwd" class="block text-black-700 mb-2">Contraseña</label>
@@ -34,26 +35,14 @@
             <button type="submit" class="w-full bg-black text-white p-2 rounded-lg hover:bg-gray-800 font-bold">Iniciar
                 Sesion</button>
         </form>
-        <p class="mt-6 text-center text-black-700">
-            <a href="/food-manager/auth/recuperar-pwd-form" class="text-blue-500 hover:underline font-bold">Recuperar contraseña</a>
+        <p class="mt-2 text-center text-black-700">
+            <a href="/food-manager/auth/recuperar-pwd-form" class="text-blue-500 hover:underline font-bold flex items-center justify-center gap-2 border border-blue-500 p-2 rounded-lg">Recuperar contraseña</a>
         </p>
+        <p class="mt-2 text-center text-black-700">
+            <a href="/food-manager/totem/home" class="text-indigo-500 hover:underline font-bold flex items-center justify-center gap-2 border border-indigo-500 p-2 rounded-lg">Ir al Totem <%- include("../icons/totem") %></a>
+        </p>
+
     </div>
     <script src="/food-manager/js/auth/login.js"></script>
 </body>
-<script>
-    function formatRUTInput(inputElement) {
-    inputElement.addEventListener('input', () => {
-      let rut = inputElement.value.replace(/\./g, '').replace(/-/g, '');
-  
-      // Extraer el cuerpo y el dígito verificador
-      const cuerpo = rut.slice(0, -1);
-      const dv = rut.slice(-1);
-  
-      // Actualizar el valor del input sin puntos, solo con guion
-      inputElement.value = `${cuerpo}-${dv}`;
-    });
-  }
-  const rutInputElement = document.getElementById('RutCompleto');
-  formatRUTInput(rutInputElement);
-</script>
 </html>
