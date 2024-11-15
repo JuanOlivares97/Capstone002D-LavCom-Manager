@@ -2,14 +2,14 @@ const form = document.getElementById("login-form");
 form.addEventListener("submit", async (e) => {
     e.preventDefault();
 
-    const rutCompleto = form.querySelector("input[name='RutCompleto']").value;
+    const username = form.querySelector("input[name='username']").value;
     const pwd = form.querySelector("input[name='pwd']").value;
     const response = await fetch("/food-manager/auth/login", {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
         },
-        body: JSON.stringify({ rutCompleto, pwd })
+        body: JSON.stringify({ username, pwd })
     });
 
     const data = await response.json();
