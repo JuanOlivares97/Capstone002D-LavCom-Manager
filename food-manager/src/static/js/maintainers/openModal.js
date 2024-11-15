@@ -135,7 +135,12 @@ document.getElementById('modalForm').addEventListener('submit', async function (
             endpoint = '/food-manager/maintainer/create-regimen';
             break;
         default:
-            alert("Mantenedor no reconocido");
+            Swal.fire({
+                title: 'Error',
+                text: 'Mantenedor no reconocido',
+                icon: 'error',
+                confirmButtonText: 'Aceptar'
+            });
             return;
     }
 
@@ -262,7 +267,12 @@ document.getElementById('modalEditForm').addEventListener('submit', async functi
             dataField = 'DescTipoRegimen';
             break;
         default:
-            alert("Mantenedor no reconocido");
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Mantenedor no reconocido',
+                confirmButtonText: 'Aceptar'
+            });
             return;
     }
 
@@ -326,7 +336,12 @@ async function deleteItem(id, mantenedor) {
             endpoint = `/food-manager/maintainer/delete-unidad/${id}`;
             break;
         default:
-            alert("Mantenedor no reconocido");
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Mantenedor no reconocido',
+                confirmButtonText: 'OK'
+            });
             return;
     }
 
