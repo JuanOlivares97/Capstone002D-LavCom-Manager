@@ -11,10 +11,22 @@
                         placeholder="Ingrese RUT (ej. 12345678-9)" disabled>
                 </div>
             </div>
-            <div class="mb-4">
-                <label for="editnombre_usuario" class="block text-black mb-2">Nombre</label>
-                <input type="text" id="editnombre_usuario" name="editnombre_usuario" class="w-full p-2 border rounded"
-                    placeholder="Ingrese Nombre" disabled>
+            <div class="mb-4 flex gap-2 w-full">
+                <div class="flex-1 w-full">
+                    <label for="nombre" class="block text-black mb-2">Nombre</label>
+                    <input type="text" id="editNombre" name="editNombre" class="w-full p-2 border rounded"
+                        placeholder="Ingrese Nombre" required />
+                </div>
+                <div>
+                    <label for="apellido_paterno" class="block text-black mb-2">Apellido Paterno</label>
+                    <input type="text" id="editApellidoPaterno" name="editApellidoPaterno" class="w-full p-2 border rounded"
+                        placeholder="Ingrese Apellido Paterno" required />
+                </div>
+                <div>
+                    <label for="apellido_materno" class="block text-black mb-2">Apellido Materno</label>
+                    <input type="text" id="editApellidoMaterno" name="editApellidoMaterno" class="w-full p-2 border rounded"
+                        placeholder="Ingrese Apellido Materno" required />
+                </div>
             </div>
             <div class="mb-4 grid grid-cols-3 gap-2">
                 <div>
