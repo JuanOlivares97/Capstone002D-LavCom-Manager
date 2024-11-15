@@ -6,6 +6,7 @@
             <script src="/food-manager/js/patient/openModal.js" defer></script>
             <script src="/food-manager/js/patient/addPatient.js" defer></script>
             <script src="/food-manager/js/patient/altaModal.js" defer></script>
+            <script src="/food-manager/js/patient/utils.js" defer></script>
             <!-- Secciones de navegación -->
             <!-- Botón para alternar la visibilidad de las unidades -->
             <!-- Contenedor del overlay (cubrirá toda la pantalla) -->
@@ -32,47 +33,68 @@
             </div>
 
             <!-- Barra de búsqueda y agregar paciente -->
-            <div class="flex justify-around items-center p-4 ">
-                <div class="flex items-center space-x-2">
-                    <button id="addPatient"
-                        class="p-2 bg-indigo-500 text-white rounded-full hover:shadow-lg flex items-center gap-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
-                            class="w-5 h-5">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-                        </svg>
-                        <span class="text-md">Ingresar Paciente</span>
-                    </button>
-
-                </div>
-                <!-- Buscador de Pacientes por nombre-->
-                <div class="w-full max-w-lg">
-                    <form onsubmit="searchByName(event)" class="flex items-center">
-                        <input type="text" id="searchQuery" placeholder="Buscar pacientes..." required
-                            class="w-full px-4 py-2 border border-gray-300 rounded-l-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                            aria-label="Buscar">
-                        <button type="submit"
-                            class="bg-indigo-500 text-white px-4 py-2 rounded-r-md hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                            Buscar
+            <div class="mx-4 p-6">
+                <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+                    <!-- Botón Ingresar Paciente -->
+                    <div >
+                        <button id="addPatient" 
+                            class="w-full p-3 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600 transition duration-300 flex items-center justify-center gap-2 shadow-md">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                                class="w-5 h-5">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                            </svg>
+                            <span class="font-medium">Ingresar Paciente</span>
                         </button>
-                    </form>
+                    </div>
+
+                    <!-- Buscador por Nombre -->
+                    <div class="lg:col-span-2">
+                        <form onsubmit="searchByName(event)" class="flex">
+                            <input type="text" id="searchQuery" placeholder="Buscar pacientes por nombre..." required
+                                class="w-full px-4 py-2 border border-gray-300 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                                aria-label="Buscar">
+                            <button type="submit"
+                                class="px-6 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600 transition duration-300">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                </svg>
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Buscador por RUT -->
+                    <div>
+                        <div class="flex">
+                            <input type="text" id="rutInput" placeholder="Buscar por RUT (11111111-1)"
+                                class="w-full px-4 py-2 border border-indigo-300 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                                oninput="formatRut(this)">
+                            <button onclick="searchByRut()"
+                                class="px-6 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600 transition duration-300">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
                 </div>
 
-                <!-- Buscador de Pacientes por Rut-->
-                <div class="flex items-center space-x-2">
-                    <input type="text" id="rutInput" placeholder="11111111-1"
-                        class="px-4 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                        oninput="formatRut(this)">
-                    <button class="p-2 bg-indigo-500 rounded-full text-white" onclick="searchByRut()">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white" fill="none"
-                            viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M8 12h.01M12 12h.01M16 12h.01M9 16h6M9 8h6M12 5v14m8-7H4" />
+                <!-- Botones de Filtro -->
+                <div class="flex justify-end gap-4 mt-6">
+                    <button onclick="openSidebar()"
+                        class="px-4 py-2 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600 transition duration-300 flex items-center gap-2 shadow-md">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
                         </svg>
+                        Filtrar por unidad
+                    </button>
+                    <button onclick="clearFilters()"
+                        class="px-4 py-2 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600 transition duration-300 flex items-center gap-2 shadow-md">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                        Limpiar filtros
                     </button>
                 </div>
-                <div class="flex justify-center items-center p-4 "><button
-                        class="p-2 bg-indigo-500 text-white rounded-full hover:shadow-lg flex items-center gap-2"
-                        onclick='openSidebar()'>Filtrar por unidad</button></div>
             </div>
 
             <!-- KPI: Pacientes Hospitalizados -->
