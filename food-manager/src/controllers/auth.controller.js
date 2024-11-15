@@ -29,21 +29,12 @@ function renderRecuperarContrasenaInfo(req, res) {
 
 async function login(req, res) {
     try {
-        const { rutCompleto, pwd } = req.body;
-
-        // Verificar si rutCompleto y pwd están presentes
-        if (!rutCompleto || !pwd) {
-            return res.status(400).json({ message: "RUT y contraseña son obligatorios", success: false });
-        }
-
-        // Dividir el RUT en dos partes: número y dígito verificador
-        const [RutFuncionario, DvFuncionario] = rutCompleto.split('-');
-
+        const { username, pwd } = req.body;
+       
         // Consulta al usuario
         const user = await prisma.Funcionario.findFirst({
             where: {
-                RutFuncionario: RutFuncionario,
-                DvFuncionario: DvFuncionario
+                username: username
             },
             include: {
                 TipoFuncionario: true 
@@ -77,8 +68,6 @@ async function login(req, res) {
         res.cookie("token", token, { path: "/food-manager" });
         res.cookie("logged-in", true, { path: "/food-manager" });
         res.cookie("tipo_usuario", user.IdTipoFuncionario, { path: "/food-manager" });
-        res.cookie("rutLogueado", user.RutFuncionario, { path: "/food-manager" });
-        res.cookie("dvLogueado", user.DvFuncionario, { path: "/food-manager" });
 
         return res.status(200).json({ message: "Has iniciado sesión, bienvenido", success: true, user });
     } catch (error) {
@@ -193,9 +182,7 @@ async function logout(req, res) {
     try {
         res.clearCookie("token", { path: '/food-manager' });  // Asegúrate de que la ruta sea la misma
         res.clearCookie("logged-in", { path: '/food-manager' });
-        res.clearCookie("tipo_usuario", { path: '/food-manager' });
-        res.clearCookie("rutLogueado", { path: '/food-manager' });
-        res.clearCookie("dvLogueado", { path: '/food-manager' });   
+        res.clearCookie("tipo_usuario", { path: '/food-manager' }); 
         return res.status(200).json({ message: "Has cerrado sesión", success: true });
     } catch (error) {
         return res.status(500).json({ message: "Internal server error", success: false });
