@@ -103,6 +103,8 @@ describe('Lunch Controller Tests', () => {
 
             expect(res.status).toHaveBeenCalledWith(500);
             expect(res.send).toHaveBeenCalledWith('Error al registrar la colación: Database error');
+            expect(res.status).toHaveBeenCalledWith(404);
+
         });
     });
 

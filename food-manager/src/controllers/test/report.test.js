@@ -16,12 +16,12 @@ describe('Report Controller Tests', () => {
 
     describe('renderHome', () => {
         test('should render home with reports and user type', async () => {
-            prisma.Reportes.findMany.mockResolvedValue([{ IdReporte: 1 }]);
+            Reportes = prisma.Reportes.findMany.mockResolvedValue([{ Mes: 10, Anio: 2024 }]);
             req.cookies['tipo_usuario'] = '1';
 
             await reportController.renderHome(req, res);
 
-            expect(res.render).toHaveBeenCalledWith('report/home', { reportes: [{ IdReporte: 1 }], tipoUsuario: 1 });
+            expect(res.render).toHaveBeenCalledWith('report/home', { reportes: Reportes, tipoUsuario: 1 });
         });
 
         test('should handle error in renderHome', async () => {
@@ -36,7 +36,8 @@ describe('Report Controller Tests', () => {
 
     describe('fillTable', () => {
         test('should fill the table by calling stored procedure and respond with success message', async () => {
-            prisma.$queryRaw.mockResolvedValue([{ IdReporte: 1 }]);
+            // Mock the $queryRaw function to resolve with some value
+            prisma.$queryRaw = jest.fn().mockResolvedValue([{ IdReporte: 1 }]);
 
             await reportController.fillTable(req, res);
 
@@ -45,12 +46,13 @@ describe('Report Controller Tests', () => {
         });
 
         test('should handle error in fillTable', async () => {
-            prisma.$queryRaw.mockRejectedValue(new Error('Database error'));
+            // Mock the $queryRaw function to reject with an error
+            prisma.$queryRaw = jest.fn().mockRejectedValue(new Error('Database error'));
 
             await reportController.fillTable(req, res);
 
             expect(res.status).toHaveBeenCalledWith(500);
-            expect(res.json).toHaveBeenCalledWith({ message: 'Error al obtener los datos' });
+            expect(res.json).toHaveBeenCalledWith({ message: "Error al obtener los datos" });
         });
     });
 
