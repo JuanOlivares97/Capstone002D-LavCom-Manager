@@ -23,17 +23,20 @@ model Funcionario {
   IdFuncionario        Int             @id @default(autoincrement())
   RutFuncionario       String          @db.VarChar(20)
   DvFuncionario        String          @db.Char(1)
-  NombreFuncionario    String          @db.VarChar(255)
+  apellido_paterno     String          @db.VarChar(30)
+  apellido_materno     String          @db.VarChar(30)
   FechaInicioContrato  DateTime?       @db.DateTime(0)
   FechaTerminoContrato DateTime?       @db.DateTime(0)
   Habilitado           String?         @default("S") @db.Char(1)
   correo               String?         @db.VarChar(100)
+  username             String          @db.VarChar(20)
   contrasena           String?         @db.VarChar(255)
   IdTipoUnidad         Int
   IdTipoFuncionario    Int
   IdTipoServicio       Int
   IdTipoContrato       Int
   IdTipoEstamento      Int
+  NombreFuncionario    String          @db.VarChar(255)
   TipoContrato         TipoContrato    @relation(fields: [IdTipoContrato], references: [IdTipoContrato], map: "fk_funcionario_contrato")
   TipoEstamento        TipoEstamento   @relation(fields: [IdTipoEstamento], references: [IdTipoEstamento], map: "fk_funcionario_estamento")
   TipoServicio         TipoServicio    @relation(fields: [IdTipoServicio], references: [IdTipoServicio], map: "fk_funcionario_servicio")
