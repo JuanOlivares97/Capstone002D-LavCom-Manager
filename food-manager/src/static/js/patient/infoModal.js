@@ -89,57 +89,6 @@ function closeModalInfo() {
     document.getElementById('patientModal').classList.add('hidden');
 }
 
-function filterByUnit(unit) {
-    const cards = document.querySelectorAll('#cardGridPacientes > div');
-    cards.forEach(card => {
-        if (card.getAttribute('data-unidad') === unit) {
-            card.classList.remove('hidden');
-        } else {
-            card.classList.add('hidden');
-        }
-    });
-}
-
-function removeAccents(str) {
-    return str.normalize("NFD").replace(/[\u0300-\u036f]/g, ""); // Elimina tildes
-}
-
-function searchByName(event) {
-    event.preventDefault();
-    const query = removeAccents(document.getElementById('searchQuery').value.toLowerCase());
-    const cards = document.querySelectorAll('#cardGridPacientes > div');
-
-    cards.forEach(card => {
-        const nombre = removeAccents(card.querySelector('h2').textContent.toLowerCase());
-        if (nombre.includes(query)) {
-            card.classList.remove('hidden');
-        } else {
-            card.classList.add('hidden');
-        }
-    });
-}
-
-function searchByRut() {
-    const query = document.getElementById('rutInput').value.trim();
-    const cards = document.querySelectorAll('#cardGridPacientes > div');
-    cards.forEach(card => {
-        const rut = card.querySelector('#rutSpan').textContent.trim();
-        if (rut === query) {
-            card.classList.remove('hidden');
-        } else {
-            card.classList.add('hidden');
-        }
-    });
-}
-
-function formatRut(input) {
-    let value = input.value.replace(/\./g, '').replace(/-/g, ''); // Eliminar puntos y guión anteriores
-    if (value.length > 1) {
-        value = value.slice(0, -1).replace() + '-' + value.slice(-1);
-    }
-    input.value = value;
-}
-
 document.addEventListener('DOMContentLoaded', () => {
     // Elemento del botón
     const changeObservacionesGeneralesButton = document.getElementById('changeObservacionesGenerales');
