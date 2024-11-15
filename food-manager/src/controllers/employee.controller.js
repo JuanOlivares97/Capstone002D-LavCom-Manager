@@ -44,8 +44,20 @@ async function getFuncionarios(req, res) {
                 ...funcionario,
                 rut: `${funcionario.RutFuncionario}-${funcionario.DvFuncionario}`,  // Concatenar RUT con DV
                 NombreFuncionario: capitalizeWords(funcionario.NombreFuncionario),  // Formatear con Initcap
+                Apellidos: capitalizeWords(`${funcionario.apellido_paterno} ${funcionario.apellido_materno}`),
                 correo: funcionario.correo ? funcionario.correo.toLowerCase() : null,  // Correo en minúsculas
-                // Puedes agregar más campos que necesites formatear aquí...
+                TipoContrato: funcionario.TipoContrato
+                    ? { IdTipoContrato: funcionario.TipoContrato.IdTipoContrato, TipoContrato: funcionario.TipoContrato.TipoContrato }
+                    : null,
+                TipoEstamento: funcionario.TipoEstamento
+                    ? { IdTipoEstamento: funcionario.TipoEstamento.IdTipoEstamento, DescTipoEstamento: funcionario.TipoEstamento.DescTipoEstamento }
+                    : null,
+                TipoServicio: funcionario.TipoServicio
+                    ? { IdTipoServicio: funcionario.TipoServicio.IdTipoServicio, DescTipoServicio: funcionario.TipoServicio.DescTipoServicio }
+                    : null,
+                TipoUnidad: funcionario.TipoUnidad
+                    ? { IdTipoUnidad: funcionario.TipoUnidad.IdTipoUnidad, DescTipoUnidad: funcionario.TipoUnidad.DescTipoUnidad }
+                    : null,
             };
         });
 
@@ -55,10 +67,13 @@ async function getFuncionarios(req, res) {
     }
 }
 
+
 async function createEmployee(req, res) {
     try {
         const {
             nombre_usuario,
+            apellido_paterno,
+            apellido_materno,
             RutCompleto,
             tipoEstamento,
             tipoServicio,
@@ -67,6 +82,7 @@ async function createEmployee(req, res) {
             tipoFuncionario,
         } = req.body;
 
+        const username = `${nombre_usuario.charAt(0).toLowerCase()}${apellido_paterno.toLowerCase()}`;
         const fechaInicioContrato = req.body.FechaInicioContrato ? new Date(req.body.FechaInicioContrato) : null;
         const fechaTerminoContrato = req.body.FechaTerminoContrato ? new Date(req.body.FechaTerminoContrato) : null;
 
@@ -106,8 +122,11 @@ async function createEmployee(req, res) {
         const funcionario = await prisma.Funcionario.create({
             data: {
                 NombreFuncionario: nombre_usuario.toUpperCase(),
+                apellido_paterno: apellido_paterno.toUpperCase(),
+                apellido_materno: apellido_materno.toUpperCase(),
                 RutFuncionario: rut_usuario,
                 DvFuncionario: dv_usuario,
+                username: username,
                 contrasena: password,
                 Habilitado: 'S',
                 FechaInicioContrato: fechaInicioContrato,
@@ -147,14 +166,46 @@ async function createEmployee(req, res) {
     }
 }
 
+// Valida si un campo está presente en req.body
+function validatePresence(field, fieldName, res) {
+    if (!field) {
+        res.status(400).json({ message: `El campo '${fieldName}' es requerido.` });
+        return false;
+    }
+    return true;
+}
 
+// Valida si un campo es un número
+function validateInteger(field, fieldName, res) {
+    const intValue = parseInt(field);
+    if (isNaN(intValue)) {
+        res.status(400).json({ message: `El campo '${fieldName}' debe ser un número válido.` });
+        return false;
+    }
+    return intValue;
+}
 
+// Verifica si el ID existe en una tabla específica usando Prisma
+async function validateExistence(fieldValue, model, fieldName, res) {
+    const recordExists = await prisma[model].findUnique({
+        where: { [fieldName]: fieldValue }
+    });
 
+    if (!recordExists) {
+        res.status(404).json({ message: `El ${fieldName} especificado no existe.` });
+        return false;
+    }
+    return true;
+}
+
+// Función para actualizar el empleado
 async function updateEmployee(req, res) {
     try {
         const id = parseInt(req.params.id);
         const {
             nombre_usuario,
+            apellido_paterno,
+            apellido_materno,
             rut_usuario,
             dv_usuario,
             tipoEstamento,
@@ -164,47 +215,77 @@ async function updateEmployee(req, res) {
             tipoFuncionario
         } = req.body;
 
-        // Check if `tipoFuncionario` exists
-        const tipoFuncionarioExists = await prisma.TipoFuncionario.findUnique({
-            where: { IdTipoFuncionario: parseInt(tipoFuncionario) } // Ensure `id` is an integer
-        });
+        console.log(nombre_usuario,
+            apellido_paterno,
+            apellido_materno,
+            rut_usuario,
+            dv_usuario,
+            tipoEstamento,
+            tipoServicio,
+            tipoUnidad,
+            tipoContrato,
+            tipoFuncionario
+        );  
+        // Validaciones para cada campo
+        if (!validatePresence(tipoFuncionario, 'tipoFuncionario', res)) return;
+        const tipoFuncionarioId = validateInteger(tipoFuncionario, 'tipoFuncionario', res);
+        if (!tipoFuncionarioId) return;
+        if (!(await validateExistence(tipoFuncionarioId, 'TipoFuncionario', 'IdTipoFuncionario', res))) return;
 
-        if (!tipoFuncionarioExists) {
-            throw new Error('El tipoFuncionario especificado no existe');
-        }
+        if (!validatePresence(tipoEstamento, 'tipoEstamento', res)) return;
+        const tipoEstamentoId = validateInteger(tipoEstamento, 'tipoEstamento', res);
+        if (!tipoEstamentoId) return;
+        if (!(await validateExistence(tipoEstamentoId, 'TipoEstamento', 'IdTipoEstamento', res))) return;
 
-        // Update `funcionario`
+        if (!validatePresence(tipoServicio, 'tipoServicio', res)) return;
+        const tipoServicioId = validateInteger(tipoServicio, 'tipoServicio', res);
+        if (!tipoServicioId) return;
+        if (!(await validateExistence(tipoServicioId, 'TipoServicio', 'IdTipoServicio', res))) return;
+
+        if (!validatePresence(tipoUnidad, 'tipoUnidad', res)) return;
+        const tipoUnidadId = validateInteger(tipoUnidad, 'tipoUnidad', res);
+        if (!tipoUnidadId) return;
+        if (!(await validateExistence(tipoUnidadId, 'TipoUnidad', 'IdTipoUnidad', res))) return;
+
+        if (!validatePresence(tipoContrato, 'tipoContrato', res)) return;
+        const tipoContratoId = validateInteger(tipoContrato, 'tipoContrato', res);
+        if (!tipoContratoId) return;
+        if (!(await validateExistence(tipoContratoId, 'TipoContrato', 'IdTipoContrato', res))) return;
+
+        // Actualizar el funcionario
         const funcionario = await prisma.Funcionario.update({
             where: {
                 IdFuncionario: id
             },
             data: {
                 NombreFuncionario: nombre_usuario,
+                apellido_paterno: apellido_paterno,
+                apellido_materno: apellido_materno,
                 RutFuncionario: rut_usuario,
                 DvFuncionario: dv_usuario,
                 TipoEstamento: {
                     connect: {
-                        IdTipoEstamento: parseInt(tipoEstamento)
+                        IdTipoEstamento: tipoEstamentoId
                     }
                 },
                 TipoServicio: {
                     connect: {
-                        IdTipoServicio: parseInt(tipoServicio)
+                        IdTipoServicio: tipoServicioId
                     }
                 },
                 TipoUnidad: {
                     connect: {
-                        IdTipoUnidad: parseInt(tipoUnidad)
+                        IdTipoUnidad: tipoUnidadId
                     }
                 },
                 TipoContrato: {
                     connect: {
-                        IdTipoContrato: parseInt(tipoContrato)
+                        IdTipoContrato: tipoContratoId
                     }
                 },
                 TipoFuncionario: {
                     connect: {
-                        IdTipoFuncionario: parseInt(tipoFuncionario)
+                        IdTipoFuncionario: tipoFuncionarioId
                     }
                 },
             },
@@ -214,6 +295,7 @@ async function updateEmployee(req, res) {
         res.status(500).json({ message: "Internal server error: " + error.message });
     }
 }
+
 
 async function deleteEmployee(req, res) {
     try {
