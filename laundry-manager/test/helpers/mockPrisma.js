@@ -95,6 +95,7 @@ const mockPrisma = {
         findFirst: jest.fn(),
         delete: jest.fn(),
     },
+    $queryRaw: jest.fn()
 };
 
 module.exports = mockPrisma;
