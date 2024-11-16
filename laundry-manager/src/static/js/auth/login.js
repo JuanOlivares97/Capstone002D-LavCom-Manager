@@ -33,7 +33,7 @@ form.addEventListener("submit", async (e) => {
         element.disabled = true;
     });
 
-    if (data.user.email == null) {
+    if (data.emailValidation.hasEmail === false) {
         const { value: email } = await Swal.fire({
             title: "No tiene registrado un correo electrónico, ingrese uno",
             input: "email",
@@ -42,13 +42,14 @@ form.addEventListener("submit", async (e) => {
             toast: true,
             position: 'top-end',
         });
+        console.log(email)
         if (email) {
             const response_email = await fetch("/laundry-manager/auth/set-email", {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json"
                 },
-                body: JSON.stringify({ email, id_usuario: data.user.id_usuario })
+                body: JSON.stringify({ email, id_usuario: data.emailValidation.id_usuario })
             });
             const data_email = await response_email.json();
             if (!data_email.success) {

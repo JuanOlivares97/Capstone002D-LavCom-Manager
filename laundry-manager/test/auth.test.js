@@ -131,7 +131,10 @@ describe("login", () => {
             () => expect(res.json).toHaveBeenCalledWith({
                 message: "Has iniciado sesión, bienvenido",
                 success: true,
-                hasEmail: false,
+                emailValidation: {
+                    hasEmail: false,
+                    id_usuario: 1
+                },
             }),
         ])
     });
@@ -451,7 +454,6 @@ describe("logout", () => {
 
         multiTest([
             () => expect(res.clearCookie).toHaveBeenCalledWith("token"),
-            () => expect(res.clearCookie).toHaveBeenCalledWith("logged-in"),
             () => expect(res.status).toHaveBeenCalledWith(200),
             () => expect(res.json).toHaveBeenCalledWith({ success: true, message: "Has cerrado sesión" }),
         ]);

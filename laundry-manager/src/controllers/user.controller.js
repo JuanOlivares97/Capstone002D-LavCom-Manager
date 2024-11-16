@@ -143,12 +143,12 @@ async function deleteUsuario(req, res) {
 }
 
 async function renderHome(req, res) {
-    const tipo_user = req.cookies["tipo_usuario"];
+    const tipo_user = req.user["tipo_usuario"];
     const servicios = await prisma.servicio.findMany();
     const estamentos = await prisma.estamento.findMany();
     const tipo_contrato = await prisma.tipo_contrato.findMany();
     const tipos_usuario = await prisma.tipo_usuario.findMany();
-    res.render('users/home', {tipo_usuario: parseInt(tipo_user), servicios, estamentos, tipo_contrato, tipos_usuario});
+    res.render('users/home', {tipo_usuario: tipo_user, servicios, estamentos, tipo_contrato, tipos_usuario});
 }
 
 module.exports = {
