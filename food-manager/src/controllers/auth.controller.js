@@ -71,8 +71,8 @@ async function login(req, res) {
 
         return res.status(200).json({ message: "Has iniciado sesión, bienvenido", success: true, user });
     } catch (error) {
-        console.error("Error en el login:", error);
-        return res.status(500).json({ message: "Internal server error: " + error.message, success: false });
+
+        return res.status(500).json({ message: "Internal server error", success: false });
     }
 }
 
@@ -115,9 +115,9 @@ async function sendPwdEmail(req, res) {
             where: {
                 RutFuncionario_DvFuncionario: {
                     RutFuncionario: RutFuncionario,
-                    DvFuncionario: DvFuncionario
-                }
-            }
+                    DvFuncionario: DvFuncionario,
+                },
+            },
         });
 
         if (!user || user.correo !== email) {
@@ -126,7 +126,10 @@ async function sendPwdEmail(req, res) {
 
         const code = Math.floor(Math.random() * (9999 - 1000 + 1)) + 1000;
 
-        res.cookie("pwdcode", bcrypt.hashSync(code.toString(), 10), { path: "/" });
+        // Asegúrate de que bcrypt.hashSync devuelve algo válido
+        const hashedCode = bcrypt.hashSync(code.toString(), 10);
+
+        res.cookie("pwdcode", hashedCode, { path: "/food-manager" });
         res.cookie("username", rutCompleto, { path: "/food-manager" });
 
         await mailer.enviarCorreo(email, code.toString());
@@ -136,6 +139,7 @@ async function sendPwdEmail(req, res) {
         return res.status(500).json({ message: "Internal server error", error: error.message });
     }
 }
+
 
 
 async function changePwd(req, res) {
