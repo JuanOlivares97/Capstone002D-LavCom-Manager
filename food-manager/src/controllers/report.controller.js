@@ -3,11 +3,12 @@ const prisma = require("../server/prisma");
 async function renderHome(req, res) {
     try {
         const reportes = await getReports();
-        const tipoUsuario = req.cookies['tipo_usuario']
-        res.render('report/home', { reportes, tipoUsuario: parseInt(tipoUsuario) });
+        const tipoUsuario = req.cookies['tipo_usuario'];
+        return res.render('report/home', { reportes, tipoUsuario: parseInt(tipoUsuario) });
     } catch (error) {
-        console.error('Error al obtener los reportes:', error);
-        res.status(500).json({ message: "Error al obtener los reportes" });
+        const errorMessage = `Error al obtener los reportes: ${error.message}`;
+        console.error(errorMessage);
+        return res.status(500).json({ message: "Error al obtener los reportes" });
     }
 }
 

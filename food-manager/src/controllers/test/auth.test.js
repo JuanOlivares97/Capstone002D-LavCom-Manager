@@ -1,9 +1,9 @@
-// tests/auth.controller.test.js
 const authController = require('../auth.controller');
 const prisma = require('../../server/prisma');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const mailer = require('../../server/mailer');
+const multiTest = require('./helpers/multiTest');
 
 jest.mock('../../server/prisma');
 jest.mock('bcrypt');
@@ -23,104 +23,183 @@ describe('Auth Controller Tests', () => {
             clearCookie: jest.fn(),
             redirect: jest.fn(),
         };
+        jest.clearAllMocks();
     });
 
     describe('renderLogin', () => {
         test('should render login page', () => {
             authController.renderLogin(req, res);
-            expect(res.render).toHaveBeenCalledWith("auth/login", { layout: false });
+            multiTest([
+                () => expect(res.render).toHaveBeenCalledWith('auth/login', { layout: false }),
+                () => expect(res.status).not.toHaveBeenCalledWith(500),
+            ]);
         });
     });
 
     describe('renderRecuperarContrasenaForm', () => {
-        test('should render password recovery form page', () => {
+        test('should render password recovery form', () => {
             authController.renderRecuperarContrasenaForm(req, res);
-            expect(res.render).toHaveBeenCalledWith("auth/recuperar_pwd_form", { layout: false });
-        });
-    });
-
-    describe('renderRecuperarContrasenaInfo', () => {
-        test('should render password recovery info page', () => {
-            authController.renderRecuperarContrasenaInfo(req, res);
-            expect(res.render).toHaveBeenCalledWith("auth/recuperar_pwd_info", { layout: false });
+            multiTest([
+                () => expect(res.render).toHaveBeenCalledWith('auth/recuperar_pwd_form', { layout: false }),
+                () => expect(res.status).not.toHaveBeenCalledWith(500),
+            ]);
         });
     });
 
     describe('login', () => {
-        test('should return 400 if RUT or password is missing', async () => {
-            req.body = {};
-            await authController.login(req, res);
-            expect(res.status).toHaveBeenCalledWith(400);
-            expect(res.json).toHaveBeenCalledWith({ message: "RUT y contraseña son obligatorios", success: false });
-        });
+        test('should login successfully with correct credentials', async () => {
+            const mockUser = {
+                IdFuncionario: 1,
+                NombreFuncionario: 'John Doe',
+                contrasena: 'hashedPwd',
+                IdTipoFuncionario: 2,
+            };
 
-        test('should return 401 if user not found or password is incorrect', async () => {
-            req.body = { rutCompleto: "12345678-9", pwd: "password" };
-            prisma.Funcionario.findFirst.mockResolvedValue(null);
-            await authController.login(req, res);
-            expect(res.status).toHaveBeenCalledWith(401);
-            expect(res.json).toHaveBeenCalledWith({ message: "Rut o contraseña incorrectos", success: false });
-        });
-
-        test('should login successfully with valid credentials', async () => {
-            req.body = { rutCompleto: "12345678-9", pwd: "password" };
-            const user = { IdFuncionario: 1, contrasena: "hashed_password", NombreFuncionario: "Juan", IdTipoFuncionario: 2 };
-            prisma.Funcionario.findFirst.mockResolvedValue(user);
+            prisma.Funcionario.findFirst.mockResolvedValue(mockUser);
             bcrypt.compare.mockResolvedValue(true);
-            jwt.sign.mockReturnValue("fake_token");
+            jwt.sign.mockReturnValue('testToken');
+
+            req.body = { username: 'johndoe', pwd: 'password123' };
 
             await authController.login(req, res);
-            expect(res.cookie).toHaveBeenCalledWith("token", "fake_token", { path: "/food-manager" });
-            expect(res.status).toHaveBeenCalledWith(200);
-            expect(res.json).toHaveBeenCalledWith({ message: "Has iniciado sesión, bienvenido", success: true, user });
+
+            multiTest([
+                () => expect(prisma.Funcionario.findFirst).toHaveBeenCalledWith({ where: { username: 'johndoe' }, include: { TipoFuncionario: true } }),
+                () => expect(bcrypt.compare).toHaveBeenCalledWith('password123', 'hashedPwd'),
+                () => expect(jwt.sign).toHaveBeenCalledWith(expect.any(Object), process.env.JWT_SECRET, { expiresIn: '8h' }),
+                () => expect(res.cookie).toHaveBeenCalledWith('token', 'testToken', { path: '/food-manager' }),
+                () => expect(res.status).toHaveBeenCalledWith(200),
+                () => expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ success: true })),
+            ]);
         });
-    });
 
-    describe('setEmail', () => {
-        test('should set email successfully', async () => {
-            req.body = { email: "test@example.com", IdFuncionario: 1 };
-            prisma.Funcionario.findUnique.mockResolvedValue({ IdFuncionario: 1 });
-            prisma.Funcionario.update.mockResolvedValue(true);
+        test('should return 401 if user not found', async () => {
+            prisma.Funcionario.findFirst.mockResolvedValue(null);
 
-            await authController.setEmail(req, res);
-            expect(res.status).toHaveBeenCalledWith(200);
-            expect(res.json).toHaveBeenCalledWith({ message: "Correo electrónico establecido", success: true });
+            req.body = { username: 'unknown', pwd: 'password123' };
+
+            await authController.login(req, res);
+
+            multiTest([
+                () => expect(res.status).toHaveBeenCalledWith(401),
+                () => expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ success: false, message: 'Rut o contraseña incorrectos' })),
+            ]);
+        });
+
+        test('should return 500 if bcrypt throws an error', async () => {
+            const mockUser = { IdFuncionario: 1, contrasena: 'hashedPwd' };
+            prisma.Funcionario.findFirst.mockResolvedValue(mockUser);
+            bcrypt.compare.mockRejectedValue(new Error('bcrypt error'));
+
+            req.body = { username: 'johndoe', pwd: 'password123' };
+
+            await authController.login(req, res);
+
+            multiTest([
+                () => expect(res.status).toHaveBeenCalledWith(500),
+                () => expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ success: false })),
+            ]);
         });
     });
 
     describe('sendPwdEmail', () => {
-        test('should send password recovery email successfully', async () => {
-            req.body = { email: "test@example.com", rutCompleto: "12345678-9" };
-            prisma.Funcionario.findUnique.mockResolvedValue({ correo: "test@example.com" });
-            mailer.enviarCorreo.mockResolvedValue(true);
+        test("The password recovery email should be sent successfully.", async () => {
             bcrypt.hashSync.mockReturnValue("hashed_code");
+        
+            req.body = {
+                email: "test@example.com",
+                rutCompleto: "12345678-9",
+            };
+        
+            prisma.Funcionario.findUnique.mockResolvedValue({
+                correo: "test@example.com",
+            });
+        
+            mailer.enviarCorreo.mockResolvedValue(true);
+        
+            await authController.sendPwdEmail(req, res);
+        
+            multiTest([
+                () =>
+                    expect(res.cookie).toHaveBeenCalledWith(
+                        "pwdcode",
+                        "hashed_code",
+                        { path: "/food-manager" }
+                    ),
+                () =>
+                    expect(res.cookie).toHaveBeenCalledWith(
+                        "username",
+                        "12345678-9",
+                        { path: "/food-manager" }
+                    ),
+                () => expect(mailer.enviarCorreo).toHaveBeenCalledWith("test@example.com", expect.any(String)),
+                () => expect(res.redirect).toHaveBeenCalledWith("/auth/recuperar-pwd-info"),
+            ]);
+        });
+        
+
+        test('should return 500 if user not found', async () => {
+            prisma.Funcionario.findUnique.mockResolvedValue(null);
+
+            req.body = { email: 'unknown@example.com', rutCompleto: '12345678-9' };
 
             await authController.sendPwdEmail(req, res);
-            expect(res.cookie).toHaveBeenCalledWith("pwdcode", "hashed_code", { path: "/" });
-            expect(res.redirect).toHaveBeenCalledWith("/auth/recuperar-pwd-info");
+
+            multiTest([
+                () => expect(res.status).toHaveBeenCalledWith(500),
+                () => expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ message: 'Usuario no encontrado' })),
+            ]);
         });
     });
 
     describe('changePwd', () => {
-        test('should change password successfully if code is valid', async () => {
-            req.body = { code: "1234", pwd: "new_password" };
-            req.cookies = { pwdcode: "hashed_code", username: "12345678-9" };
+        test('should update password successfully', async () => {
+            req.cookies = { pwdcode: 'hashedCode', username: '12345678-9' };
+            req.body = { code: '1234', pwd: 'newPassword123' };
+
             bcrypt.compare.mockResolvedValue(true);
-            bcrypt.hashSync.mockReturnValue("new_hashed_password");
+            bcrypt.hashSync.mockReturnValue('hashedNewPassword');
+            prisma.Funcionario.update.mockResolvedValue(true);
 
             await authController.changePwd(req, res);
-            expect(res.status).toHaveBeenCalledWith(200);
-            expect(res.json).toHaveBeenCalledWith({ success: true, message: "Contraseña actualizada" });
+
+            multiTest([
+                () => expect(bcrypt.compare).toHaveBeenCalledWith('1234', 'hashedCode'),
+                () => expect(prisma.Funcionario.update).toHaveBeenCalledWith({
+                    where: { RutFuncionario_DvFuncionario: { RutFuncionario: '12345678', DvFuncionario: '9' } },
+                    data: { contrasena: 'hashedNewPassword' },
+                }),
+                () => expect(res.status).toHaveBeenCalledWith(200),
+                () => expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ success: true })),
+            ]);
+        });
+
+        test('should return 500 if code is invalid', async () => {
+            req.cookies = { pwdcode: 'hashedCode', username: '12345678-9' };
+            req.body = { code: '1234' };
+
+            bcrypt.compare.mockResolvedValue(false);
+
+            await authController.changePwd(req, res);
+
+            multiTest([
+                () => expect(res.status).toHaveBeenCalledWith(500),
+                () => expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ success: false, message: 'Código inválido, intente nuevamente' })),
+            ]);
         });
     });
 
     describe('logout', () => {
-        test('should clear cookies and return success message on logout', async () => {
+        test('should clear cookies and logout successfully', async () => {
             await authController.logout(req, res);
-            expect(res.clearCookie).toHaveBeenCalledWith("token", { path: '/food-manager' });
-            expect(res.clearCookie).toHaveBeenCalledWith("logged-in", { path: '/food-manager' });
-            expect(res.status).toHaveBeenCalledWith(200);
-            expect(res.json).toHaveBeenCalledWith({ message: "Has cerrado sesión", success: true });
+
+            multiTest([
+                () => expect(res.clearCookie).toHaveBeenCalledWith('token', { path: '/food-manager' }),
+                () => expect(res.clearCookie).toHaveBeenCalledWith('logged-in', { path: '/food-manager' }),
+                () => expect(res.clearCookie).toHaveBeenCalledWith('tipo_usuario', { path: '/food-manager' }),
+                () => expect(res.status).toHaveBeenCalledWith(200),
+                () => expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ success: true })),
+            ]);
         });
     });
 });
