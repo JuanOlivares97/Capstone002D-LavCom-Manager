@@ -104,6 +104,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                 modal.classList.add('hidden');
                 e.target.reset();
                 document.getElementById('dar_ropa_de_baja_container').innerHTML = '';
+                document.getElementById('grid').innerHTML = '';
+                window.generateGrid();
             })
             return;
         }

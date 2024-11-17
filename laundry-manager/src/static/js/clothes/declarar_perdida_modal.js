@@ -103,6 +103,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                 modal.classList.add('hidden');
                 e.target.reset();
                 document.getElementById('declarar_perdida_container').innerHTML = '';
+                document.getElementById('grid').innerHTML = '';
+                window.generateGrid();
             })
             return;
         }
