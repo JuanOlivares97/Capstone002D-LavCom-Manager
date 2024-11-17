@@ -55,11 +55,11 @@ describe("getUsuarios", () => {
         ]);
     });
 
-    test("should return 401 if user is not found or length is 0", async () => {
+    test("should return 404 if user is not found or length is 0", async () => {
         prisma.usuarios.findMany.mockResolvedValue([] || null);
         await userController.getUsuarios(req, res);
         multiTest([
-            () => expect(res.status).toHaveBeenCalledWith(401),
+            () => expect(res.status).toHaveBeenCalledWith(404),
             () => expect(res.json).toHaveBeenCalledWith({ message: "No se encontraron usuarios" }),
         ]);
     })

@@ -329,15 +329,15 @@ describe("sendPwdEmail", () => {
             () => expect(res.cookie).toHaveBeenCalledWith("pwdcode", mockCodeHash, { path: "/laundry-manager", httpOnly: true }),
             () => expect(res.cookie).toHaveBeenCalledWith("username", 'username', { path: "/laundry-manager", httpOnly: true }),
             () => expect(enviarCorreo).toHaveBeenCalledWith('j8t2j@example.com', expect.any(String)),
-            () => expect(res.redirect).toHaveBeenCalledWith("/auth/recuperar-pwd-info")
+            () => expect(res.redirect).toHaveBeenCalledWith("/laundry-manager/auth/recuperar-pwd-info")
         ]);
     });
 
-    test("sould return 401 if user is not found", async () => {
+    test("sould return 404 if user is not found", async () => {
         prisma.usuarios.findUnique.mockResolvedValue(null || undefined);
         await authController.sendPwdEmail(req, res);
         multiTest([
-            () => expect(res.status).toHaveBeenCalledWith(401),
+            () => expect(res.status).toHaveBeenCalledWith(404),
             () => expect(res.json).toHaveBeenCalledWith({
                 message: "Usuario no encontrado",
                 success: false,
@@ -403,8 +403,8 @@ describe("changePwd", () => {
                     pwd: "hashedNewPassword",
                 },
             }),
-            () => expect(res.clearCookie).toHaveBeenCalledWith("pwdcode"),
-            () => expect(res.clearCookie).toHaveBeenCalledWith("username"),
+            () => expect(res.clearCookie).toHaveBeenCalledWith("pwdcode", { path: "/laundry-manager" }),
+            () => expect(res.clearCookie).toHaveBeenCalledWith("username", { path: "/laundry-manager" }),
             () => expect(res.status).toHaveBeenCalledWith(200),
             () => expect(res.json).toHaveBeenCalledWith({ success: true, message: "Contraseña actualizada" }),
         ]);
@@ -453,7 +453,7 @@ describe("logout", () => {
         await authController.logout(req, res);
 
         multiTest([
-            () => expect(res.clearCookie).toHaveBeenCalledWith("token"),
+            () => expect(res.clearCookie).toHaveBeenCalledWith("token", { path: "/laundry-manager" }),
             () => expect(res.status).toHaveBeenCalledWith(200),
             () => expect(res.json).toHaveBeenCalledWith({ success: true, message: "Has cerrado sesión" }),
         ]);

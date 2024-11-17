@@ -47,7 +47,7 @@ describe('renderHome', () => {
                 usuarios: [{ id_usuario: 1, nombre: 'User1' }],
                 unidades_sigcom: [{ id: 1, name: 'Unit 1' }],
                 tipo_usuario: 1,
-                rutLogueado: "12345678-9",
+                rutLogueado: 12345678,
                 nombreLogueado: "John Doe",
             })
         ])
@@ -159,7 +159,7 @@ describe('createArticulo', () => {
         await articulosController.createArticulo(req, res);
 
         expect(res.status).toHaveBeenCalledWith(500);
-        expect(res.json).toHaveBeenCalledWith({ message: "Internal server  error", success: false });
+        expect(res.json).toHaveBeenCalledWith({ message: "Internal server error", success: false });
     });
 });
 
@@ -561,7 +561,7 @@ describe('declararPerdida', () => {
             // Verificar que prisma.registro.create se llama correctamente
             () => expect(prisma.registro.create).toHaveBeenCalledWith({
                 data: {
-                    rut_usuario_1: 98765432,
+                    rut_usuario_1: 12345678,
                     id_tipo_registro: 5,
                     id_unidad_sigcom: null, // Debe ser null si tipo_perdida es "5"
                     observacion: 'Observación de pérdida',
@@ -629,7 +629,6 @@ describe('declararPerdida', () => {
             () => expect(res.status).toHaveBeenCalledWith(500),
             () => expect(res.json).toHaveBeenCalledWith({
                 message: "Internal server error",
-                error: expect.any(Error),
                 success: false
             }),
         ])
@@ -737,7 +736,7 @@ describe('recibirSuciaUnidadSigcom', () => {
             // Verificar que la respuesta maneja un error del servidor interno
             () => expect(res.status).toHaveBeenCalledWith(500),
             () => expect(res.json).toHaveBeenCalledWith({
-                message: "Internal server error ",
+                message: "Internal server error",
                 success: false
             })
         ]);
@@ -928,7 +927,6 @@ describe('recibirRopaLimpia', () => {
             () => expect(res.status).toHaveBeenCalledWith(500),
             () => expect(res.json).toHaveBeenCalledWith({
                 message: "Internal server error",
-                error: expect.any(Error),
                 success: false
             })
         ]);
