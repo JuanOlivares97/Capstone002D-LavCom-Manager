@@ -3,7 +3,7 @@ const prisma = require("../server/prisma");
 function renderHome(req, res) {
     try {
         const tipo_user = req.user["tipo_usuario"];
-        return res.render('reports/home', {tipo_usuario: parseInt(tipo_user)})
+        return res.status(200).render('reports/home', {tipo_usuario: parseInt(tipo_user)})
     } catch (error) {
         return res.status(500).json({ message: "Internal server error" });
     }
@@ -44,7 +44,7 @@ async function getServicesReport(req, res) {
 
         return res.status(200).json(formattedResult);
     } catch (error) {
-        return res.status(500).json({ message: "Internal server error " + error });
+        return res.status(500).json({ message: "Internal server error" });
     }
 }
 
@@ -66,7 +66,7 @@ async function getBajasyPerdidas(req, res) {
 
         return res.status(200).json(formattedResult);
     } catch (error) {
-        return res.status(500).json({ message: "Internal server error", error });
+        return res.status(500).json({ message: "Internal server error" });
     }
 }
 
@@ -90,7 +90,7 @@ async function getServicesDownReport(req, res) {
 
         return res.status(200).json(formattedResult);
     } catch (error) {
-        return res.status(500).json({ message: "Internal server error: " + error });
+        return res.status(500).json({ message: "Internal server error" });
     }
 }
 

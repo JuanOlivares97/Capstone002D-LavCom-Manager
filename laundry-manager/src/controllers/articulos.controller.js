@@ -39,7 +39,7 @@ async function getArticulos(req, res) {
         
         return res.status(200).json(articulosConSubgrupo);
     } catch (error) {
-        return res.status(500).json({ message: "Internal server error" + error });
+        return res.status(500).json({ message: "Internal server error"});
     }
 }
 
@@ -62,7 +62,7 @@ async function createArticulo(req, res) {
         }
         return res.status(200).json({ message: "Articulo creado exitosamente", success: true, articulo });
     } catch (error) {
-        return res.status(500).json({ message: "Internal server  error  ", error, success: false });
+        return res.status(500).json({ message: "Internal server error", success: false });
     }
 }
 
@@ -89,7 +89,7 @@ async function updateArticulo(req, res) {
 
         return res.status(200).json({ message: "Artículo actualizado exitosamente", success: true, articulo_actualizado });
     } catch (error) {
-        return res.status(500).json({ message: "Internal server error", error, success: false });
+        return res.status(500).json({ message: "Internal server error", success: false });
     }
 }
 
@@ -108,7 +108,7 @@ async function deleteArticulo(req, res) {
         }
         return res.status(200).json({ message: "Articulo eliminado exitosamente", success: true });
     } catch (error) {
-        return res.status(500).json({ message: "Internal server error", error, success: false });
+        return res.status(500).json({ message: "Internal server error", success: false });
     }
 }
 
@@ -117,7 +117,7 @@ async function entregarUnidadSigcom(req, res) {
         var fecha = new Date();
         fecha = tempo.format(fecha, "YYYY-MM-DD HH:mm:ss A", "cl");
         const data = req.body;
-        const rut_usuario_1 = req.cookies["rutLogueado"];
+        const rut_usuario_1 = req.user["rutLogueado"];
         const result = await prisma.registro.create({
             data: {
                 rut_usuario_1: parseInt(rut_usuario_1),
@@ -143,7 +143,7 @@ async function entregarUnidadSigcom(req, res) {
 
         return res.status(200).json({ message: "Registro creado exitosamente", success: true });
     } catch (error) {
-        return res.status(500).json({ message: "Internal server error", error, success: false });
+        return res.status(500).json({ message: "Internal server error", success: false });
     }
 }
 
@@ -152,7 +152,7 @@ async function darRopaDeBaja(req, res) {
         var fecha = new Date();
         fecha = tempo.format(fecha, "YYYY-MM-DD HH:mm:ss A", "cl");
         let data = req.body;
-        const rut_usuario_1 = req.cookies["rutLogueado"];
+        const rut_usuario_1 = req.user["rutLogueado"];
         if (data.tipo_dada_de_baja === "8") {
             data.id_unidad_sigcom = null;
         }
@@ -198,7 +198,7 @@ async function darRopaDeBaja(req, res) {
         return res.status(200).json({ message: "Registro creado exitosamente", success: true });
     } catch (error) {
         console.error(error);
-        return res.status(500).json({ message: "Internal server error", error, success: false });
+        return res.status(500).json({ message: "Internal server error", success: false });
     }
 }
 
@@ -207,7 +207,7 @@ async function declararPerdida(req, res) {
         var fecha = new Date();
         fecha = tempo.format(fecha, "YYYY-MM-DD HH:mm:ss A", "cl");
         let data = req.body;
-        const rut_usuario_1 = req.cookies["rutLogueado"];
+        const rut_usuario_1 = req.user["rutLogueado"];
         if (data.tipo_perdida === "5") {
             data.id_unidad_sigcom = null;
         }
@@ -253,7 +253,7 @@ async function declararPerdida(req, res) {
         return res.status(200).json({ message: "Registro creado exitosamente", success: true });
     } catch (error) {
         console.error(error);
-        return res.status(500).json({ message: "Internal server error", error, success: false });
+        return res.status(500).json({ message: "Internal server error", success: false });
     }
 }
 
@@ -261,7 +261,7 @@ async function recibirSuciaUnidadSigcom(req, res) {
     try {
         var fecha = new Date();
         fecha = tempo.format(fecha, "YYYY-MM-DD HH:mm:ss A", "cl");
-        const rut_usuario_1 = req.cookies["rutLogueado"];
+        const rut_usuario_1 = req.user["rutLogueado"];
         const data = req.body;
         const result = await prisma.registro.create({
             data: {
@@ -288,7 +288,7 @@ async function recibirSuciaUnidadSigcom(req, res) {
 
         return res.status(200).json({ message: "Registro creado exitosamente", success: true });
     } catch (error) {
-        return res.status(500).json({ message: "Internal server error ", error, success: false });
+        return res.status(500).json({ message: "Internal server error", success: false });
     }
 }
 
@@ -296,7 +296,7 @@ async function remesaRopaSucia(req, res) {
     try {
         var fecha = new Date();
         fecha = tempo.format(fecha, "YYYY-MM-DD HH:mm:ss A", "cl");
-        const rut_usuario_1 = req.cookies["rutLogueado"];
+        const rut_usuario_1 = req.user["rutLogueado"];
         const data = req.body;
         const result = await prisma.registro.create({
             data: {
@@ -323,7 +323,7 @@ async function remesaRopaSucia(req, res) {
 
         return res.status(200).json({ message: "Registro creado exitosamente", success: true });
     } catch (error) {
-        return res.status(500).json({ message: "Internal server error", error, success: false });
+        return res.status(500).json({ message: "Internal server error", success: false });
     }
 }
 
@@ -332,7 +332,7 @@ async function recibirRopaLimpia(req, res) {
         var fecha = new Date();
         fecha = tempo.format(fecha, "YYYY-MM-DD HH:mm:ss A", "cl");
         const data = req.body;
-        const rut_usuario_1 = req.cookies["rutLogueado"];
+        const rut_usuario_1 = req.user["rutLogueado"];
         const result = await prisma.registro.create({
             data: {
                 rut_usuario_1: parseInt(rut_usuario_1),
@@ -356,7 +356,7 @@ async function recibirRopaLimpia(req, res) {
 
         return res.status(200).json({ message: "Registro creado exitosamente", success: true });
     } catch (error) {
-        return res.status(500).json({ message: "Internal server error", success: false, error });
+        return res.status(500).json({ message: "Internal server error", success: false });
     }
 }
 

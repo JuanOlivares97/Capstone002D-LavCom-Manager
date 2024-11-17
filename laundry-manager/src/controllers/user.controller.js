@@ -21,7 +21,12 @@ async function getUsuarios(req, res) {
                 pwd: false
             }
         });
-        return res.json(users);
+
+        if (users === null || users.length === 0) {
+            return res.status(404).json({ message: "No se encontraron usuarios" });
+        }
+
+        return res.status(200).json(users);
     } catch (error) {
         return res.status(500).json({ message: "Internal server error" });
     }
@@ -83,7 +88,7 @@ async function createUsuario(req, res) {
         return res.status(200).json({ message: "Usuario creado exitosamente", success: true, user });
     } catch (error) {
         console.error(error);
-        return res.status(500).json({ message: "Internal server error: "+ error, error, success: false });
+        return res.status(500).json({ message: "Internal server error", success: false });
     }
 }
 
@@ -117,7 +122,7 @@ async function updateUsuario(req, res) {
 
         return res.status(200).json({ message: "Usuario actualizado exitosamente", success: true, usuario_actualizado });
     } catch (error) {
-        return res.status(500).json({ message: "Internal server error "+ error, error, success: false });
+        return res.status(500).json({ message: "Internal server error", success: false });
     }
 }
 
@@ -148,7 +153,7 @@ async function renderHome(req, res) {
     const estamentos = await prisma.estamento.findMany();
     const tipo_contrato = await prisma.tipo_contrato.findMany();
     const tipos_usuario = await prisma.tipo_usuario.findMany();
-    res.render('users/home', {tipo_usuario: tipo_user, servicios, estamentos, tipo_contrato, tipos_usuario});
+    res.status(200).render('users/home', {tipo_usuario: tipo_user, servicios, estamentos, tipo_contrato, tipos_usuario});
 }
 
 module.exports = {
