@@ -18,6 +18,7 @@ async function getUsuarios(req, res) {
                 id_estamento: true,
                 id_tipo_usuario: true,
                 username: true,
+                email: true,
                 pwd: false
             }
         });
@@ -108,6 +109,7 @@ async function updateUsuario(req, res) {
             id_tipo_usuario: parseInt(req.body.etipo_usuario),
             username: req.body.eusername,
             pwd: hashedPassword,
+            email: req.body.eemail
         }
         const usuario_actualizado = await prisma.usuarios.update({
             where: {

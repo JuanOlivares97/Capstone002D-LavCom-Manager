@@ -54,6 +54,7 @@ document.addEventListener("DOMContentLoaded", function() {
                         id_tipo_usuario: newdata.id_tipo_usuario,
                         username: newdata.username,
                         rut: `${newdata.rut_usuario}-${newdata.dv_usuario}`,
+                        email: newdata.email
                     });
                 }
                 e.target.reset();
