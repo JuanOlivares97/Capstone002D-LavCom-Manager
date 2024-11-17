@@ -1,5 +1,6 @@
 import { AG_GRID_LOCALE_ES } from "../utils.js";
-document.addEventListener("DOMContentLoaded", async function () {
+
+window.generateGrid = async function () {
     let gridApi;
 
     const response = await fetch("/laundry-manager/clothes/get-clothes");
@@ -118,4 +119,6 @@ window.deleteArticulo = function (rowIndex, articulo) {
 };
 
 window.gridApi = gridApi;
-});
+}
+
+document.addEventListener("DOMContentLoaded", window.generateGrid);
