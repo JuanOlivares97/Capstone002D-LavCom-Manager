@@ -45,9 +45,14 @@ async function getArticulos(req, res) {
 
 async function createArticulo(req, res) {
     try {
+        const stock = parseInt(req.body.stock);
+        if (isNaN(stock) || stock <= 0) {
+            return res.status(400).json({ message: "Stock debe ser un número entero positivo", success: false });
+        }
+
         const newArticulo = {
             nombre_articulo: req.body.nombre,
-            stock: parseInt(req.body.stock),
+            stock: stock,
             id_subgrupo_ropa: parseInt(req.body.subgrupo),
             borrado: false,
         };
@@ -68,9 +73,14 @@ async function createArticulo(req, res) {
 
 async function updateArticulo(req, res) {
     try {
+        const stock = parseInt(req.body.stock);
+        if (isNaN(stock) || stock <= 0) {
+            return res.status(400).json({ message: "Stock debe ser un número entero positivo", success: false });
+        }
+
         const articulo = {
             nombre_articulo: req.body.nombre,
-            stock: parseInt(req.body.stock),
+            stock: stock,
             id_subgrupo_ropa: parseInt(req.body.subgrupo),
             borrado: false,
         };
@@ -118,6 +128,18 @@ async function entregarUnidadSigcom(req, res) {
         fecha = tempo.format(fecha, "YYYY-MM-DD HH:mm:ss A", "cl");
         const data = req.body;
         const rut_usuario_1 = req.user["rutLogueado"];
+
+        for (let i = 0; i < data.articulos.length; i++) {
+            const a = data.articulos[i];
+            const cantidad = parseInt(a.cantidad);
+            if (isNaN(cantidad) || cantidad <= 0) {
+                return res.status(400).json({ 
+                    message: `La cantidad de cada artículo debe ser un número entero positivo. Error en artículo en la posición ${i + 1}`, 
+                    success: false 
+                });
+            }
+        }
+
         const result = await prisma.registro.create({
             data: {
                 rut_usuario_1: parseInt(rut_usuario_1),
@@ -156,6 +178,40 @@ async function darRopaDeBaja(req, res) {
         if (data.tipo_dada_de_baja === "8") {
             data.id_unidad_sigcom = null;
         }
+
+        for (let i = 0; i < data.articulos.length; i++) {
+            const a = data.articulos[i];
+            const cantidad = parseInt(a.cantidad);
+            if (isNaN(cantidad) || cantidad <= 0) {
+                return res.status(400).json({ 
+                    message: `La cantidad de cada artículo debe ser un número entero positivo. Error en artículo en la posición ${i + 1}`, 
+                    success: false 
+                });
+            }
+
+            // Validar si hay suficiente stock antes de proceder
+            const idArticulo = parseInt(a.id_articulo);
+            const articulo = await prisma.articulo.findUnique({
+                where: {
+                    id_articulo: idArticulo,
+                },
+            });
+
+            if (!articulo) {
+                return res.status(400).json({ 
+                    message: `Artículo en la posición ${i + 1} no encontrado`, 
+                    success: false 
+                });
+            }
+
+            if (articulo.stock < cantidad) {
+                return res.status(400).json({ 
+                    message: `Stock insuficiente para el artículo en la posición ${i + 1}. Stock actual: ${articulo.stock}. Cantidad a decrementar: ${cantidad}`, 
+                    success: false 
+                });
+            }
+        }
+
         const resultado = await prisma.$transaction(async (prisma) => {
             const registro = await prisma.registro.create({
                 data: {
@@ -211,6 +267,40 @@ async function declararPerdida(req, res) {
         if (data.tipo_perdida === "5") {
             data.id_unidad_sigcom = null;
         }
+
+        for (let i = 0; i < data.articulos.length; i++) {
+            const a = data.articulos[i];
+            const cantidad = parseInt(a.cantidad);
+            if (isNaN(cantidad) || cantidad <= 0) {
+                return res.status(400).json({ 
+                    message: `La cantidad de cada artículo debe ser un número entero positivo. Error en artículo en la posición ${i + 1}`, 
+                    success: false 
+                });
+            }
+
+            // Validar si hay suficiente stock antes de proceder
+            const idArticulo = parseInt(a.id_articulo);
+            const articulo = await prisma.articulo.findUnique({
+                where: {
+                    id_articulo: idArticulo,
+                },
+            });
+
+            if (!articulo) {
+                return res.status(400).json({ 
+                    message: `Artículo en la posición ${i + 1} no encontrado`, 
+                    success: false 
+                });
+            }
+
+            if (articulo.stock < cantidad) {
+                return res.status(400).json({ 
+                    message: `Stock insuficiente para el artículo en la posición ${i + 1}. Stock actual: ${articulo.stock}. Cantidad a decrementar: ${cantidad}`, 
+                    success: false 
+                });
+            }
+        }
+
         const resultado = await prisma.$transaction(async (prisma) => {
             const registro = await prisma.registro.create({
                 data: {
@@ -263,6 +353,18 @@ async function recibirSuciaUnidadSigcom(req, res) {
         fecha = tempo.format(fecha, "YYYY-MM-DD HH:mm:ss A", "cl");
         const rut_usuario_1 = req.user["rutLogueado"];
         const data = req.body;
+
+        for (let i = 0; i < data.articulos.length; i++) {
+            const a = data.articulos[i];
+            const cantidad = parseInt(a.cantidad);
+            if (isNaN(cantidad) || cantidad <= 0) {
+                return res.status(400).json({ 
+                    message: `La cantidad de cada artículo debe ser un número entero positivo. Error en artículo en la posición ${i + 1}`, 
+                    success: false 
+                });
+            }
+        }
+
         const result = await prisma.registro.create({
             data: {
                 rut_usuario_1: parseInt(rut_usuario_1),
@@ -298,6 +400,18 @@ async function remesaRopaSucia(req, res) {
         fecha = tempo.format(fecha, "YYYY-MM-DD HH:mm:ss A", "cl");
         const rut_usuario_1 = req.user["rutLogueado"];
         const data = req.body;
+
+        for (let i = 0; i < data.articulos.length; i++) {
+            const a = data.articulos[i];
+            const cantidad = parseInt(a.cantidad);
+            if (isNaN(cantidad) || cantidad <= 0) {
+                return res.status(400).json({ 
+                    message: `La cantidad de cada artículo debe ser un número entero positivo. Error en artículo en la posición ${i + 1}`, 
+                    success: false 
+                });
+            }
+        }
+
         const result = await prisma.registro.create({
             data: {
                 rut_usuario_1: parseInt(rut_usuario_1),
@@ -333,6 +447,18 @@ async function recibirRopaLimpia(req, res) {
         fecha = tempo.format(fecha, "YYYY-MM-DD HH:mm:ss A", "cl");
         const data = req.body;
         const rut_usuario_1 = req.user["rutLogueado"];
+
+        for (let i = 0; i < data.articulos.length; i++) {
+            const a = data.articulos[i];
+            const cantidad = parseInt(a.cantidad);
+            if (isNaN(cantidad) || cantidad <= 0) {
+                return res.status(400).json({ 
+                    message: `La cantidad de cada artículo debe ser un número entero positivo. Error en artículo en la posición ${i + 1}`, 
+                    success: false 
+                });
+            }
+        }
+        
         const result = await prisma.registro.create({
             data: {
                 rut_usuario_1: parseInt(rut_usuario_1),
