@@ -16,6 +16,4 @@ router.post("/recibir-sucia-unidad-sigcom", articulosController.recibirSuciaUnid
 router.post("/remesa-ropa-sucia", articulosController.remesaRopaSucia);
 router.post("/recibir-ropa-limpia", articulosController.recibirRopaLimpia);
 
-router.get("/get-records", articulosController.getRegistros);
-
 module.exports = router;
