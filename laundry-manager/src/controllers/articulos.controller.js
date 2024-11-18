@@ -45,6 +45,17 @@ async function getArticulos(req, res) {
 
 async function createArticulo(req, res) {
     try {
+
+        const existingArticulo = await prisma.articulo.findUnique({
+            where: {
+                nombre_articulo: req.body.nombre,
+            },
+        })
+
+        if (existingArticulo) {
+            return res.status(400).json({ message: "El artículo ya existe, es posible que este se encuentre deshabilitado, contacte al administrador", success: false });
+        }
+
         const stock = parseInt(req.body.stock);
         if (isNaN(stock) || stock <= 0) {
             return res.status(400).json({ message: "Stock debe ser un número entero positivo", success: false });
@@ -76,6 +87,22 @@ async function updateArticulo(req, res) {
         const stock = parseInt(req.body.stock);
         if (isNaN(stock) || stock <= 0) {
             return res.status(400).json({ message: "Stock debe ser un número entero positivo", success: false });
+        }
+
+        const existingArticulo = await prisma.articulo.findFirst({
+            where: {
+                nombre_articulo: req.body.nombre,
+                id_articulo: {
+                    not: parseInt(req.body.id_articulo), // Asegurarse de que no coincida con el ID del artículo que estás actualizando
+                },
+            },
+        });
+        
+        if (existingArticulo) {
+            return res.status(400).json({ 
+                message: "El artículo ya existe, es posible que este se encuentre deshabilitado, contacte al administrador", 
+                success: false 
+            });
         }
 
         const articulo = {
@@ -486,39 +513,6 @@ async function recibirRopaLimpia(req, res) {
     }
 }
 
-async function getRegistros(req, res) {
-    try {
-        const registros = await prisma.registro.findMany({
-            include: {
-                detalle_registro: {
-                    include: {
-                        articulo: true
-                    }
-                },
-                tipo_registro: true,
-                usuarios_registro_rut_usuario_1Tousuarios: {
-                    select: {
-                        nombre: true
-                    }
-                },
-                usuarios_registro_rut_usuario_2Tousuarios: {
-                    select: {
-                        nombre: true
-                    }
-                },
-                unidad_sigcom: true
-            }
-        })
-        if (!registros) {
-            return res.status(400).json({ message: "Error obteniendo registros", success: false });
-        }
-        console.log(registros);
-        return res.status(200).json({ message: "Registros obtenidos exitosamente", success: true, registros });
-    } catch (error) {
-        res.status(500).json({ message: "Internal server error", success: false, error });
-    }
-}
-
 module.exports = {
     getArticulos,
     renderHome,
@@ -531,5 +525,4 @@ module.exports = {
     recibirSuciaUnidadSigcom,
     remesaRopaSucia,
     recibirRopaLimpia,
-    getRegistros
 };
