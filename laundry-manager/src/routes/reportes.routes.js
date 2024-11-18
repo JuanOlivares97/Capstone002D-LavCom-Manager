@@ -8,5 +8,6 @@ router.get('/get-report', reportesController.getFullReport);
 router.get('/get-services-report', reportesController.getServicesReport);
 router.get('/get-bajas-perdidas', reportesController.getBajasyPerdidas);
 router.get('/get-bajas-services', reportesController.getServicesDownReport);
+router.get("/get-records", reportesController.getRegistros);
 
 module.exports = router;
