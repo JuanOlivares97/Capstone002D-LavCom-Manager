@@ -1,42 +1,212 @@
-<div>
-    <div class="flex gap-2 my-2">
-        <div class="bg-white rounded-lg shadow-md p-6 flex-1 mx-auto">
-            <div class="flex justify-between items-center mb-4">
-                <h2 class="text-xl font-semibold text-gray-800">Total Revenue</h2> 
-            </div>
-            <div class="text-3xl font-bold text-gray-900 mb-2">$24,560</div>
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<div class="container mx-auto p-4">
+    <!-- Grilla 3x2 -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <!-- Gráfico 1 -->
+        <div class="bg-white shadow-md rounded-lg p-4">
+            <canvas id="unidadMasPedidosChart" width="400" height="400"></canvas>
+        </div>
+        
+        <!-- Gráfico 2 -->
+        <div class="bg-white shadow-md rounded-lg p-4">
+            <canvas id="unidadMasPerdidasChart" width="400" height="400"></canvas>
+        </div>
+        
+        <!-- Gráfico 3 -->
+        <div class="bg-white shadow-md rounded-lg p-4">
+            <canvas id="unidadMasBajasChart" width="400" height="400"></canvas>
+        </div>
+        
+        <!-- Gráfico 4 -->
+        <div class="bg-white shadow-md rounded-lg p-4">
+            <canvas id="articulosMasPedidosChart" width="400" height="400"></canvas>
         </div>
 
-        <div class="bg-white rounded-lg shadow-md p-6 flex-1 mx-auto">
-            <div class="flex justify-between items-center mb-4">
-                <h2 class="text-xl font-semibold text-gray-800">Total Revenue</h2>
-            </div>
-            <div class="text-3xl font-bold text-gray-900 mb-2">$24,560</div>
+        <!-- Gráfico 5 -->
+        <div class="bg-white shadow-md rounded-lg p-4">
+            <canvas id="articulosMasPerdidosChart" width="400" height="400"></canvas>
         </div>
 
-        <div class="bg-white rounded-lg shadow-md p-6 flex-1 mx-auto">
-            <div class="flex justify-between items-center mb-4">
-                <h2 class="text-xl font-semibold text-gray-800">Total Revenue</h2>
-            </div>
-            <div class="text-3xl font-bold text-gray-900 mb-2">$24,560</div>
-        </div>
-
-        <div class="bg-white rounded-lg shadow-md p-6 flex-1 mx-auto">
-            <div class="flex justify-between items-center mb-4">
-                <h2 class="text-xl font-semibold text-gray-800">Total Revenue</h2>
-            </div>
-            <div class="text-3xl font-bold text-gray-900 mb-2">$24,560</div>
-        </div>
-    </div>
-    <div class="flex gap-2 my-2">
-        <div class="bg-white rounded-lg shadow-md p-6 mx-auto flex-1">
-            <div id="chartForLines"></div>
-        </div>
-        <div class="bg-white rounded-lg shadow-md p-6 mx-auto flex-1">
-            <div id="chartForPie"></div>
+        <!-- Gráfico 6 -->
+        <div class="bg-white shadow-md rounded-lg p-4">
+            <canvas id="articulosMasBajasChart" width="400" height="400"></canvas>
         </div>
     </div>
 </div>
 
+<script>
+    // Configuración para el gráfico de Unidades con más pedidos
+    const rawDataUnidadMasPedidos = <%- JSON.stringify(unidadMasPedidos) %>;
+    const labels1 = rawDataUnidadMasPedidos.map(i => i.unidad_sigcom);
+    const data1 = rawDataUnidadMasPedidos.map(i => i.total_solicitado);
 
-<script src="/laundry-manager/js/generarAgCharts.js"></script>
+    new Chart(document.getElementById('unidadMasPedidosChart'), {
+        type: 'doughnut',
+        data: {
+            labels: labels1,
+            datasets: [{
+                label: 'Total de artículos solicitados',
+                data: data1
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Solicitudes de artículos en Unidades SIGCOM'
+                }
+            }
+        }
+    });
+
+    // Configuración para el gráfico de Unidades con más pérdidas
+    const rawDataunidadMasPerdidas = <%- JSON.stringify(unidadMasPerdidas) %>;
+    const labels2 = rawDataunidadMasPerdidas.map(i => i.unidad_sigcom);
+    const data2 = rawDataunidadMasPerdidas.map(i => i.total_perdido);
+
+    new Chart(document.getElementById('unidadMasPerdidasChart'), {
+        type: 'doughnut',
+        data: {
+            labels: labels2,
+            datasets: [{
+                label: 'Total de artículos perdidos',
+                data: data2,
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Pérdidas de artículos en Unidades SIGCOM'
+                }
+            }
+        }
+    });
+
+    // Configuración para el gráfico de Unidades con más bajas
+    const rawDataunidadMasBajas = <%- JSON.stringify(unidadMasBajas) %>;
+    const labels3 = rawDataunidadMasBajas.map(i => i.unidad_sigcom);
+    const data3 = rawDataunidadMasBajas.map(i => i.total_baja);
+
+    new Chart(document.getElementById('unidadMasBajasChart'), {
+        type: 'doughnut',
+        data: {
+            labels: labels3,
+            datasets: [{
+                label: 'Total de artículos dados de baja',
+                data: data3,
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Bajas de artículos en Unidades SIGCOM'
+                }
+            }
+        }
+    });
+
+    // Configuración para el gráfico de Artículos más solicitados
+    const rawDataArticulosMasPedidos = <%- JSON.stringify(articulosMasPedidos) %>;
+    const labels4 = rawDataArticulosMasPedidos.map(i => i.nombre_articulo);
+    const data4 = rawDataArticulosMasPedidos.map(i => i.total_pedido);
+
+    new Chart(document.getElementById('articulosMasPedidosChart'), {
+        type: 'bar',
+        data: {
+            labels: labels4,
+            datasets: [{
+                label: 'Total de entregas',
+                data: data4,
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Artículos más solicitados'
+                }
+            },
+            scales: {
+                x: {
+                    beginAtZero: true
+                },
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+
+    // Configuración para el gráfico de Artículos más perdidos
+    const rawDataArticulosMasPerdidos = <%- JSON.stringify(articulosMasPerdidos) %>;
+    const labels5 = rawDataArticulosMasPerdidos.map(i => i.nombre_articulo);
+    const data5 = rawDataArticulosMasPerdidos.map(i => i.total_perdido);
+
+    new Chart(document.getElementById('articulosMasPerdidosChart'), {
+        type: 'bar',
+        data: {
+            labels: labels5,
+            datasets: [{
+                label: 'Total de pérdidas',
+                data: data5,
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Artículos más perdidos'
+                }
+            },
+            scales: {
+                x: {
+                    beginAtZero: true
+                },
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+
+    // Configuración para el gráfico de Artículos dados de baja
+    const rawDataArticulosMasBajas = <%- JSON.stringify(articulosMasBajas) %>;
+    const labels6 = rawDataArticulosMasBajas.map(i => i.nombre_articulo);
+    const data6 = rawDataArticulosMasBajas.map(i => i.total_baja);
+
+    new Chart(document.getElementById('articulosMasBajasChart'), {
+        type: 'bar',
+        data: {
+            labels: labels6,
+            datasets: [{
+                label: 'Total de bajas',
+                data: data6,
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Artículos dados de baja'
+                }
+            },
+            scales: {
+                x: {
+                    beginAtZero: true
+                },
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+</script>
