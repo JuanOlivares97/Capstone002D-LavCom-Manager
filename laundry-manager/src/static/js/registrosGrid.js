@@ -1,7 +1,7 @@
 import { AG_GRID_LOCALE_ES } from "./utils.js";
 document.addEventListener("DOMContentLoaded", async function() {
     let gridApi;
-    const responseRegistros = await fetch('/laundry-manager/clothes/get-records');
+    const responseRegistros = await fetch('/laundry-manager/reports/get-records');
     const registros = await responseRegistros.json();
 
     const gridOptions = {
