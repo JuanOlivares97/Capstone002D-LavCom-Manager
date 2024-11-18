@@ -53,6 +53,19 @@ async function createUsuario(req, res) {
         const rut = req.body.rut_usuario.split('-')[0];
         const dv = req.body.rut_usuario.split('-')[1];
 
+        const existingUser = await prisma.usuarios.findUnique({
+            where: {
+                OR: [
+                    { rut_usuario: parseInt(rut) },
+                    { username: req.body.username }
+                ]
+            }
+        });
+
+        if (existingUser) {
+            return res.status(400).json({ message: "El rut o el nombre de usuario ya estan en uso, es posible que este usuario se encuentre deshabilitado, contacte al administrador", success: false });
+        }
+
         const user = await prisma.usuarios.create({
             data: {
                 rut_usuario: parseInt(rut),
@@ -98,6 +111,32 @@ async function updateUsuario(req, res) {
         const hashedPassword = bcrypt.hashSync(req.body.epwd, 10);
         const rut = req.body.erut_usuario.split('-')[0];
         const dv = req.body.erut_usuario.split('-')[1];
+
+        const existingUser = await prisma.usuarios.findFirst({
+            where: {
+                AND: [
+                    {
+                        OR: [
+                            { rut_usuario: parseInt(rut) },
+                            { username: req.body.eusername },
+                            { email: req.body.eemail }
+                        ]
+                    },
+                    {
+                        NOT: { id_usuario: parseInt(req.body.id_usuario) } // Asegurarse de que no es el mismo usuario
+                    }
+                ]
+            }
+        });
+
+        // Si se encuentra un usuario existente, se devuelve un error
+        if (existingUser) {
+            return res.status(400).json({ 
+                message: "El RUT, el email o el nombre de usuario ya están en uso por otro usuario, es posible que este usuario se encuentre deshabilitado, contacte al administrador", 
+                success: false 
+            });
+        }
+
         const usuario = {
             rut_usuario: parseInt(rut),
             dv_usuario: dv,
