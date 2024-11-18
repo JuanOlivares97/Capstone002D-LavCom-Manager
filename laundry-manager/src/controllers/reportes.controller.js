@@ -94,10 +94,44 @@ async function getServicesDownReport(req, res) {
     }
 }
 
+async function getRegistros(req, res) {
+    try {
+        const registros = await prisma.registro.findMany({
+            include: {
+                detalle_registro: {
+                    include: {
+                        articulo: true
+                    }
+                },
+                tipo_registro: true,
+                usuarios_registro_rut_usuario_1Tousuarios: {
+                    select: {
+                        nombre: true
+                    }
+                },
+                usuarios_registro_rut_usuario_2Tousuarios: {
+                    select: {
+                        nombre: true
+                    }
+                },
+                unidad_sigcom: true
+            }
+        })
+        if (!registros) {
+            return res.status(400).json({ message: "Error obteniendo registros", success: false });
+        }
+        console.log(registros);
+        return res.status(200).json({ message: "Registros obtenidos exitosamente", success: true, registros });
+    } catch (error) {
+        res.status(500).json({ message: "Internal server error", success: false, error });
+    }
+}
+
 module.exports = {
     renderHome,
     getFullReport,
     getServicesReport,
     getBajasyPerdidas,
-    getServicesDownReport
+    getServicesDownReport,
+    getRegistros
 };
