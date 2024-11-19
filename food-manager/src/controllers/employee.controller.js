@@ -8,16 +8,20 @@ const {
     getTipoFuncionario,
 } = require("./maintainer.controller");
 
+// Renderiza la página principal de empleados
 async function renderHome(req, res) {
     try {
+        // Obtiene los datos necesarios para renderizar la vista desde funciones externas
         const contrato = await getContrato();
         const servicios = await getServicio();
         const unidades = await getUnidad();
         const estamentos = await getEstamento();
         const tipoFuncionario = await getTipoFuncionario();
-        const tipoUsuario = req.cookies["tipo_usuario"];
+        const tipoUsuario = req.cookies["tipo_usuario"]; // Obtiene el tipo de usuario desde las cookies
+
+        // Renderiza la vista 'employee/home' con los datos necesarios
         res.render("employee/home", {
-            tipoUsuario: parseInt(tipoUsuario),
+            tipoUsuario: parseInt(tipoUsuario), // Convierte tipoUsuario a número
             contrato,
             servicios,
             unidades,
@@ -25,13 +29,14 @@ async function renderHome(req, res) {
             tipoFuncionario,
         });
     } catch (error) {
+        // Maneja errores devolviendo un estado 500 y un mensaje de error
         return res.status(500).json({ message: "Internal server error" });
     }
 }
 
+// Obtiene la lista de todos los funcionarios habilitados
 async function getFuncionarios(req, res) {
     try {
-        // Obtener todos los funcionarios desde Prisma
         const funcionarios = await prisma.Funcionario.findMany({
             include: {
                 TipoContrato: true,
@@ -40,16 +45,16 @@ async function getFuncionarios(req, res) {
                 TipoUnidad: true,
             },
             where: {
-                Habilitado: "S",
+                Habilitado: "S", // Solo funcionarios habilitados
             },
         });
 
-        // Modificar los datos antes de enviarlos
+        // Transforma los datos para formatear nombres y concatenar RUT con DV
         const funcionariosTransformados = funcionarios.map((funcionario) => {
             return {
                 ...funcionario,
-                rut: `${funcionario.RutFuncionario}-${funcionario.DvFuncionario}`, // Concatenar RUT con DV
-                NombreFuncionario: capitalizeWords(funcionario.NombreFuncionario), // Formatear con Initcap
+                rut: `${funcionario.RutFuncionario}-${funcionario.DvFuncionario}`, // Formato de RUT completo
+                NombreFuncionario: capitalizeWords(funcionario.NombreFuncionario), // Capitaliza el nombre
                 Apellidos: capitalizeWords(
                     `${funcionario.apellido_paterno} ${funcionario.apellido_materno}`
                 ),
@@ -81,14 +86,17 @@ async function getFuncionarios(req, res) {
             };
         });
 
+        // Devuelve la lista de funcionarios transformada
         res.status(200).json(funcionariosTransformados);
     } catch (error) {
+        // Maneja errores devolviendo un estado 500 y un mensaje de error
         res
             .status(500)
             .json({ message: "Internal server error: " + error.message });
     }
 }
 
+// Crea un nuevo empleado
 async function createEmployee(req, res) {
     try {
         const {
@@ -104,7 +112,7 @@ async function createEmployee(req, res) {
         } = req.body;
 
         // Validar campos obligatorios
-        if (!nombre_usuario || !apellido_paterno || !RutCompleto || !tipoEstamento || !tipoServicio || !tipoUnidad || !tipoContrato ||!tipoFuncionario) {
+        if (!nombre_usuario || !apellido_paterno || !RutCompleto || !tipoEstamento || !tipoServicio || !tipoUnidad || !tipoContrato || !tipoFuncionario) {
             return res.status(400).json({ message: "Todos los campos son requeridos" });
         }
 
@@ -115,7 +123,7 @@ async function createEmployee(req, res) {
             });
         }
 
-        const [rut_usuario, dv_usuario] = RutCompleto.split("-");
+        const [rut_usuario, dv_usuario] = RutCompleto.split("-"); // Separa el RUT del DV
 
         // Busca si el empleado ya existe
         const existingEmployee = await prisma.Funcionario.findUnique({
@@ -128,6 +136,7 @@ async function createEmployee(req, res) {
         });
 
         if (existingEmployee) {
+            // Si el empleado ya existe, lo habilita nuevamente
             const updatedEmployee = await prisma.Funcionario.update({
                 where: {
                     IdFuncionario: existingEmployee.IdFuncionario,
@@ -138,13 +147,15 @@ async function createEmployee(req, res) {
             });
 
             return res.status(201).json({
-                message:"El empleado ya existía y se actualizó su estado a 'Habilitado'",
+                message: "El empleado ya existía y se actualizó su estado a 'Habilitado'",
                 empleado: updatedEmployee,
             });
         }
 
+        // Genera una contraseña para el nuevo empleado
         const password = await bcrypt.hash(rut_usuario + dv_usuario, 10);
 
+        // Crea un nuevo registro de empleado
         const funcionario = await prisma.Funcionario.create({
             data: {
                 NombreFuncionario: nombre_usuario.toUpperCase(),
@@ -152,20 +163,14 @@ async function createEmployee(req, res) {
                 apellido_materno: apellido_materno.toUpperCase(),
                 RutFuncionario: rut_usuario,
                 DvFuncionario: dv_usuario,
-                username:
-                    nombre_usuario.charAt(0).toLowerCase() +
-                    apellido_paterno.toLowerCase(),
+                username: nombre_usuario.charAt(0).toLowerCase() + apellido_paterno.toLowerCase(),
                 contrasena: password,
                 Habilitado: "S",
-                TipoEstamento: {
-                    connect: { IdTipoEstamento: parseInt(tipoEstamento) },
-                },
+                TipoEstamento: { connect: { IdTipoEstamento: parseInt(tipoEstamento) } },
                 TipoServicio: { connect: { IdTipoServicio: parseInt(tipoServicio) } },
                 TipoUnidad: { connect: { IdTipoUnidad: parseInt(tipoUnidad) } },
                 TipoContrato: { connect: { IdTipoContrato: parseInt(tipoContrato) } },
-                TipoFuncionario: {
-                    connect: { IdTipoFuncionario: parseInt(tipoFuncionario) },
-                },
+                TipoFuncionario: { connect: { IdTipoFuncionario: parseInt(tipoFuncionario) } },
             },
         });
 
@@ -178,8 +183,7 @@ async function createEmployee(req, res) {
     }
 }
 
-
-// Función para actualizar el empleado
+// Actualiza los datos de un empleado existente
 async function updateEmployee(req, res) {
     try {
         const id = parseInt(req.params.id);
@@ -194,21 +198,12 @@ async function updateEmployee(req, res) {
             tipoFuncionario,
         } = req.body;
 
-        // Validar presencia de campos
+        // Validar campos obligatorios
         if (!nombre_usuario || !tipoFuncionario || !tipoEstamento || !tipoServicio || !tipoUnidad || !tipoContrato) {
             return res.status(400).json({ message: "Todos los campos son requeridos." });
         }
 
-        // Validar existencia en la base de datos
-        const validateExistence = async (id, model, field) => {
-            const record = await prisma[model].findUnique({ where: { [field]: id } });
-            return !!record;
-        };
-
-        if (!(await validateExistence(tipoFuncionario, 'TipoFuncionario', 'IdTipoFuncionario'))) {
-            return res.status(404).json({ message: "El tipoFuncionario especificado no existe." });
-        }
-
+        // Actualiza los datos del empleado
         const funcionario = await prisma.Funcionario.update({
             where: { IdFuncionario: id },
             data: {
@@ -230,10 +225,12 @@ async function updateEmployee(req, res) {
     }
 }
 
-
+// Deshabilita un empleado (soft delete)
 async function deleteEmployee(req, res) {
     try {
         const id = parseInt(req.params.id);
+
+        // Actualiza el estado de habilitado a 'N'
         const funcionario = await prisma.Funcionario.update({
             where: {
                 IdFuncionario: id,
@@ -242,6 +239,7 @@ async function deleteEmployee(req, res) {
                 Habilitado: "N",
             },
         });
+
         res.status(201).json(funcionario);
     } catch (error) {
         res
@@ -250,6 +248,7 @@ async function deleteEmployee(req, res) {
     }
 }
 
+// Capitaliza las palabras (inicial mayúscula)
 function capitalizeWords(str) {
     return str
         .toLowerCase()
@@ -258,6 +257,7 @@ function capitalizeWords(str) {
         .join(" ");
 }
 
+// Formatea fechas para la base de datos
 const formatDateForDB = (dateString) => {
     const date = new Date(dateString);
     if (isNaN(date.getTime())) {
@@ -268,42 +268,6 @@ const formatDateForDB = (dateString) => {
     const day = String(date.getDate()).padStart(2, "0");
     return `${year}-${month}-${day}`;
 };
-
-// Valida si un campo está presente en req.body
-function validatePresence(field, fieldName, res) {
-    if (!field) {
-        res.status(400).json({ message: `El campo '${fieldName}' es requerido.` });
-        return false;
-    }
-    return true;
-}
-
-// Valida si un campo es un número
-function validateInteger(field, fieldName, res) {
-    const intValue = parseInt(field);
-    if (isNaN(intValue)) {
-        res
-            .status(400)
-            .json({ message: `El campo '${fieldName}' debe ser un número válido.` });
-        return false;
-    }
-    return intValue;
-}
-
-// Verifica si el ID existe en una tabla específica usando Prisma
-async function validateExistence(fieldValue, model, fieldName, res) {
-    const recordExists = await prisma[model].findUnique({
-        where: { [fieldName]: fieldValue },
-    });
-
-    if (!recordExists) {
-        res
-            .status(404)
-            .json({ message: `El ${fieldName} especificado no existe.` });
-        return false;
-    }
-    return true;
-}
 
 module.exports = {
     renderHome,
