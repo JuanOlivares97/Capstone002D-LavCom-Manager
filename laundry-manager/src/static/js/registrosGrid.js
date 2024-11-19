@@ -10,6 +10,7 @@ document.addEventListener("DOMContentLoaded", async function() {
         columnDefs: [
             { headerName: "#", field: "id_registro", flex: 1 },
             { headerName: "Tipo", field: "tipo_registro.tipo_registro", flex: 1 },
+            { headerName: "Fecha", field: "fecha", flex: 1}
         ],
         defaultColDef: {
             resizable: false,
@@ -37,7 +38,6 @@ document.addEventListener("DOMContentLoaded", async function() {
                     <hr>
                     ${params.data.observacion !== null && params.data.observacion !== undefined ? `<p><strong>Observaciones:</strong> ${params.data.observacion}</p>` : ''}
                 `,
-                showCancelButton: true,
                 confirmButtonText: "Cerrar"
             })
         }
