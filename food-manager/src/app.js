@@ -45,7 +45,7 @@ const { loginRequired } = require('./server/authentication');
 
 // Redireccionar a la página de dashboard
 app.get('/', (req, res) => {
-    res.redirect('/food-manager/dashboard/home');
+    res.redirect('/food-manager/lunch/home');
 });
 
 // Cargar rutas dinámicamente
