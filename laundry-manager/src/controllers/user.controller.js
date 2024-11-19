@@ -1,5 +1,6 @@
 const prisma = require('../server/prisma');
 const bcrypt = require('bcrypt');
+const {Fn} = require('../server/authentication');
 
 async function getUsuarios(req, res) {
     try {
@@ -33,27 +34,19 @@ async function getUsuarios(req, res) {
     }
 }
 
-async function getUsuario(req, res) {
-    const { id_usuario } = req.params;
-    try {
-        const user = await prisma.usuarios.findUnique({
-            where: {
-                id_usuario: parseInt(id_usuario)
-            }
-        });
-        return res.json(user);
-    } catch (error) {
-        return res.status(500).json({ message: "Internal server error" });
-    }
-}
-
 async function createUsuario(req, res) {
     try {
         const hashedPassword = bcrypt.hashSync(req.body.pwd, 10);
         const rut = req.body.rut_usuario.split('-')[0];
         const dv = req.body.rut_usuario.split('-')[1];
 
-        const existingUser = await prisma.usuarios.findUnique({
+        const rutValid = Fn.validaRut(req.body.rut_usuario);
+        
+        if (!rutValid) {
+            return res.status(400).json({ message: `El rut ${req.body.rut_usuario} es inválido`, success: false });
+        }
+
+        const existingUser = await prisma.usuarios.findFirst({
             where: {
                 OR: [
                     { rut_usuario: parseInt(rut) },
@@ -111,6 +104,12 @@ async function updateUsuario(req, res) {
         const hashedPassword = bcrypt.hashSync(req.body.epwd, 10);
         const rut = req.body.erut_usuario.split('-')[0];
         const dv = req.body.erut_usuario.split('-')[1];
+
+        const rutValid = Fn.validaRut(req.body.erut_usuario);
+        
+        if (!rutValid) {
+            return res.status(400).json({ message: `El rut ${req.body.erut_usuario} es inválido`, success: false });
+        }
 
         const existingUser = await prisma.usuarios.findFirst({
             where: {
@@ -200,7 +199,6 @@ async function renderHome(req, res) {
 module.exports = {
     getUsuarios,
     renderHome,
-    getUsuario,
     createUsuario,
     updateUsuario,
     deleteUsuario
