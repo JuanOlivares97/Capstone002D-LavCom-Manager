@@ -63,6 +63,7 @@ document.addEventListener("DOMContentLoaded", async function() {
         const estamentoInput = modal.querySelector("select[id='eestamento']");
         const tipoUsuarioInput = modal.querySelector("select[id='etipo_usuario']");
         const usernameInput = modal.querySelector("input[id='eusername']");
+        const emailInput = modal.querySelector("input[id='eemail']");
 
         // Asignar valores de los datos
         idUsuarioInput.value = user.id_usuario;
@@ -74,6 +75,7 @@ document.addEventListener("DOMContentLoaded", async function() {
         estamentoInput.value = user.id_estamento;
         tipoUsuarioInput.value = user.id_tipo_usuario;
         usernameInput.value = user.username;
+        emailInput.value = user.email;
 
         modal.classList.remove('hidden');
         setTimeout(() => {

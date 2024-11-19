@@ -23,7 +23,12 @@ async function loginRequired(req, res, next) {
             return res.redirect("/laundry-manager/auth/login");
         }
 
-        req.user = user; // Añadir el usuario al objeto req
+        req.user = {
+            rutLogueado: user.rut_usuario,
+            nombreLogueado: user.nombre,
+            tipo_usuario: user.id_tipo_usuario
+        } 
+        
         next();
     } catch (error) {
         console.error("Error during authentication:", error);

@@ -5,7 +5,7 @@ logoutButtons.forEach(button => {
         e.preventDefault(); // Prevenir la acción predeterminada del botón
         console.log('Logout button clicked');
         const response = await fetch("/laundry-manager/auth/logout", {
-            method: "POST",
+            method: "GET",
             headers: {
                 "Content-Type": "application/json"
             }

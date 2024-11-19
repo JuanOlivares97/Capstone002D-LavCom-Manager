@@ -2,8 +2,8 @@ const prisma = require("../server/prisma");
 
 function renderHome(req, res) {
     try {
-        const tipo_user = req.cookies["tipo_usuario"];
-        return res.render('reports/home', {tipo_usuario: parseInt(tipo_user)})
+        const tipo_user = req.user["tipo_usuario"];
+        return res.status(200).render('reports/home', {tipo_usuario: parseInt(tipo_user)})
     } catch (error) {
         return res.status(500).json({ message: "Internal server error" });
     }
@@ -44,7 +44,7 @@ async function getServicesReport(req, res) {
 
         return res.status(200).json(formattedResult);
     } catch (error) {
-        return res.status(500).json({ message: "Internal server error " + error });
+        return res.status(500).json({ message: "Internal server error" });
     }
 }
 
@@ -66,7 +66,7 @@ async function getBajasyPerdidas(req, res) {
 
         return res.status(200).json(formattedResult);
     } catch (error) {
-        return res.status(500).json({ message: "Internal server error", error });
+        return res.status(500).json({ message: "Internal server error" });
     }
 }
 
@@ -90,7 +90,40 @@ async function getServicesDownReport(req, res) {
 
         return res.status(200).json(formattedResult);
     } catch (error) {
-        return res.status(500).json({ message: "Internal server error: " + error });
+        return res.status(500).json({ message: "Internal server error" });
+    }
+}
+
+async function getRegistros(req, res) {
+    try {
+        const registros = await prisma.registro.findMany({
+            include: {
+                detalle_registro: {
+                    include: {
+                        articulo: true
+                    }
+                },
+                tipo_registro: true,
+                usuarios_registro_rut_usuario_1Tousuarios: {
+                    select: {
+                        nombre: true
+                    }
+                },
+                usuarios_registro_rut_usuario_2Tousuarios: {
+                    select: {
+                        nombre: true
+                    }
+                },
+                unidad_sigcom: true
+            }
+        })
+        if (!registros) {
+            return res.status(400).json({ message: "Error obteniendo registros", success: false });
+        }
+        console.log(registros);
+        return res.status(200).json({ message: "Registros obtenidos exitosamente", success: true, registros });
+    } catch (error) {
+        res.status(500).json({ message: "Internal server error", success: false, error });
     }
 }
 
@@ -99,5 +132,6 @@ module.exports = {
     getFullReport,
     getServicesReport,
     getBajasyPerdidas,
-    getServicesDownReport
+    getServicesDownReport,
+    getRegistros
 };

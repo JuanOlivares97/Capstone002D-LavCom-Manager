@@ -5,7 +5,7 @@ const mailer = require("../server/mailer")
 
 function renderLogin(req, res) {
     try {
-        return res.render("auth/login", {layout:false});
+        return res.status(200).render("auth/login", {layout:false});
     } catch (error) {
         return res.status(500).json({ message: "Internal server error" });
     }
@@ -13,7 +13,7 @@ function renderLogin(req, res) {
 
 function renderRecuperarContrasenaForm(req, res) {
     try {
-        return res.render("auth/recuperar_pwd_form", {layout:false});
+        return res.status(200).render("auth/recuperar_pwd_form", {layout:false});
     } catch (error) {
         return res.status(500).json({ message: "Internal server error" });
     }
@@ -21,7 +21,7 @@ function renderRecuperarContrasenaForm(req, res) {
 
 function renderRecuperarContrasenaInfo(req, res) {
     try {
-        return res.render("auth/recuperar_pwd_info", {layout:false});
+        return res.status(200).render("auth/recuperar_pwd_info", {layout:false});
     } catch (error) {
         return res.status(500).json({ message: "Internal server error" });
     }
@@ -44,18 +44,19 @@ async function login(req, res) {
 
         const token_data = {
             id_usuario: user.id_usuario,
-            rut: `${user.rut_usuario}-${user.dv_usuario}`,
-            nombre: user.nombre,
-            tipo_usuario: user.id_tipo_usuario
         }
         const token = jwt.sign(token_data, process.env.JWT_SECRET, { expiresIn: "8h" });
 
-        res.cookie("token", token, { path: "/" });
-        res.cookie("logged-in", true, { path: "/" });
-        res.cookie("tipo_usuario", user.id_tipo_usuario, { path: "/" });
-        res.cookie("rutLogueado", user.rut_usuario, { path: "/" });
-        res.cookie("nombreLogueado", user.nombre, { path: "/" });
-        return res.status(200).json({ message: "Has iniciado sesión, bienvenido", success: true, user });
+        let emailValidation = {
+            hasEmail: true,
+            id_usuario: user.id_usuario
+        };
+        if(user.email === null) {
+            emailValidation.hasEmail = false;
+        }
+
+        res.cookie("token", token, { path: "/laundry-manager", httpOnly: true });
+        return res.status(200).json({ message: "Has iniciado sesión, bienvenido", success: true, emailValidation });
     } catch (error) {
         return res.status(500).json({ message: "Internal server error", success: false });
     } 
@@ -85,7 +86,7 @@ async function setEmail(req, res) {
 
         return res.status(200).json({ message: "Correo electrónico establecido", success: true });
     } catch (error) {
-        return res.status(500).json({ message: "Internal server error" + error, success: false });
+        return res.status(500).json({ message: "Internal server error", success: false });
     }
 }
 
@@ -102,19 +103,19 @@ async function sendPwdEmail(req, res) {
         })
 
         if (!user) {
-            return res.status(500).json({message: "Usuario no encontrado"})
+            return res.status(404).json({message: "Usuario no encontrado", success: false})
         }
 
         const code = Math.floor(Math.random() * (9999 - 1000 + 1)) + 1000;
 
-        res.cookie("pwdcode", bcrypt.hashSync(code.toString(), 10), {path: "/"})
-        res.cookie("username", username, {path: "/"})
+        res.cookie("pwdcode", bcrypt.hashSync(code.toString(), 10), {path: "/laundry-manager", httpOnly: true})
+        res.cookie("username", username, {path: "/laundry-manager", httpOnly: true})
 
         await mailer.enviarCorreo(email, code.toString())
 
         return res.redirect("/laundry-manager/auth/recuperar-pwd-info")
     } catch (error) {
-        return res.status(500).json({ message: "Internal server error", error})
+        return res.status(500).json({ message: "Internal server error", success: false });
     }
 }
 
@@ -139,12 +140,15 @@ async function changePwd(req, res) {
 
         await prisma.usuarios.update({
             where: {
-                username: username
+                username: req.cookies.username
             },
             data: {
                 pwd: hashedPwd
             }
         })
+
+        res.clearCookie("pwdcode", {path: "/laundry-manager"})
+        res.clearCookie("username", {path: "/laundry-manager"})
 
         return res.status(200).json({success: true, message: "Contraseña actualizada"})
     } catch (error) {
@@ -154,8 +158,7 @@ async function changePwd(req, res) {
 
 async function logout(req, res) {
     try {
-        res.clearCookie("token");
-        res.clearCookie("logged-in");
+        res.clearCookie("token", { path: '/laundry-manager' });
         return res.status(200).json({ message: "Has cerrado sesión", success: true });
     } catch (error) {
         return res.status(500).json({ message: "Internal server error", success: false });

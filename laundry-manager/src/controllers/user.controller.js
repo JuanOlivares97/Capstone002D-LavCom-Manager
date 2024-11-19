@@ -18,10 +18,16 @@ async function getUsuarios(req, res) {
                 id_estamento: true,
                 id_tipo_usuario: true,
                 username: true,
+                email: true,
                 pwd: false
             }
         });
-        return res.json(users);
+
+        if (users === null || users.length === 0) {
+            return res.status(404).json({ message: "No se encontraron usuarios" });
+        }
+
+        return res.status(200).json(users);
     } catch (error) {
         return res.status(500).json({ message: "Internal server error" });
     }
@@ -46,6 +52,19 @@ async function createUsuario(req, res) {
         const hashedPassword = bcrypt.hashSync(req.body.pwd, 10);
         const rut = req.body.rut_usuario.split('-')[0];
         const dv = req.body.rut_usuario.split('-')[1];
+
+        const existingUser = await prisma.usuarios.findUnique({
+            where: {
+                OR: [
+                    { rut_usuario: parseInt(rut) },
+                    { username: req.body.username }
+                ]
+            }
+        });
+
+        if (existingUser) {
+            return res.status(400).json({ message: "El rut o el nombre de usuario ya estan en uso, es posible que este usuario se encuentre deshabilitado, contacte al administrador", success: false });
+        }
 
         const user = await prisma.usuarios.create({
             data: {
@@ -83,7 +102,7 @@ async function createUsuario(req, res) {
         return res.status(200).json({ message: "Usuario creado exitosamente", success: true, user });
     } catch (error) {
         console.error(error);
-        return res.status(500).json({ message: "Internal server error: "+ error, error, success: false });
+        return res.status(500).json({ message: "Internal server error", success: false });
     }
 }
 
@@ -92,6 +111,32 @@ async function updateUsuario(req, res) {
         const hashedPassword = bcrypt.hashSync(req.body.epwd, 10);
         const rut = req.body.erut_usuario.split('-')[0];
         const dv = req.body.erut_usuario.split('-')[1];
+
+        const existingUser = await prisma.usuarios.findFirst({
+            where: {
+                AND: [
+                    {
+                        OR: [
+                            { rut_usuario: parseInt(rut) },
+                            { username: req.body.eusername },
+                            { email: req.body.eemail }
+                        ]
+                    },
+                    {
+                        NOT: { id_usuario: parseInt(req.body.id_usuario) } // Asegurarse de que no es el mismo usuario
+                    }
+                ]
+            }
+        });
+
+        // Si se encuentra un usuario existente, se devuelve un error
+        if (existingUser) {
+            return res.status(400).json({ 
+                message: "El RUT, el email o el nombre de usuario ya están en uso por otro usuario, es posible que este usuario se encuentre deshabilitado, contacte al administrador", 
+                success: false 
+            });
+        }
+
         const usuario = {
             rut_usuario: parseInt(rut),
             dv_usuario: dv,
@@ -103,6 +148,7 @@ async function updateUsuario(req, res) {
             id_tipo_usuario: parseInt(req.body.etipo_usuario),
             username: req.body.eusername,
             pwd: hashedPassword,
+            email: req.body.eemail
         }
         const usuario_actualizado = await prisma.usuarios.update({
             where: {
@@ -117,7 +163,7 @@ async function updateUsuario(req, res) {
 
         return res.status(200).json({ message: "Usuario actualizado exitosamente", success: true, usuario_actualizado });
     } catch (error) {
-        return res.status(500).json({ message: "Internal server error "+ error, error, success: false });
+        return res.status(500).json({ message: "Internal server error", success: false });
     }
 }
 
@@ -143,12 +189,12 @@ async function deleteUsuario(req, res) {
 }
 
 async function renderHome(req, res) {
-    const tipo_user = req.cookies["tipo_usuario"];
+    const tipo_user = req.user["tipo_usuario"];
     const servicios = await prisma.servicio.findMany();
     const estamentos = await prisma.estamento.findMany();
     const tipo_contrato = await prisma.tipo_contrato.findMany();
     const tipos_usuario = await prisma.tipo_usuario.findMany();
-    res.render('users/home', {tipo_usuario: parseInt(tipo_user), servicios, estamentos, tipo_contrato, tipos_usuario});
+    res.status(200).render('users/home', {tipo_usuario: tipo_user, servicios, estamentos, tipo_contrato, tipos_usuario});
 }
 
 module.exports = {
