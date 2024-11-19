@@ -1,32 +1,44 @@
 const prisma = require('../server/prisma');
 
+// Renderiza la página principal del mantenedor
 async function renderHome(req, res) {
-    const Estamento = await getEstamento();
-    const servicios = await getServicio();
-    const Unidad = await getUnidad();
-    const Via = await getVia();
-    const Regimen = await getRegimen();
-    const TipoFuncionario = await getTipoFuncionario();
-    const Contrato = await getContrato();
-    const tipoUsuario = req.cookies['tipo_usuario']
-    res.render('maintainer/home', { tipoUsuario: parseInt(tipoUsuario), Estamento, servicios, Unidad, Via, Regimen, TipoFuncionario, Contrato });
+    const Estamento = await getEstamento(); // Obtiene los estamentos desde la base de datos
+    const servicios = await getServicio(); // Obtiene los servicios habilitados
+    const Unidad = await getUnidad(); // Obtiene las unidades habilitadas
+    const Via = await getVia(); // Obtiene las vías
+    const Regimen = await getRegimen(); // Obtiene los regímenes habilitados
+    const TipoFuncionario = await getTipoFuncionario(); // Obtiene los tipos de funcionario
+    const Contrato = await getContrato(); // Obtiene los tipos de contrato
+    const tipoUsuario = req.cookies['tipo_usuario']; // Tipo de usuario desde las cookies
+
+    // Renderiza la vista del mantenedor con los datos obtenidos
+    res.render('maintainer/home', {
+        tipoUsuario: parseInt(tipoUsuario),
+        Estamento,
+        servicios,
+        Unidad,
+        Via,
+        Regimen,
+        TipoFuncionario,
+        Contrato
+    });
 }
 
+// Obtiene todos los estamentos
 async function getEstamento() {
     try {
-        const Estamento = await prisma.TipoEstamento.findMany();
+        const Estamento = await prisma.TipoEstamento.findMany(); // Consulta todos los registros de TipoEstamento
         return Estamento;
     } catch (error) {
         throw new Error("Error al obtener los Estamento: " + error.message);
     }
 }
 
+// Obtiene todos los servicios habilitados
 async function getServicio() {
     try {
         const servicios = await prisma.TipoServicio.findMany({
-            where: {
-                Habilitado: 'S'
-            }
+            where: { Habilitado: 'S' } // Filtra solo los servicios habilitados
         });
         return servicios;
     } catch (error) {
@@ -34,13 +46,11 @@ async function getServicio() {
     }
 }
 
+// Obtiene todas las unidades habilitadas
 async function getUnidad() {
     try {
         const Unidad = await prisma.TipoUnidad.findMany({
-            where: {
-                Habilitado: 'S'
-            },
-
+            where: { Habilitado: 'S' } // Filtra solo las unidades habilitadas
         });
         return Unidad;
     } catch (error) {
@@ -48,22 +58,21 @@ async function getUnidad() {
     }
 }
 
+// Obtiene todas las vías
 async function getVia() {
     try {
-        const Via = await prisma.TipoVia.findMany();
+        const Via = await prisma.TipoVia.findMany(); // Consulta todos los registros de TipoVia
         return Via;
     } catch (error) {
         throw new Error("Error al obtener los Via: " + error.message);
     }
 }
 
+// Obtiene todos los regímenes habilitados
 async function getRegimen() {
     try {
         const Regimen = await prisma.TipoRegimen.findMany({
-            where: {
-                Habilitado: 'S'
-            },
-
+            where: { Habilitado: 'S' } // Filtra solo los regímenes habilitados
         });
         return Regimen;
     } catch (error) {
@@ -71,39 +80,40 @@ async function getRegimen() {
     }
 }
 
+// Obtiene todos los tipos de funcionario
 async function getTipoFuncionario() {
     try {
-        const TipoFuncionario = await prisma.TipoFuncionario.findMany();
+        const TipoFuncionario = await prisma.TipoFuncionario.findMany(); // Consulta todos los registros de TipoFuncionario
         return TipoFuncionario;
     } catch (error) {
         throw new Error("Error al obtener los TipoFuncionario: " + error.message);
     }
 }
 
+// Obtiene todos los tipos de contrato
 async function getContrato() {
     try {
-        const Contrato = await prisma.TipoContrato.findMany();
+        const Contrato = await prisma.TipoContrato.findMany(); // Consulta todos los registros de TipoContrato
         return Contrato;
     } catch (error) {
         throw new Error("Error al obtener los Contrato: " + error.message);
     }
 }
 
+// Función genérica para crear un nuevo ítem
 async function createItem(req, res, model, dataField) {
     try {
-        const data = req.body[dataField];
+        const data = req.body[dataField]; // Obtiene el valor desde el cuerpo de la solicitud
         const item = await prisma[model].create({
-            data: {
-                [dataField]: data
-            }
+            data: { [dataField]: data } // Crea un nuevo registro con el campo especificado
         });
-        res.status(201).json(item);
+        res.status(201).json(item); // Devuelve el registro creado
     } catch (error) {
-        res.status(500).json({ error: `Error al crear el item: ${error.message}` });
+        res.status(500).json({ error: `Error al crear el item: ${error.message}` }); // Maneja errores
     }
 }
 
-// Wrappers para llamar a la función genérica con los parámetros adecuados
+// Funciones específicas para crear elementos llamando a la función genérica
 async function createEstamento(req, res) {
     await createItem(req, res, 'TipoEstamento', 'DescTipoEstamento');
 }
@@ -132,13 +142,12 @@ async function createContrato(req, res) {
     await createItem(req, res, 'TipoContrato', 'TipoContrato');
 }
 
+// Función genérica para actualizar un ítem existente
 async function updateItem(req, res, model, dataField, idField) {
     try {
-        const data = req.body[dataField];
+        const data = req.body[dataField]; // Nuevo valor desde el cuerpo de la solicitud
         const existingItem = await prisma[model].findUnique({
-            where: {
-                [idField]: parseInt(req.params.id)
-            }
+            where: { [idField]: parseInt(req.params.id) } // Busca el ítem por ID
         });
 
         if (existingItem[dataField] === data) {
@@ -146,19 +155,16 @@ async function updateItem(req, res, model, dataField, idField) {
         }
 
         const item = await prisma[model].update({
-            where: {
-                [idField]: parseInt(req.params.id)
-            },
-            data: {
-                [dataField]: data
-            }
+            where: { [idField]: parseInt(req.params.id) }, // Actualiza el ítem por ID
+            data: { [dataField]: data }
         });
-        res.status(200).json(item);
+        res.status(200).json(item); // Devuelve el ítem actualizado
     } catch (error) {
-        res.status(500).json({ error: `Error al actualizar el item: ${error.message}` });
+        res.status(500).json({ error: `Error al actualizar el item: ${error.message}` }); // Maneja errores
     }
 }
 
+// Funciones específicas para actualizar elementos llamando a la función genérica
 async function updateEstamento(req, res) {
     await updateItem(req, res, 'TipoEstamento', 'DescTipoEstamento', 'IdTipoEstamento');
 }
@@ -187,35 +193,31 @@ async function updateContrato(req, res) {
     await updateItem(req, res, 'TipoContrato', 'TipoContrato', 'IdTipoContrato');
 }
 
+// Función genérica para deshabilitar un ítem existente (soft delete)
 async function deleteItem(req, res, model, idField) {
     try {
         const item = await prisma[model].update({
-            where: {
-                [idField]: parseInt(req.params.id)
-            },
-            data: {
-                Habilitado: 'N'
-            }
+            where: { [idField]: parseInt(req.params.id) }, // Busca el ítem por ID
+            data: { Habilitado: 'N' } // Cambia el estado a 'N'
         });
-        res.status(200).json(item);
+        res.status(200).json(item); // Devuelve el ítem deshabilitado
     } catch (error) {
-        res.status(500).json({ error: `Error al actualizar el item: ${error.message}` });
+        res.status(500).json({ error: `Error al actualizar el item: ${error.message}` }); // Maneja errores
     }
 }
 
+// Funciones específicas para deshabilitar elementos llamando a la función genérica
 async function deleteRegimen(req, res) {
-    await deleteItem(req, res, 'TipoRegimen','IdTipoRegimen');
+    await deleteItem(req, res, 'TipoRegimen', 'IdTipoRegimen');
 }
 
 async function deleteService(req, res) {
-    await deleteItem(req, res, 'TipoServicio','IdTipoServicio');
+    await deleteItem(req, res, 'TipoServicio', 'IdTipoServicio');
 }
 
 async function deleteUnidad(req, res) {
-    await deleteItem(req, res, 'TipoUnidad','IdTipoUnidad');
+    await deleteItem(req, res, 'TipoUnidad', 'IdTipoUnidad');
 }
-
-
 
 module.exports = {
     renderHome,
@@ -243,4 +245,4 @@ module.exports = {
     deleteRegimen,
     deleteService,
     deleteUnidad,
-}
+};
