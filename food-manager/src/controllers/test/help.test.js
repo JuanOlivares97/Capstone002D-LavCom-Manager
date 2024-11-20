@@ -12,7 +12,7 @@ describe('Help Controller Tests', () => {
 
     describe('renderHome', () => {
         test('should render the home page with tipoUsuario as integer', async () => {
-            req.cookies['tipo_usuario'] = '1';
+            req.user = { tipo_usuario: '1' };
 
             await helpController.renderHome(req, res);
 
@@ -20,7 +20,7 @@ describe('Help Controller Tests', () => {
         });
 
         test('should render the home page with tipoUsuario as NaN if not provided', async () => {
-            req.cookies['tipo_usuario'] = undefined;
+            req.user = { tipo_usuario: undefined };
 
             await helpController.renderHome(req, res);
 
@@ -28,7 +28,7 @@ describe('Help Controller Tests', () => {
         });
 
         test('should render the home page with tipoUsuario parsed to integer', async () => {
-            req.cookies['tipo_usuario'] = '2';
+            req.user = { tipo_usuario: '2' };
 
             await helpController.renderHome(req, res);
 

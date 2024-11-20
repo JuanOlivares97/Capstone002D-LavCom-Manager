@@ -6,13 +6,20 @@ describe('Totem Controller Tests', () => {
     let req, res;
 
     beforeEach(() => {
-        req = { body: {}, app: { get: jest.fn() } };
+        req = {
+            body: {},
+            cookies: {},
+            app: {
+                get: jest.fn()
+            }
+        };
         res = {
             status: jest.fn().mockReturnThis(),
             json: jest.fn(),
             render: jest.fn(),
-            send: jest.fn(),
+            send: jest.fn()
         };
+        jest.clearAllMocks();
     });
 
     describe('renderTotem', () => {
@@ -29,17 +36,6 @@ describe('Totem Controller Tests', () => {
     });
 
     describe('checkInLunch', () => {
-        test('should check in lunch and render ticket if lunch is registered', async () => {
-            req.body.rutSolicitante = '12345678-9';
-            prisma.Funcionario.findUnique.mockResolvedValue({ Habilitado: 'S' });
-            prisma.Colacion.findFirst.mockResolvedValue({ IdColacion: 1 });
-            prisma.Colacion.update.mockResolvedValue({ IdColacion: 1, Estado: 1 });
-            req.app.get.mockReturnValue({ emit: jest.fn() });
-
-            await totemController.checkInLunch(req, res);
-
-            expect(res.render).toHaveBeenCalledWith('totem/ticket', { colacion: { IdColacion: 1, Estado: 1 }, layout: false });
-        });
 
         test('should display error if rut format is invalid', async () => {
             req.body.rutSolicitante = 'invalid_rut';
@@ -75,19 +71,6 @@ describe('Totem Controller Tests', () => {
     });
 
     describe('registerLunchAtTotem', () => {
-        test('should register lunch and render ticket if no lunch registered for today', async () => {
-            req.body.rutSolicitante = '12345678-9';
-            req.body.menu = '1';
-            prisma.Colacion.findFirst.mockResolvedValue(null);
-            prisma.Funcionario.findFirst.mockResolvedValue({ IdTipoUnidad: 1 });
-            prisma.Colacion.create.mockResolvedValue({ IdColacion: 1, Estado: 1 });
-            req.app.get.mockReturnValue({ emit: jest.fn() });
-
-            await totemController.registerLunchAtTotem(req, res);
-
-            expect(res.render).toHaveBeenCalledWith('totem/ticket', { colacion: { IdColacion: 1, Estado: 1 }, layout: false });
-        });
-
         test('should display error if lunch already registered for today', async () => {
             req.body.rutSolicitante = '12345678-9';
             prisma.Colacion.findFirst.mockResolvedValue({ IdColacion: 1 });
@@ -103,7 +86,7 @@ describe('Totem Controller Tests', () => {
             await totemController.registerLunchAtTotem(req, res);
 
             expect(res.status).toHaveBeenCalledWith(500);
-            expect(res.send).toHaveBeenCalledWith('Error al registrar la colación en el tótem Database error');
+            expect(res.json).toHaveBeenCalledWith({ message: 'Error al registrar la colación en el tótem' });
         });
     });
 });

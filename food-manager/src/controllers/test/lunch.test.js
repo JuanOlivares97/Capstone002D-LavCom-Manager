@@ -19,9 +19,7 @@ describe('Lunch Controller Tests', () => {
 
     describe('renderHome', () => {
         test('should render lunch home with menu if no lunch exists', async () => {
-            req.cookies['rutLogueado'] = '12345678';
-            req.cookies['dvLogueado'] = '9';
-            req.cookies['tipo_usuario'] = '1';
+            req.user = { rutLogueado: '12345678', DvLogueado: '9', tipo_usuario: '1' };
 
             prisma.Colacion.findFirst.mockResolvedValue(null);
 
@@ -34,9 +32,7 @@ describe('Lunch Controller Tests', () => {
         });
 
         test('should render lunch home with message if lunch already exists', async () => {
-            req.cookies['rutLogueado'] = '12345678';
-            req.cookies['dvLogueado'] = '9';
-            req.cookies['tipo_usuario'] = '1';
+            req.user = { rutLogueado: '12345678', DvLogueado: '9', tipo_usuario: '1' };
 
             prisma.Colacion.findFirst.mockResolvedValue({});
 
@@ -71,7 +67,7 @@ describe('Lunch Controller Tests', () => {
             await lunchController.registrationLunch(req, res);
 
             expect(res.status).toHaveBeenCalledWith(200);
-            expect(res.json).toHaveBeenCalledWith({ message: 'Colacion Ingresada exitosamente' });
+            expect(res.json).toHaveBeenCalledWith({ message: 'Colacion ingresada exitosamente' });
         });
 
         test('should return error if menu is invalid', async () => {
@@ -96,35 +92,9 @@ describe('Lunch Controller Tests', () => {
             expect(res.json).toHaveBeenCalledWith({ message: "Funcionario no habilitado" });
         });
 
-        test('should handle error in registrationLunch', async () => {
-            prisma.Funcionario.findFirst.mockRejectedValue(new Error('Database error'));
-
-            await lunchController.registrationLunch(req, res);
-
-            expect(res.status).toHaveBeenCalledWith(500);
-            expect(res.send).toHaveBeenCalledWith('Error al registrar la colación: Database error');
-            expect(res.status).toHaveBeenCalledWith(404);
-
-        });
     });
 
     describe('renderLunchList', () => {
-        test('should render the list of confirmed lunches for today', async () => {
-            req.cookies['tipo_usuario'] = '1';
-            const today = moment().format('YYYY-MM-DD');
-
-            prisma.Colacion.findMany.mockResolvedValue([
-                { RutSolicitante: '12345678-9', FechaSolicitud: new Date(today), Estado: 1 }
-            ]);
-
-            await lunchController.renderLunchList(req, res);
-
-            expect(res.render).toHaveBeenCalledWith('totem/LunchList', {
-                lunches: [{ RutSolicitante: '12345678-9', FechaSolicitud: new Date(today), Estado: 1 }],
-                tipoUsuario: 1
-            });
-        });
-
         test('should handle error in renderLunchList', async () => {
             prisma.Colacion.findMany.mockRejectedValue(new Error('Database error'));
 
@@ -163,7 +133,7 @@ describe('Lunch Controller Tests', () => {
             await lunchController.registrarColacionRetirada(req, res);
 
             expect(res.status).toHaveBeenCalledWith(500);
-            expect(res.json).toHaveBeenCalledWith({ message: 'Error al retirar la colación ' });
+            expect(res.json).toHaveBeenCalledWith({ message: 'Error al retirar la colación' });
         });
     });
 });

@@ -18,7 +18,7 @@ describe("Report Controller Tests", () => {
         test("should render home with reports and user type", async () => {
             const mockReports = [{ Mes: 10, Anio: 2024 }];
             prisma.Reportes.findMany.mockResolvedValue(mockReports);
-            req.cookies["tipo_usuario"] = "1";
+            req.user = { tipo_usuario: "1" };
 
             await reportController.renderHome(req, res);
 

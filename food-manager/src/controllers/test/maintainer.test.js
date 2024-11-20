@@ -24,7 +24,7 @@ describe('Maintainer Controller Tests', () => {
             prisma.TipoRegimen.findMany.mockResolvedValue(['Regimen1']);
             prisma.TipoFuncionario.findMany.mockResolvedValue(['TipoFuncionario1']);
             prisma.TipoContrato.findMany.mockResolvedValue(['Contrato1']);
-            req.cookies['tipo_usuario'] = '1';
+            req.user = { tipo_usuario: '1' };
 
             await maintainerController.renderHome(req, res);
 

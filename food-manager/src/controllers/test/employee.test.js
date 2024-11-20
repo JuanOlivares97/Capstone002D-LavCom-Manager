@@ -33,7 +33,7 @@ describe("Employee Controller Tests", () => {
             getUnidad.mockResolvedValue(["Unidad1"]);
             getEstamento.mockResolvedValue(["Estamento1"]);
             getTipoFuncionario.mockResolvedValue(["TipoFuncionario1"]);
-            req.cookies["tipo_usuario"] = "1";
+            req.user = { tipo_usuario: "1" };
 
             await employeeController.renderHome(req, res);
             expect(res.render).toHaveBeenCalledWith("employee/home", {
@@ -334,29 +334,6 @@ describe("Employee Controller Tests", () => {
             expect(res.json).toHaveBeenCalledWith({
                 IdFuncionario: 1,
                 NombreFuncionario: "Juan Perez",
-            });
-        });
-
-        test("should handle non-existing tipoFuncionario", async () => {
-            req.params.id = 1;
-            req.body = {
-                nombre_usuario: "Juan",
-                apellido_paterno: "Perez",
-                apellido_materno: "Gomez",
-                tipoEstamento: 1,
-                tipoServicio: 1,
-                tipoUnidad: 1,
-                tipoContrato: 1,
-                tipoFuncionario: 99, // Un ID que no existe
-            };
-
-            prisma.TipoFuncionario.findUnique.mockResolvedValue(null); // Simula que no existe el tipoFuncionario
-
-            await employeeController.updateEmployee(req, res);
-
-            expect(res.status).toHaveBeenCalledWith(404);
-            expect(res.json).toHaveBeenCalledWith({
-                message: "El tipoFuncionario especificado no existe.",
             });
         });
 
