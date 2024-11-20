@@ -7,10 +7,8 @@ const {
 } = require("./maintainer.controller");
 const moment = require("moment-timezone");
 
-// Renderiza la página principal de pacientes
 async function renderHome(req, res) {
   try {
-    // Obtiene listas relacionadas para los selectores
     const [servicios, unidades, vias, regimen] = await Promise.all([
       getServicio(),
       getUnidad(),
@@ -18,7 +16,7 @@ async function renderHome(req, res) {
       getRegimen(),
     ]);
 
-    // Consulta los pacientes que no tienen alta o cuya fecha de alta es mayor a hoy
+    // Obtener los pacientes con las condiciones especificadas
     const pacientes = await prisma.Hospitalizado.findMany({
       where: {
         OR: [{ FechaAlta: null }, { FechaAlta: { gt: new Date() } }],
@@ -31,45 +29,50 @@ async function renderHome(req, res) {
       },
     });
 
-    // Define las fechas de inicio y fin del día actual en la zona horaria de Chile
+    // Obtener la fecha actual en la zona horaria de Chile y definir el inicio y fin del día
     const startOfTodayChile = moment().tz("America/Santiago").startOf("day");
     const endOfTodayChile = moment().tz("America/Santiago").endOf("day");
 
-    // Convierte las fechas de inicio y fin del día a UTC para comparación
+    // Convertir el inicio y fin del día a UTC para comparar con fechas en UTC en la base de datos
     const startOfTodayUTC = startOfTodayChile.clone().utc().toDate();
     const endOfTodayUTC = endOfTodayChile.clone().utc().toDate();
 
-    // Calcula KPIs diarios y datos históricos
+    // KPIs diarios y datos históricos comparando solo fechas
     const [pacientesHospitalizados, pacientesEnAyuno, ingresosHoy, altasHoy] =
       await Promise.all([
-        // Total de pacientes hospitalizados
         prisma.Hospitalizado.count({
           where: {
             OR: [{ FechaAlta: null }, { FechaAlta: { gt: new Date() } }],
           },
         }),
-        // Pacientes en ayuno
         prisma.Hospitalizado.count({
           where: {
-            FechaFinAyuno: { gte: startOfTodayUTC },
+            FechaFinAyuno: {
+              // Comparamos si la fecha de fin de ayuno es posterior o igual al inicio del día actual en Chile (UTC)
+              gte: startOfTodayUTC,
+            },
             FechaAlta: null,
           },
         }),
-        // Pacientes ingresados hoy
         prisma.Hospitalizado.count({
           where: {
-            FechaIngreso: { gte: startOfTodayChile, lte: endOfTodayChile },
+            FechaIngreso: {
+              gte: startOfTodayChile,
+              lte: endOfTodayChile,
+            },
           },
         }),
-        // Pacientes dados de alta hoy
         prisma.Hospitalizado.count({
           where: {
-            FechaAlta: { gte: startOfTodayUTC, lte: endOfTodayUTC },
+            FechaAlta: {
+              gte: startOfTodayUTC,
+              lte: endOfTodayUTC,
+            },
           },
         }),
       ]);
 
-    // Calcula la edad y el estado de ayuno de cada paciente
+    // Calcular la edad y determinar el estado de Ayuno para cada paciente
     const pacientesConDatos = pacientes.map((paciente) => ({
       ...paciente,
       edad: calcularEdad(paciente.FechaNacimiento),
@@ -80,7 +83,7 @@ async function renderHome(req, res) {
 
     const tipoUsuario = req.cookies["tipo_usuario"];
 
-    // Renderiza la vista de pacientes con los datos obtenidos
+    // Renderizar la vista y pasar los datos
     res.render("patient/home", {
       tipoUsuario: parseInt(tipoUsuario),
       pacientes: pacientesConDatos,
@@ -99,28 +102,24 @@ async function renderHome(req, res) {
   }
 }
 
-// Obtiene un paciente específico por RUT
 async function getPaciente(req, res) {
-  const rutCompleto = req.params.rut; // RUT en formato completo
+  const rutCompleto = req.params.rut;
   const [rut, dv] = rutCompleto.split("-");
   try {
-    // Consulta pacientes con el RUT y DV especificados
     const paciente = await prisma.Hospitalizado.findMany({
       where: {
         OR: [{ RutHospitalizado: rut }, { DvHospitalizado: dv }],
       },
     });
 
-    return res.status(200).json(paciente); // Devuelve el paciente encontrado
+    return res.status(200).json(paciente);
   } catch (error) {
     return res.status(500).json({ message: "Internal server error" });
   }
 }
 
-// Obtiene todos los pacientes hospitalizados
 async function getPacientes(req, res) {
   try {
-    // Filtra pacientes que no tienen alta o cuya fecha de alta es mayor a hoy
     const pacientes = await prisma.Hospitalizado.findMany({
       where: {
         OR: [{ FechaAlta: null }, { FechaAlta: { gt: new Date() } }],
@@ -132,41 +131,45 @@ async function getPacientes(req, res) {
         logMovimientosPaciente: true,
       },
     });
-    return res.status(200).json(pacientes); // Devuelve la lista de pacientes
+    return res.status(200).json(pacientes);
   } catch (error) {
-    console.error("Error en getPacientes:", error);
+    console.error("Error en getPacientes:", error); // Depuración del error
     return res.status(500).json({ message: "Internal server error" });
   }
 }
 
-// Crea o reingresa un paciente
 async function createPaciente(req, res) {
   try {
-    const rutCompleto = req.body.RutCompleto; // RUT completo desde el cuerpo de la solicitud
+    // Verificar si `Rut` está presente en el cuerpo de la solicitud
+    const rutCompleto = req.body.RutCompleto;
     if (!rutCompleto) {
       return res.status(400).json({ message: "El campo Rut es obligatorio" });
     }
 
-    const [rut, dv] = rutCompleto.split("-"); // Divide el RUT y DV
+    // Extraer `rut` y `dv` del `RutCompleto`
+    const [rut, dv] = rutCompleto.split("-");
     if (!rut || !dv) {
       return res.status(400).json({ message: "Formato de RUT inválido" });
     }
 
-    // Busca si el paciente ya existe
+    // Buscar paciente existente
     const pacienteExistente = await prisma.Hospitalizado.findFirst({
-      where: { RutHospitalizado: rut, DvHospitalizado: dv },
+      where: {
+        RutHospitalizado: rut,
+        DvHospitalizado: dv,
+      },
     });
 
     const fechaIngreso = new Date().toISOString();
 
     if (pacienteExistente) {
-      // Si el paciente existe, actualiza su fecha de ingreso
+      // Actualizar fecha de ingreso para paciente existente
       const pacienteActualizado = await prisma.Hospitalizado.update({
         where: { IdHospitalizado: pacienteExistente.IdHospitalizado },
         data: { FechaIngreso: fechaIngreso, FechaAlta: null },
       });
 
-      // Registra un log de reingreso
+      // Crear log de reingreso
       await prisma.logMovimientosPaciente.create({
         data: {
           descripcionLog: "Paciente Reingresa al Hospital",
@@ -175,12 +178,14 @@ async function createPaciente(req, res) {
         },
       });
 
-      return res.status(200).json({
-        message: "Paciente reingresado exitosamente",
-        paciente: pacienteActualizado,
-      });
+      return res
+        .status(200)
+        .json({
+          message: "Paciente reingresado exitosamente",
+          paciente: pacienteActualizado,
+        });
     } else {
-      // Crea un nuevo paciente
+      // Crear nuevo paciente
       const nuevoPaciente = await prisma.Hospitalizado.create({
         data: {
           CodigoCama: parseInt(req.body.CodigoCama),
@@ -203,7 +208,7 @@ async function createPaciente(req, res) {
         },
       });
 
-      // Registra un log de ingreso
+      // Crear log de ingreso
       await prisma.logMovimientosPaciente.create({
         data: {
           descripcionLog: "Paciente Hace Ingreso al Hospital",
@@ -212,18 +217,21 @@ async function createPaciente(req, res) {
         },
       });
 
-      return res.status(200).json({
-        message: "Paciente ingresado exitosamente",
-        paciente: nuevoPaciente,
-      });
+      return res
+        .status(200)
+        .json({
+          message: "Paciente ingresado exitosamente",
+          paciente: nuevoPaciente,
+        });
     }
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Error al crear o reingresar el paciente" });
+    res
+      .status(500)
+      .json({ message: "Error al crear o reingresar el paciente" });
   }
 }
 
-// Calcula la edad de un paciente a partir de su fecha de nacimiento
 function calcularEdad(fechaNacimiento) {
   const hoy = new Date();
   const fechaNac = new Date(fechaNacimiento);
@@ -234,96 +242,89 @@ function calcularEdad(fechaNacimiento) {
   }
   return edad;
 }
-const prisma = require("../server/prisma");
-const moment = require("moment-timezone");
 
-// Obtiene el historial de movimientos de un paciente
 async function getMovimientosPaciente(req, res) {
-  const idPaciente = parseInt(req.params.id); // Obtiene el ID del paciente desde los parámetros
+  const idPaciente = parseInt(req.params.id);
   try {
     const movimientos = await prisma.logMovimientosPaciente.findMany({
       where: {
-        idPaciente: idPaciente, // Filtra por ID del paciente
+        idPaciente: idPaciente,
       },
     });
-    return res.status(200).json(movimientos); // Devuelve el historial de movimientos
+    return res.status(200).json(movimientos);
   } catch (error) {
-    return res.status(500).json({ message: "Internal server error" }); // Manejo de errores
+    return res.status(500).json({ message: "Internal server error" });
   }
 }
 
-// Cambia el servicio asociado a un paciente
 async function movePatientService(req, res) {
-  try {
-    const paciente = await prisma.Hospitalizado.findFirst({
-      where: { IdHospitalizado: parseInt(req.params.id) }, // Busca al paciente por ID
-      include: { TipoServicio_Hospitalizado_IdTipoServicioToTipoServicio: true }, // Incluye el servicio actual del paciente
-    });
+    try {
+        const paciente = await prisma.Hospitalizado.findFirst({
+            where: { IdHospitalizado: parseInt(req.params.id) },
+            include: { TipoServicio_Hospitalizado_IdTipoServicioToTipoServicio: true }
+        });
 
-    if (!paciente) {
-      return res.status(404).json({ message: "Paciente no encontrado" }); // Si no se encuentra el paciente
+        if (!paciente) {
+            return res.status(404).json({ message: 'Paciente no encontrado' });
+        }
+
+        const newService = parseInt(req.body.newService);
+
+        // Obtén la lista de servicios válidos
+        const servicios = await getServicio();
+        const isValidService = servicios.some(servicio => servicio.IdTipoServicio === newService);
+
+        // Si el nuevo servicio no es válido, devuelve un error 400
+        if (!isValidService) {
+            return res.status(400).json({ message: 'Servicio no válido' });
+        }
+
+        // Actualizar el servicio del paciente si es válido
+        const updatedPatient = await prisma.Hospitalizado.update({
+            where: { IdHospitalizado: paciente.IdHospitalizado },
+            data: { IdTipoServicio: newService }
+        });
+
+        return res.status(200).json({ message: 'Movimiento al Servicio exitoso', paciente: updatedPatient });
+    } catch (error) {
+        console.error('Error interno:', error);
+        return res.status(500).json({ message: 'Error interno del servidor', error: error.message });
     }
-
-    const newService = parseInt(req.body.newService); // Nuevo servicio solicitado
-
-    // Valida si el nuevo servicio es válido
-    const servicios = await getServicio();
-    const isValidService = servicios.some(
-      (servicio) => servicio.IdTipoServicio === newService
-    );
-
-    if (!isValidService) {
-      return res.status(400).json({ message: "Servicio no válido" }); // Si el servicio no es válido
-    }
-
-    // Actualiza el servicio del paciente
-    const updatedPatient = await prisma.Hospitalizado.update({
-      where: { IdHospitalizado: paciente.IdHospitalizado },
-      data: { IdTipoServicio: newService },
-    });
-
-    return res
-      .status(200)
-      .json({ message: "Movimiento al Servicio exitoso", paciente: updatedPatient });
-  } catch (error) {
-    console.error("Error interno:", error);
-    return res
-      .status(500)
-      .json({ message: "Error interno del servidor", error: error.message });
-  }
 }
 
-// Cambia el régimen alimenticio de un paciente
 async function changeRegimen(req, res) {
   try {
     const paciente = await prisma.Hospitalizado.findFirst({
       where: {
-        IdHospitalizado: parseInt(req.params.id), // Busca al paciente por ID
+        IdHospitalizado: parseInt(req.params.id),
       },
-      include: { TipoRegimen: true }, // Incluye el régimen actual del paciente
+      include: {
+        TipoRegimen: true,
+      },
     });
 
     if (!paciente) {
-      return res.status(404).json({ message: "Paciente no encontrado" }); // Si no se encuentra el paciente
+      return res.status(404).json({ message: "Paciente no encontrado" });
     }
 
-    const newRegimen = parseInt(req.body.newRegimen); // Nuevo régimen solicitado
+    const newRegimen = parseInt(req.body.newRegimen);
 
-    // Valida si el nuevo régimen es válido
+    // Obtén la lista de regímenes válidos
     const regimens = await getRegimen();
     const isValidRegimen = regimens.some(
       (regimen) => regimen.IdTipoRegimen === newRegimen
     );
 
+    // Si el nuevo régimen no es válido, devuelve un error 400
     if (!isValidRegimen) {
-      return res.status(400).json({ message: "Régimen no válido" }); // Si el régimen no es válido
+      return res.status(400).json({ message: "Régimen no válido" });
     }
 
+    // Verifica si el nuevo régimen es el mismo que el actual
     if (paciente.IdTipoRegimen === newRegimen) {
-      return res.status(400).json({ message: "El régimen no ha cambiado" }); // Si el régimen no cambia
+      return res.status(400).json({ message: "El régimen no ha cambiado" });
     }
 
-    // Actualiza el régimen del paciente
     const updatedPatient = await prisma.Hospitalizado.update({
       where: { IdHospitalizado: paciente.IdHospitalizado },
       data: { IdTipoRegimen: newRegimen },
@@ -340,26 +341,27 @@ async function changeRegimen(req, res) {
   }
 }
 
-// Cambia las observaciones de alta de un paciente
 async function changeObservacionesAlta(req, res) {
+  // Verificar si el paciente existe en la base de datos
   try {
     const paciente = await prisma.Hospitalizado.findFirst({
       where: {
-        IdHospitalizado: parseInt(req.params.id), // Busca al paciente por ID
+        IdHospitalizado: parseInt(req.params.id),
       },
     });
-
     const oldObservacionesAlta =
-      paciente.ObservacionesAlta || "Sin Observacion"; // Observación actual de alta
-    const newObservacionesAlta = req.body.newObservacionesAlta; // Nueva observación
+      paciente.ObservacionesAlta || "Sin Observacion";
+    const newObservacionesAlta = req.body.newObservacionesAlta;
 
-    // Actualiza las observaciones de alta
+    // Actualizar el servicio del paciente
     await prisma.Hospitalizado.update({
-      where: { IdHospitalizado: paciente.IdHospitalizado },
-      data: { ObservacionesAlta: newObservacionesAlta },
+      where: {
+        IdHospitalizado: paciente.IdHospitalizado,
+      },
+      data: {
+        ObservacionesAlta: newObservacionesAlta,
+      },
     });
-
-    // Registra el cambio en el historial de movimientos
     const movimiento = await prisma.logMovimientosPaciente.create({
       data: {
         idPaciente: paciente.IdHospitalizado,
@@ -367,7 +369,6 @@ async function changeObservacionesAlta(req, res) {
         descripcionLog: `Cambio de Observaciones de Alta: ${oldObservacionesAlta} a ${newObservacionesAlta}`,
       },
     });
-
     return res
       .status(200)
       .json({ message: "Movimiento al Observaciones de Alta", movimiento });
@@ -376,27 +377,27 @@ async function changeObservacionesAlta(req, res) {
   }
 }
 
-// Cambia las observaciones nutricionales de un paciente
 async function changeObservacionesNutricionista(req, res) {
+  // Verificar si el paciente existe en la base de datos
   try {
     const paciente = await prisma.Hospitalizado.findFirst({
       where: {
-        IdHospitalizado: parseInt(req.params.id), // Busca al paciente por ID
+        IdHospitalizado: parseInt(req.params.id),
       },
     });
-
     const oldObservacionesNutricionista =
-      paciente.ObservacionesNutricionista || "Sin Observacion"; // Observación actual
+      paciente.ObservacionesNutricionista || "Sin Observacion";
     const newObservacionesNutricionista =
-      req.body.newObservacionesNutricionista; // Nueva observación
-
-    // Actualiza las observaciones nutricionales
+      req.body.newObservacionesNutricionista;
+    // Actualizar el servicio del paciente
     await prisma.Hospitalizado.update({
-      where: { IdHospitalizado: paciente.IdHospitalizado },
-      data: { ObservacionesNutricionista: newObservacionesNutricionista },
+      where: {
+        IdHospitalizado: paciente.IdHospitalizado,
+      },
+      data: {
+        ObservacionesNutricionista: newObservacionesNutricionista,
+      },
     });
-
-    // Registra el cambio en el historial de movimientos
     const movimiento = await prisma.logMovimientosPaciente.create({
       data: {
         idPaciente: paciente.IdHospitalizado,
@@ -404,7 +405,6 @@ async function changeObservacionesNutricionista(req, res) {
         descripcionLog: `Cambio de Observaciones Nutricionista: ${oldObservacionesNutricionista} a ${newObservacionesNutricionista}`,
       },
     });
-
     return res
       .status(200)
       .json({
@@ -413,152 +413,6 @@ async function changeObservacionesNutricionista(req, res) {
       });
   } catch (error) {
     return res.status(500).json({ message: "Internal server error " + error });
-  }
-}
-
-// Cambia la vía alimenticia de un paciente
-async function changeVia(req, res) {
-  try {
-    const paciente = await prisma.Hospitalizado.findFirst({
-      where: {
-        IdHospitalizado: parseInt(req.params.id), // Busca al paciente por ID
-      },
-      include: { TipoVia: true }, // Incluye la vía actual
-    });
-
-    if (!paciente) {
-      return res.status(404).json({ message: "Paciente no encontrado" }); // Si no se encuentra el paciente
-    }
-
-    const oldVia = paciente.TipoVia ? paciente.TipoVia.DescTipoVia : null; // Vía actual
-    const newVia = parseInt(req.body.newVia); // Nueva vía solicitada
-
-    // Valida si la nueva vía es válida
-    const Vias = await getVia();
-    const newViaIndex = Vias.findIndex((via) => via.IdTipoVia === newVia);
-
-    if (newViaIndex === -1) {
-      return res.status(400).json({ message: "Vía no válida" }); // Si la vía no es válida
-    }
-
-    if (paciente.IdTipoVia === newVia) {
-      return res.status(400).json({ message: "La vía no ha cambiado" }); // Si la vía no cambia
-    }
-
-    const strVia = Vias[newViaIndex].DescTipoVia;
-
-    // Actualiza la vía del paciente
-    await prisma.Hospitalizado.update({
-      where: { IdHospitalizado: paciente.IdHospitalizado },
-      data: { IdTipoVia: newVia },
-    });
-
-    // Registra el cambio en el historial de movimientos
-    const movimiento = await prisma.logMovimientosPaciente.create({
-      data: {
-        idPaciente: paciente.IdHospitalizado,
-        fechaLog: new Date(),
-        descripcionLog: `Cambio de ingesta de alimentos de ${oldVia} a ${strVia}`,
-      },
-    });
-
-    return res
-      .status(200)
-      .json({ message: "Vía de ingesta actualizada exitosamente", movimiento });
-  } catch (error) {
-    console.error("Error interno:", error);
-    return res
-      .status(500)
-      .json({ message: "Internal server error", error: error.message });
-  }
-}
-
-// Indica que un paciente ha sido dado de alta
-async function indicarAlta(req, res) {
-  try {
-    const idPaciente = parseInt(req.params.id); // ID del paciente
-    const today = new Date(); // Fecha actual
-
-    const paciente = await prisma.Hospitalizado.findFirst({
-      where: { IdHospitalizado: idPaciente }, // Busca al paciente
-    });
-
-    if (!paciente) {
-      return res.status(404).json({ message: "Paciente no encontrado" }); // Si no se encuentra el paciente
-    }
-
-    // Actualiza la fecha de alta y otros datos
-    const newPaciente = await prisma.Hospitalizado.update({
-      where: { IdHospitalizado: idPaciente },
-      data: {
-        FechaAlta: today,
-        CodigoCamaAlta: req.body.CodigoCamaAlta
-          ? parseInt(req.body.CodigoCamaAlta)
-          : null,
-        ServicioAlta: req.body.ServicioAlta
-          ? parseInt(req.body.ServicioAlta)
-          : null,
-        ObservacionesAlta: req.body.ObservacionesAlta || null,
-      },
-    });
-
-    // Registra el cambio en el historial de movimientos
-    await prisma.logMovimientosPaciente.create({
-      data: {
-        descripcionLog: `Paciente es dado de alta, sus observaciones son: ${req.body.ObservacionesAlta}`,
-        idPaciente: newPaciente.IdHospitalizado,
-        fechaLog: today,
-      },
-    });
-
-    return res
-      .status(200)
-      .json({ message: "Paciente indicado como alta", paciente: newPaciente });
-  } catch (error) {
-    console.error("Error interno:", error);
-    return res
-      .status(500)
-      .json({ message: "Internal server error", error: error.message });
-  }
-}
-
-// Cambia la fecha de fin de ayuno de un paciente
-async function changeFastingDate(req, res) {
-  try {
-    const idPaciente = parseInt(req.params.id); // ID del paciente
-    const newFastingDate = new Date(req.body.fastingDate); // Nueva fecha de ayuno
-
-    if (!moment(newFastingDate, "YYYY-MM-DD", true).isValid()) {
-      return res
-        .status(400)
-        .json({ message: "La fecha de ayuno no es válida" }); // Valida la fecha
-    }
-
-    // Actualiza la fecha de fin de ayuno
-    const paciente = await prisma.Hospitalizado.update({
-      where: { IdHospitalizado: idPaciente },
-      data: { FechaFinAyuno: newFastingDate },
-    });
-
-    if (!paciente) {
-      return res.status(404).json({ message: "Paciente no encontrado" }); // Si no se encuentra el paciente
-    }
-
-    // Registra el cambio en el historial de movimientos
-    await prisma.logMovimientosPaciente.create({
-      data: {
-        descripcionLog: `Paciente se ha indicado como ayuno hasta el día ${newFastingDate}`,
-        idPaciente: paciente.IdHospitalizado,
-        fechaLog: new Date(),
-      },
-    });
-
-    return res.status(200).json({
-      message: `Paciente indicado como ayuno hasta el día ${newFastingDate}`,
-      paciente,
-    });
-  } catch (error) {
-    return res.status(500).json({ message: "Internal server error" });
   }
 }
 
@@ -586,7 +440,7 @@ async function changeObservacionesGenerales(req, res) {
       data: {
         idPaciente: paciente.IdHospitalizado,
         fechaLog: new Date(),
-        descripcionLog:`Cambio de Observaciones Generales: ${oldObservacionesGenerales} a ${newObservacionesGenerales}`,
+        descripcionLog: `Cambio de Observaciones Generales: ${oldObservacionesGenerales} a ${newObservacionesGenerales}`,
       },
     });
     return res
@@ -597,8 +451,184 @@ async function changeObservacionesGenerales(req, res) {
   }
 }
 
+async function changeVia(req, res) {
+  try {
+    // Verificar si el paciente existe en la base de datos
+    const paciente = await prisma.Hospitalizado.findFirst({
+      where: {
+        IdHospitalizado: parseInt(req.params.id),
+      },
+      include: {
+        TipoVia: true,
+      },
+    });
+
+    // Verificar si se encontró el paciente
+    if (!paciente) {
+      return res.status(404).json({ message: "Paciente no encontrado" });
+    }
+
+    const oldVia = paciente.TipoVia ? paciente.TipoVia.DescTipoVia : null;
+    const newVia = parseInt(req.body.newVia);
+
+    // Obtener la lista de vías
+    const Vias = await getVia();
+    const newViaIndex = Vias.findIndex((via) => via.IdTipoVia === newVia);
+
+    // Validar si la nueva vía es válida
+    if (newViaIndex === -1) {
+      return res.status(400).json({ message: "Vía no válida" });
+    }
+
+    // Validar si la nueva vía es la misma que la anterior
+    if (paciente.IdTipoVia === newVia) {
+      return res.status(400).json({ message: "La vía no ha cambiado" });
+    }
+
+    const strVia = Vias[newViaIndex].DescTipoVia;
+
+    // Actualizar la vía del paciente
+    await prisma.Hospitalizado.update({
+      where: {
+        IdHospitalizado: paciente.IdHospitalizado,
+      },
+      data: {
+        IdTipoVia: newVia,
+      },
+    });
+
+    // Registrar el movimiento del cambio de vía
+    const movimiento = await prisma.logMovimientosPaciente.create({
+      data: {
+        idPaciente: paciente.IdHospitalizado,
+        fechaLog: new Date(),
+        descripcionLog: `Cambio de ingesta de alimentos de ${oldVia} a ${strVia}`,
+      },
+    });
+
+    return res
+      .status(200)
+      .json({ message: "Vía de ingesta actualizada exitosamente", movimiento });
+  } catch (error) {
+    console.error("Error interno:", error);
+    return res
+      .status(500)
+      .json({ message: "Internal server error", error: error.message });
+  }
+}
+
+async function indicarAlta(req, res) {
+  try {
+    const idPaciente = parseInt(req.params.id);
+
+    // Obtener la fecha actual como objeto Date
+    const today = new Date(); // Esto generará la fecha de hoy en formato Date
+
+    const paciente = await prisma.Hospitalizado.findFirst({
+      where: {
+        IdHospitalizado: idPaciente,
+      },
+    });
+
+    if (!paciente) {
+      return res.status(404).json({ message: "Paciente no encontrado" });
+    }
+
+    const newPaciente = await prisma.Hospitalizado.update({
+      where: {
+        IdHospitalizado: idPaciente,
+      },
+      data: {
+        FechaAlta: today, // Usar el objeto Date
+        CodigoCamaAlta: req.body.CodigoCamaAlta
+          ? parseInt(req.body.CodigoCamaAlta)
+          : null, // Convertir a int si es necesario
+        ServicioAlta: req.body.ServicioAlta
+          ? parseInt(req.body.ServicioAlta)
+          : null, // Convertir a int si es necesario
+        ObservacionesAlta: req.body.ObservacionesAlta || null,
+      },
+    });
+
+    // Crear un log de ingreso
+    await prisma.logMovimientosPaciente.create({
+      data: {
+        descripcionLog:
+          "Paciente es dado de alta, sus observaciones son las siguientes: " +
+          req.body.ObservacionesAlta,
+        idPaciente: newPaciente.IdHospitalizado,
+        fechaLog: today, // Fecha actual
+      },
+    });
+
+    return res
+      .status(200)
+      .json({ message: "Paciente indicado como alta", paciente: newPaciente });
+  } catch (error) {
+    console.error("Error interno:", error);
+    return res
+      .status(500)
+      .json({ message: "Internal server error", error: error.message });
+  }
+}
+
+async function changeFastingDate(req, res) {
+  try {
+    const idPaciente = parseInt(req.params.id);
+
+    const newFastingDate = new Date(req.body.fastingDate);
+
+    // Verificar si la fecha es válida
+    if (!newFastingDate) {
+      return res
+        .status(400)
+        .json({ message: "La fecha de ayuno no puede ser vacía" });
+    }
+
+    // Verificar si la fecha es válida
+    if (!moment(newFastingDate, "YYYY-MM-DD", true).isValid()) {
+      return res
+        .status(400)
+        .json({ message: "La fecha de ayuno no es válida" });
+    }
+
+    const paciente = await prisma.Hospitalizado.update({
+      where: {
+        IdHospitalizado: idPaciente,
+      },
+      data: {
+        FechaFinAyuno: newFastingDate,
+      },
+    });
+    if (!paciente) {
+      return res.status(404).json({ message: "Paciente no encontrado" });
+    }
+
+    // Crear un log de ingreso
+    await prisma.logMovimientosPaciente.create({
+      data: {
+        descripcionLog:
+          "Paciente se ha indicado como ayuno hasta el día " + newFastingDate,
+        idPaciente: paciente.IdHospitalizado,
+        fechaLog: new Date(), // Fecha actual
+      },
+    });
+
+    return res
+      .status(200)
+      .json({
+        message: "Paciente indicado como ayuno hasta el día " + newFastingDate,
+        paciente: paciente,
+      });
+  } catch (error) {
+    return res.status(500).json({ message: "Internal server error" });
+  }
+}
+
 module.exports = {
   renderHome,
+  getPacientes,
+  createPaciente,
   getMovimientosPaciente,
   movePatientService,
   changeRegimen,
@@ -608,5 +638,5 @@ module.exports = {
   changeVia,
   indicarAlta,
   changeFastingDate,
+  getPaciente,
 };
-
