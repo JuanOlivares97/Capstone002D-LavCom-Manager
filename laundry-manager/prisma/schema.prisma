@@ -127,12 +127,13 @@ model usuarios {
 }
 
 model error_log {
-  id_error      Int      @id @default(autoincrement())
-  id_usuario    Int
-  tipo_error    String   @db.VarChar(30)
-  mensaje_error String   @db.LongText
-  ruta_error    String   @db.VarChar(40)
-  usuarios      usuarios @relation(fields: [id_usuario], references: [id_usuario], onUpdate: Restrict, map: "fk_user_error")
+  id_error      Int       @id @default(autoincrement())
+  id_usuario    Int?
+  tipo_error    String    @db.VarChar(100)
+  mensaje_error String    @db.LongText
+  ruta_error    String    @db.VarChar(100)
+  codigo_http   Int 
+  usuarios      usuarios? @relation(fields: [id_usuario], references: [id_usuario], onUpdate: Restrict, map: "fk_user_error")
 
   @@index([id_usuario], map: "fk_user_error")
 }
