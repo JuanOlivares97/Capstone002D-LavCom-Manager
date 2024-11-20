@@ -91,8 +91,16 @@ async function renderHome(req, res) {
         });
 
     } catch (error) {
-        console.error("Error al renderizar el dashboard: ", error);
-        return res.status(500).json({ message: "Internal server error", error });
+        await prisma.error_log.create({
+            data: {
+                id_usuario: req.user["id_usuario"] || null,
+                tipo_error: "Error interno del servidor",
+                mensaje_error: JSON.stringify(error),
+                ruta_error: "laundry-manager/dashboard/home",
+                codigo_http: 500
+            },
+        })
+        return res.status(500).json({ message: "Internal server error" });
     }
 }
 
