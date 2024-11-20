@@ -26,7 +26,8 @@ async function loginRequired(req, res, next) {
         req.user = {
             rutLogueado: user.rut_usuario,
             nombreLogueado: user.nombre,
-            tipo_usuario: user.id_tipo_usuario
+            tipo_usuario: user.id_tipo_usuario,
+            id_usuario: user.id_usuario
         } 
         
         next();
