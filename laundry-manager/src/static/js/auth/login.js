@@ -75,7 +75,7 @@ form.addEventListener("submit", async (e) => {
         position: 'top-end',
         showConfirmButton: false, // No mostrar botón de confirmación
         willClose: () => {
-            window.location.href = "/laundry-manager/dashboard/home"; // Redirigir cuando la alerta se cierre
+            window.location.href = "/laundry-manager/help/home"; // Redirigir cuando la alerta se cierre
         }
     });
 });

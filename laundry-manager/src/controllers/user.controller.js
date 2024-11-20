@@ -23,7 +23,7 @@ async function getUsuarios(req, res) {
         });
         return res.json(users);
     } catch (error) {
-        return res.status(500).json({ message: "Internal server error" });
+        return res.status(500).json({ message: "Internal server error", error });
     }
 }
 
