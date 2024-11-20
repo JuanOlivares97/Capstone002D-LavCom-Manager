@@ -23,7 +23,15 @@ async function loginRequired(req, res, next) {
             return res.redirect("/food-manager/auth/login");
         }
 
-        req.user = user; // Añadir el usuario al objeto req
+        req.user = {
+            id_usuario: user.IdFuncionario,
+            nombre: user.NombreFuncionario,
+            tipo_usuario: user.IdTipoFuncionario,
+            email: user.correo,
+            rutLogueado: user.RutFuncionario,
+            DvLogueado: user.DvFuncionario,
+            
+        }; // Añadir el usuario al objeto req
         next();
     } catch (error) {
         console.error("Error during authentication:", error);
