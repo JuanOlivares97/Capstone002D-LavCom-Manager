@@ -16,7 +16,7 @@ function openModalInfo(paciente) {
     document.getElementById('infoServicio').value = paciente.IdTipoServicio !== null && paciente.IdTipoServicio !== undefined ? paciente.IdTipoServicio : '';
     document.getElementById('infoVia').value = paciente.IdTipoVia !== null && paciente.IdTipoVia !== undefined ? paciente.IdTipoVia : '';
     document.getElementById('infoRegimen').value = paciente.IdTipoRegimen !== null && paciente.IdTipoRegimen !== undefined ? paciente.IdTipoRegimen : '';
-    
+
 
 
 
@@ -95,7 +95,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const changeObservacionesNutricionistaButton = document.getElementById('changeObservacionesNutricionista');
     const changeViaButton = document.getElementById('changeVia');
     const changeRegimenButton = document.getElementById('changeRegimen');
-
+    const changeServicioButton = document.getElementById('changeServicio');
 
     // Verificar que los botones existen antes de añadir el evento
     if (changeObservacionesGeneralesButton) {
@@ -113,8 +113,69 @@ document.addEventListener('DOMContentLoaded', () => {
     if (changeRegimenButton) {
         changeRegimenButton.addEventListener('click', sendNewRegimen);
     }
+
+    if (changeServicioButton) {
+        changeServicioButton.addEventListener('click', sendNewServicio);
+    }
 });
 
+async function sendNewServicio(event) {
+    event.preventDefault();
+
+    const newServicio = document.getElementById('infoServicio').value;
+    const newCodigoCama = document.getElementById('infoCama').value;
+    const idPaciente = document.getElementById('idPaciente').value;
+
+    if (!newServicio || !newCodigoCama || !idPaciente) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Debe seleccionar un nuevo servicio y ingresar el número de cama',
+            confirmButtonText: 'Ok'
+        });
+        return; // Salir de la función si faltan datos
+    }
+
+    const result = await Swal.fire({
+        icon: 'warning',
+        title: '¿Estás seguro?',
+        text: '¿Deseas cambiar el servicio del paciente?',
+        confirmButtonText: 'Sí',
+        cancelButtonText: 'No',
+        showCancelButton: true
+    });
+
+    if (result.isConfirmed) {
+        try {
+            // Hacer la petición PUT al servidor para actualizar el servicio
+            const response = await fetch(`/food-manager/patient/move-service/${idPaciente}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ newService: newServicio, newCodigoCama: newCodigoCama })
+            });
+
+            if (!response.ok) {
+                throw new Error('Error al enviar el cambio de servicio');
+            }
+
+            await Swal.fire({
+                icon: 'success',
+                title: 'Actualización exitosa',
+                text: 'El servicio del paciente se ha actualizado correctamente',
+                confirmButtonText: 'Ok'
+            });
+        } catch (error) {
+            await Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Error al enviar el cambio de servicio',
+                confirmButtonText: 'Ok'
+            });
+        }
+    }
+}
 
 async function sendObservacionesGenerales(event) {
     event.preventDefault();
