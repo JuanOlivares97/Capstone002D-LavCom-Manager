@@ -70,8 +70,6 @@ async function login(req, res) {
 
         // Establece cookies para autenticación
         res.cookie("token", token, { path: "/food-manager" });
-        res.cookie("logged-in", true, { path: "/food-manager" });
-        res.cookie("tipo_usuario", user.IdTipoFuncionario, { path: "/food-manager" });
 
         return res.status(200).json({ message: "Has iniciado sesión, bienvenido", success: true, user });
     } catch (error) {
@@ -202,8 +200,6 @@ async function logout(req, res) {
     try {
         // Limpia las cookies de autenticación
         res.clearCookie("token", { path: '/food-manager' });
-        res.clearCookie("logged-in", { path: '/food-manager' });
-        res.clearCookie("tipo_usuario", { path: '/food-manager' });
         return res.status(200).json({ message: "Has cerrado sesión", success: true });
     } catch (error) {
         return res.status(500).json({ message: "Internal server error", success: false });
