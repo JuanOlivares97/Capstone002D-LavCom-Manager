@@ -276,15 +276,50 @@ async function movePatientService(req, res) {
             return res.status(400).json({ message: 'Servicio no válido' });
         }
 
+        const newCodigoCama = req.body.newCodigoCama ? parseInt(req.body.newCodigoCama) : null;
+        const oldCodigoCama = paciente.CodigoCama;
+        
         // Actualizar el servicio del paciente si es válido
         const updatedPatient = await prisma.Hospitalizado.update({
             where: { IdHospitalizado: paciente.IdHospitalizado },
-            data: { IdTipoServicio: newService }
+            data: { IdTipoServicio: newService, CodigoCama: newCodigoCama }
         });
 
-        return res.status(200).json({ message: 'Movimiento al Servicio exitoso', paciente: updatedPatient });
+        let log;
+        
+        // Si el servicio es el mismo, solo registrar cambio de cama si hay
+        if (paciente.IdTipoServicio === newService) {
+            if (oldCodigoCama !== newCodigoCama) {
+                log = await prisma.logMovimientosPaciente.create({
+                    data: {
+                        descripcionLog: `Cambio de Cama: ${oldCodigoCama} a ${newCodigoCama}`,
+                        fechaLog: new Date(),
+                        idPaciente: paciente.IdHospitalizado
+                    }
+                });
+            }
+        } else {
+            // Si el servicio es diferente, registrar cambio de servicio y cama si hay
+            let descripcion = `Movimiento al Servicio: ${paciente.TipoServicio_Hospitalizado_IdTipoServicioToTipoServicio.DescTipoServicio} a ${servicios.find(servicio => servicio.IdTipoServicio === newService).DescTipoServicio}`;
+            
+            if (oldCodigoCama !== newCodigoCama) {
+                descripcion += ` y Cambio de Cama: ${oldCodigoCama} a ${newCodigoCama}`;
+            }
+            
+            log = await prisma.logMovimientosPaciente.create({
+                data: {
+                    descripcionLog: descripcion,
+                    fechaLog: new Date(),
+                    idPaciente: paciente.IdHospitalizado
+                }
+            });
+        }
+
+        return res.status(200).json({ 
+            message: 'Movimiento realizado exitosamente', 
+            log: log 
+        });
     } catch (error) {
-        console.error('Error interno:', error);
         return res.status(500).json({ message: 'Error interno del servidor', error: error.message });
     }
 }
