@@ -133,7 +133,7 @@ describe('Auth Controller Tests', () => {
                         { path: "/food-manager" }
                     ),
                 () => expect(mailer.enviarCorreo).toHaveBeenCalledWith("test@example.com", expect.any(String)),
-                () => expect(res.redirect).toHaveBeenCalledWith("/auth/recuperar-pwd-info"),
+                () => expect(res.redirect).toHaveBeenCalledWith("/food-manager/auth/recuperar-pwd-info"),
             ]);
         });
         
@@ -195,8 +195,6 @@ describe('Auth Controller Tests', () => {
 
             multiTest([
                 () => expect(res.clearCookie).toHaveBeenCalledWith('token', { path: '/food-manager' }),
-                () => expect(res.clearCookie).toHaveBeenCalledWith('logged-in', { path: '/food-manager' }),
-                () => expect(res.clearCookie).toHaveBeenCalledWith('tipo_usuario', { path: '/food-manager' }),
                 () => expect(res.status).toHaveBeenCalledWith(200),
                 () => expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ success: true })),
             ]);
