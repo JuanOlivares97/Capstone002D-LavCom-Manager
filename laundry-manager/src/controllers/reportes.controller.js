@@ -1,10 +1,19 @@
 const prisma = require("../server/prisma");
 
-function renderHome(req, res) {
+async function renderHome(req, res) {
     try {
         const tipo_user = req.user["tipo_usuario"];
         return res.status(200).render('reports/home', {tipo_usuario: parseInt(tipo_user)})
     } catch (error) {
+        await prisma.error_log.create({
+            data: {
+                id_usuario: req.user["id_usuario"] || null,
+                tipo_error: "Error interno del servidor",
+                mensaje_error: JSON.stringify(error),
+                ruta_error: "laundry-manager/reports/home",
+                codigo_http: 500,
+            }
+        })
         return res.status(500).json({ message: "Internal server error" });
     }
 }
@@ -27,6 +36,15 @@ async function getFullReport(req, res) {
 
         return res.status(200).json(formattedResult);
     } catch (error) {
+        await prisma.error_log.create({
+            data: {
+                id_usuario: req.user["id_usuario"] || null,
+                tipo_error: "Error interno del servidor",
+                mensaje_error: JSON.stringify(error),
+                ruta_error: "laundry-manager/reports/get-report",
+                codigo_http: 500,
+            }
+        })
         return res.status(500).json({ message: "Internal server error" });
     }
 }
@@ -44,6 +62,15 @@ async function getServicesReport(req, res) {
 
         return res.status(200).json(formattedResult);
     } catch (error) {
+        await prisma.error_log.create({
+            data: {
+                id_usuario: req.user["id_usuario"] || null,
+                tipo_error: "Error interno del servidor",
+                mensaje_error: JSON.stringify(error),
+                ruta_error: "laundry-manager/reports/get-services-report",
+                codigo_http: 500,
+            }
+        })
         return res.status(500).json({ message: "Internal server error" });
     }
 }
@@ -66,6 +93,15 @@ async function getBajasyPerdidas(req, res) {
 
         return res.status(200).json(formattedResult);
     } catch (error) {
+        await prisma.error_log.create({
+            data: {
+                id_usuario: req.user["id_usuario"] || null,
+                tipo_error: "Error interno del servidor",
+                mensaje_error: JSON.stringify(error),
+                ruta_error: "laundry-manager/reports/get-bajas-perdidas",
+                codigo_http: 500,
+            }
+        })
         return res.status(500).json({ message: "Internal server error" });
     }
 }
@@ -90,6 +126,15 @@ async function getServicesDownReport(req, res) {
 
         return res.status(200).json(formattedResult);
     } catch (error) {
+        await prisma.error_log.create({
+            data: {
+                id_usuario: req.user["id_usuario"] || null,
+                tipo_error: "Error interno del servidor",
+                mensaje_error: JSON.stringify(error),
+                ruta_error: "laundry-manager/reports/get-bajas-services",
+                codigo_http: 500,
+            }
+        })
         return res.status(500).json({ message: "Internal server error" });
     }
 }
@@ -118,11 +163,29 @@ async function getRegistros(req, res) {
             }
         })
         if (!registros) {
+            await prisma.error_log.create({
+                data: {
+                    id_usuario: req.user["id_usuario"] || null,
+                    tipo_error: "Error de base de datos",
+                    mensaje_error: "Error obteniendo registros",
+                    ruta_error: "laundry-manager/reports/get-records",
+                    codigo_http: 400,
+                }
+            })
             return res.status(400).json({ message: "Error obteniendo registros", success: false });
         }
         console.log(registros);
         return res.status(200).json({ message: "Registros obtenidos exitosamente", success: true, registros });
     } catch (error) {
+        await prisma.error_log.create({
+            data: {
+                id_usuario: req.user["id_usuario"] || null,
+                tipo_error: "Error interno del servidor",
+                mensaje_error: JSON.stringify(error),
+                ruta_error: "laundry-manager/reports/get-records",
+                codigo_http: 500,
+            }
+        })
         res.status(500).json({ message: "Internal server error", success: false, error });
     }
 }
