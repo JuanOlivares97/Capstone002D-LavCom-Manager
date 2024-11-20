@@ -17,14 +17,12 @@ async function checkInLunch(req, res) {
 
         // Verificación del formato del RUT
         if (typeof rutSolicitante !== 'string' || !rutSolicitante.includes('-')) {
-            console.error('El rut solicitante no es válido');
             return res.render('totem/home', { errorMessage: 'El rut solicitante no es válido', mostrarMenu: false, layout: false });
         }
 
         // Separación del RUT y DV
         const [rut, dv] = rutSolicitante.split('-');
         if (!rut || !dv) {
-            console.error('El rut solicitante no es válido');
             return res.render('totem/home', { errorMessage: 'El rut solicitante no es válido', mostrarMenu: false, layout: false });
         }
 
@@ -80,8 +78,7 @@ async function checkInLunch(req, res) {
         return res.render('totem/ticket', { colacion: newColacion, layout: false });
 
     } catch (error) {
-        console.error(error);
-        return res.status(500).send('Error al procesar el check-in ' + error);
+        return res.status(500).json({ message: 'Error al procesar el check-in' });
     }
 }
 
@@ -130,8 +127,7 @@ async function registerLunchAtTotem(req, res) {
         // Renderizar el ticket
         res.render('totem/ticket', { colacion, layout: false });
     } catch (error) {
-        console.error(error);
-        res.status(500).send('Error al registrar la colación en el tótem ' + error);
+        res.status(500).json({ message: 'Error al registrar la colación en el tótem' });
     }
 }
 
