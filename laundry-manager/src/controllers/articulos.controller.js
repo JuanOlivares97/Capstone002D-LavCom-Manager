@@ -14,6 +14,15 @@ async function renderHome(req, res) {
         const tipo_user = req.user["tipo_usuario"];
         res.status(200).render("clothes/home", { usuarios, unidades_sigcom, tipo_usuario: tipo_user, rutLogueado, nombreLogueado });
     } catch (error) {
+        await prisma.error_log.create({
+            data: {
+                id_usuario: req.user["id_usuario"] || null,
+                tipo_error: "Error interno del servidor",
+                mensaje_error: JSON.stringify(error),
+                ruta_error: "laundry-manager/clothes/home",
+                codigo_http: 500,
+            }
+        })
         return res.status(500).json({ message: "Internal server error" });
     }
 }
@@ -39,6 +48,15 @@ async function getArticulos(req, res) {
         
         return res.status(200).json(articulosConSubgrupo);
     } catch (error) {
+        await prisma.error_log.create({
+            data: {
+                id_usuario: req.user["id_usuario"] || null,
+                tipo_error: "Error interno del servidor",
+                mensaje_error: JSON.stringify(error),
+                ruta_error: "laundry-manager/clothes/get-clothes",
+                codigo_http: 500,
+            }
+        })
         return res.status(500).json({ message: "Internal server error"});
     }
 }
@@ -53,11 +71,29 @@ async function createArticulo(req, res) {
         })
 
         if (existingArticulo) {
+            await prisma.error_log.create({
+                data: {
+                    id_usuario: req.user["id_usuario"] || null,
+                    tipo_error: "Error en ingreso de datos",
+                    mensaje_error: "El artículo que se intentó ingresar ya existe",
+                    ruta_error: "laundry-manager/clothes/create-clothes",
+                    codigo_http: 400
+                }
+            })
             return res.status(400).json({ message: "El artículo ya existe, es posible que este se encuentre deshabilitado, contacte al administrador", success: false });
         }
 
         const stock = parseInt(req.body.stock);
         if (isNaN(stock) || stock <= 0) {
+            await prisma.error_log.create({
+                data: {
+                    id_usuario: req.user["id_usuario"] || null,
+                    tipo_error: "Error en ingreso de datos",
+                    mensaje_error: "El stock que se intento ingresar es invalido",
+                    ruta_error: "laundry-manager/clothes/create-clothes",
+                    codigo_http: 400
+                }
+            })
             return res.status(400).json({ message: "Stock debe ser un número entero positivo", success: false });
         }
 
@@ -74,10 +110,28 @@ async function createArticulo(req, res) {
             }
         });
         if (!articulo) {
+            await prisma.error_log.create({
+                data: {
+                    id_usuario: req.user["id_usuario"] || null,
+                    tipo_error: "Error de base de datos",
+                    mensaje_error: "No se pudo crear el artículo deseado",
+                    ruta_error: "laundry-manager/clothes/create-clothes",
+                    codigo_http: 400
+                }
+            })
             return res.status(400).json({ message: "Error al crear artículo" , success: false});
         }
         return res.status(200).json({ message: "Articulo creado exitosamente", success: true, articulo });
     } catch (error) {
+        await prisma.error_log.create({
+            data: {
+                id_usuario: req.user["id_usuario"] || null,
+                tipo_error: "Error interno del servidor",
+                mensaje_error: JSON.stringify(error),
+                ruta_error: "laundry-manager/clothes/create-clothes",
+                codigo_http: 500
+            }
+        })
         return res.status(500).json({ message: "Internal server error", success: false });
     }
 }
@@ -86,6 +140,15 @@ async function updateArticulo(req, res) {
     try {
         const stock = parseInt(req.body.stock);
         if (isNaN(stock) || stock <= 0) {
+            await prisma.error_log.create({
+                data: {
+                    id_usuario: req.user["id_usuario"] || null,
+                    tipo_error: "Error en ingreso de datos",
+                    mensaje_error: "El stock que se intento ingresar es invalido",
+                    ruta_error: "laundry-manager/clothes/update-clothes",
+                    codigo_http: 400
+                }
+            })
             return res.status(400).json({ message: "Stock debe ser un número entero positivo", success: false });
         }
 
@@ -99,6 +162,15 @@ async function updateArticulo(req, res) {
         });
         
         if (existingArticulo) {
+            await prisma.error_log.create({
+                data: {
+                    id_usuario: req.user["id_usuario"] || null,
+                    tipo_error: "Error en ingreso de datos",
+                    mensaje_error: "El artículo que se intentó ingresar ya existe",
+                    ruta_error: "laundry-manager/clothes/update-clothes",
+                    codigo_http: 400
+                }
+            })
             return res.status(400).json({ 
                 message: "El artículo ya existe, es posible que este se encuentre deshabilitado, contacte al administrador", 
                 success: false 
@@ -121,11 +193,29 @@ async function updateArticulo(req, res) {
             }
         });
         if (!articulo_actualizado) {
+            await prisma.error_log.create({
+                data: {
+                    id_usuario: req.user["id_usuario"] || null,
+                    tipo_error: "Error de base de datos",
+                    mensaje_error: "No se pudo actualizar el artículo deseado",
+                    ruta_error: "laundry-manager/clothes/update-clothes",
+                    codigo_http: 400
+                }
+            })
             return res.status(400).json({ message: "Error al actualizar artículo", success: false });
         }
 
         return res.status(200).json({ message: "Artículo actualizado exitosamente", success: true, articulo_actualizado });
     } catch (error) {
+        await prisma.error_log.create({
+            data: {
+                id_usuario: req.user["id_usuario"] || null,
+                tipo_error: "Error interno del servidor",
+                mensaje_error: JSON.stringify(error),
+                ruta_error: "laundry-manager/clothes/update-clothes",
+                codigo_http: 500
+            }
+        })
         return res.status(500).json({ message: "Internal server error", success: false });
     }
 }
@@ -141,10 +231,28 @@ async function deleteArticulo(req, res) {
             },
         });
         if (!articulo) {
+            await prisma.error_log.create({
+                data: {
+                    id_usuario: req.user["id_usuario"] || null,
+                    tipo_error: "Error de base de datos",
+                    mensaje_error: "No se pudo eliminar el artículo deseado",
+                    ruta_error: "laundry-manager/clothes/delete-clothes",
+                    codigo_http: 400
+                }
+            })
             return res.status(400).json({ message: "Error al eliminar artículo", success: false });
         }
         return res.status(200).json({ message: "Articulo eliminado exitosamente", success: true });
     } catch (error) {
+        await prisma.error_log.create({
+            data: {
+                id_usuario: req.user["id_usuario"] || null,
+                tipo_error: "Error interno del servidor",
+                mensaje_error: JSON.stringify(error),
+                ruta_error: "laundry-manager/clothes/delete-clothes",
+                codigo_http: 500
+            }
+        })
         return res.status(500).json({ message: "Internal server error", success: false });
     }
 }
@@ -160,6 +268,15 @@ async function entregarUnidadSigcom(req, res) {
             const a = data.articulos[i];
             const cantidad = parseInt(a.cantidad);
             if (isNaN(cantidad) || cantidad <= 0) {
+                await prisma.error_log.create({
+                    data: {
+                        id_usuario: req.user["id_usuario"] || null,
+                        tipo_error: "Error en ingreso de datos",
+                        mensaje_error: "Se intentó ingresar una cantidad de artículos no válida",
+                        ruta_error: "laundry-manager/clothes/entregar-unidad-sigcom",
+                        codigo_http: 400
+                    }
+                })
                 return res.status(400).json({ 
                     message: `La cantidad de cada artículo debe ser un número entero positivo. Error en artículo en la posición ${i + 1}`, 
                     success: false 
@@ -187,11 +304,29 @@ async function entregarUnidadSigcom(req, res) {
         })
 
         if (!result) {
+            await prisma.error_log.create({
+                data: {
+                    id_usuario: req.user["id_usuario"] || null,
+                    tipo_error: "Error de base de datos",
+                    mensaje_error: "No se pudo crear el registro",
+                    ruta_error: "laundry-manager/clothes/entregar-unidad-sigcom",
+                    codigo_http: 400
+                }
+            })
             return res.status(400).json({ message: "Error creando registro", success: false });
         }   
 
         return res.status(200).json({ message: "Registro creado exitosamente", success: true });
     } catch (error) {
+        await prisma.error_log.create({
+            data: {
+                id_usuario: req.user["id_usuario"] || null,
+                tipo_error: "Error interno del servidor",
+                mensaje_error: JSON.stringify(error),
+                ruta_error: "laundry-manager/clothes/entregar-unidad-sigcom",
+                codigo_http: 500
+            }
+        })
         return res.status(500).json({ message: "Internal server error", success: false });
     }
 }
@@ -210,6 +345,15 @@ async function darRopaDeBaja(req, res) {
             const a = data.articulos[i];
             const cantidad = parseInt(a.cantidad);
             if (isNaN(cantidad) || cantidad <= 0) {
+                await prisma.error_log.create({
+                    data: {
+                        id_usuario: req.user["id_usuario"] || null,
+                        tipo_error: "Error en ingreso de datos",
+                        mensaje_error: "Se intentó ingresar una cantidad de artículos no válida",
+                        ruta_error: "laundry-manager/clothes/dar-ropa-de-baja",
+                        codigo_http: 400
+                    }
+                })
                 return res.status(400).json({ 
                     message: `La cantidad de cada artículo debe ser un número entero positivo. Error en artículo en la posición ${i + 1}`, 
                     success: false 
@@ -225,6 +369,15 @@ async function darRopaDeBaja(req, res) {
             });
 
             if (!articulo) {
+                await prisma.error_log.create({
+                    data: {
+                        id_usuario: req.user["id_usuario"] || null,
+                        tipo_error: "Error en ingreso de datos",
+                        mensaje_error: "Se intentó ingresar un artículo que no existe",
+                        ruta_error: "laundry-manager/clothes/dar-ropa-de-baja",
+                        codigo_http: 400
+                    }
+                })
                 return res.status(400).json({ 
                     message: `Artículo en la posición ${i + 1} no encontrado`, 
                     success: false 
@@ -232,6 +385,15 @@ async function darRopaDeBaja(req, res) {
             }
 
             if (articulo.stock < cantidad) {
+                await prisma.error_log.create({
+                    data: {
+                        id_usuario: req.user["id_usuario"] || null,
+                        tipo_error: "Error en ingreso de datos",
+                        mensaje_error: "Se intentó ingresar una cantidad de artículos que supera el stock disponible",
+                        ruta_error: "laundry-manager/clothes/dar-ropa-de-baja",
+                        codigo_http: 400
+                    }
+                })
                 return res.status(400).json({ 
                     message: `Stock insuficiente para el artículo en la posición ${i + 1}. Stock actual: ${articulo.stock}. Cantidad a decrementar: ${cantidad}`, 
                     success: false 
@@ -275,12 +437,29 @@ async function darRopaDeBaja(req, res) {
         });
 
         if (!resultado) {
+            await prisma.error_log.create({
+                data: {
+                    id_usuario: req.user["id_usuario"] || null,
+                    tipo_error: "Error de base de datos",
+                    mensaje_error: "Error creando registro",
+                    ruta_error: "laundry-manager/clothes/dar-ropa-de-baja",
+                    codigo_http: 400
+                }
+            })
             return res.status(400).json({ message: "Error creando registro", success: false });
         }
 
         return res.status(200).json({ message: "Registro creado exitosamente", success: true });
     } catch (error) {
-        console.error(error);
+        await prisma.error_log.create({
+            data: {
+                id_usuario: req.user["id_usuario"] || null,
+                tipo_error: "Error de base de datos",
+                mensaje_error: JSON.stringify(error),
+                ruta_error: "laundry-manager/clothes/dar-ropa-de-baja",
+                codigo_http: 500
+            }
+        })
         return res.status(500).json({ message: "Internal server error", success: false });
     }
 }
@@ -299,6 +478,15 @@ async function declararPerdida(req, res) {
             const a = data.articulos[i];
             const cantidad = parseInt(a.cantidad);
             if (isNaN(cantidad) || cantidad <= 0) {
+                await prisma.error_log.create({
+                    data: {
+                        id_usuario: req.user["id_usuario"] || null,
+                        tipo_error: "Error en ingreso de datos",
+                        mensaje_error: "Se intentó ingresar una cantidad de artículos no válida",
+                        ruta_error: "laundry-manager/clothes/declarar-perdida",
+                        codigo_http: 400
+                    }
+                })
                 return res.status(400).json({ 
                     message: `La cantidad de cada artículo debe ser un número entero positivo. Error en artículo en la posición ${i + 1}`, 
                     success: false 
@@ -314,6 +502,15 @@ async function declararPerdida(req, res) {
             });
 
             if (!articulo) {
+                await prisma.error_log.create({
+                    data: {
+                        id_usuario: req.user["id_usuario"] || null,
+                        tipo_error: "Error en ingreso de datos",
+                        mensaje_error: "Se intentó ingresar un artículo que no existe",
+                        ruta_error: "laundry-manager/clothes/declarar-perdida",
+                        codigo_http: 400
+                    }
+                })
                 return res.status(400).json({ 
                     message: `Artículo en la posición ${i + 1} no encontrado`, 
                     success: false 
@@ -321,6 +518,15 @@ async function declararPerdida(req, res) {
             }
 
             if (articulo.stock < cantidad) {
+                await prisma.error_log.create({
+                    data: {
+                        id_usuario: req.user["id_usuario"] || null,
+                        tipo_error: "Error en ingreso de datos",
+                        mensaje_error: "Se intentó ingresar un artículo con stock insuficiente",
+                        ruta_error: "laundry-manager/clothes/declarar-perdida",
+                        codigo_http: 400
+                    }
+                })
                 return res.status(400).json({ 
                     message: `Stock insuficiente para el artículo en la posición ${i + 1}. Stock actual: ${articulo.stock}. Cantidad a decrementar: ${cantidad}`, 
                     success: false 
@@ -364,12 +570,29 @@ async function declararPerdida(req, res) {
         });
 
         if (!resultado) {
+            await prisma.error_log.create({
+                data: {
+                    id_usuario: req.user["id_usuario"] || null,
+                    tipo_error: "Error en ingreso de datos",
+                    mensaje_error: "Error al crear el registro",
+                    ruta_error: "laundry-manager/clothes/declarar-perdida",
+                    codigo_http: 400
+                }
+            })
             return res.status(400).json({ message: "Error creando registro", success: false });
         }
 
         return res.status(200).json({ message: "Registro creado exitosamente", success: true });
     } catch (error) {
-        console.error(error);
+        await prisma.error_log.create({
+            data: {
+                id_usuario: req.user["id_usuario"] || null,
+                tipo_error: "Error interno del servidor",
+                mensaje_error: JSON.stringify(error),
+                ruta_error: "laundry-manager/clothes/declarar-perdida",
+                codigo_http: 500
+            }
+        })
         return res.status(500).json({ message: "Internal server error", success: false });
     }
 }
@@ -385,6 +608,15 @@ async function recibirSuciaUnidadSigcom(req, res) {
             const a = data.articulos[i];
             const cantidad = parseInt(a.cantidad);
             if (isNaN(cantidad) || cantidad <= 0) {
+                await prisma.error_log.create({
+                    data: {
+                        id_usuario: req.user["id_usuario"] || null,
+                        tipo_error: "Error en ingreso de datos",
+                        mensaje_error: "Se intentó ingresar un artículo con cantidad inválida",
+                        ruta_error: "laundry-manager/clothes/recibir-sucia-unidad-sigcom",
+                        codigo_http: 400
+                    }
+                })
                 return res.status(400).json({ 
                     message: `La cantidad de cada artículo debe ser un número entero positivo. Error en artículo en la posición ${i + 1}`, 
                     success: false 
@@ -412,11 +644,29 @@ async function recibirSuciaUnidadSigcom(req, res) {
         })
 
         if (!result) {
+            await prisma.error_log.create({
+                data: {
+                    id_usuario: req.user["id_usuario"] || null,
+                    tipo_error: "Error en ingreso de datos",
+                    mensaje_error: "Error al crear el registro",
+                    ruta_error: "laundry-manager/clothes/recibir-sucia-unidad-sigcom",
+                    codigo_http: 400
+                }
+            })
             return res.status(400).json({ message: "Error creando registro", success: false });
         }   
 
         return res.status(200).json({ message: "Registro creado exitosamente", success: true });
     } catch (error) {
+        await prisma.error_log.create({
+            data: {
+                id_usuario: req.user["id_usuario"] || null,
+                tipo_error: "Error interno del servidor",
+                mensaje_error: JSON.stringify(error),
+                ruta_error: "laundry-manager/clothes/recibir-sucia-unidad-sigcom",
+                codigo_http: 500
+            }
+        })
         return res.status(500).json({ message: "Internal server error", success: false });
     }
 }
@@ -432,6 +682,15 @@ async function remesaRopaSucia(req, res) {
             const a = data.articulos[i];
             const cantidad = parseInt(a.cantidad);
             if (isNaN(cantidad) || cantidad <= 0) {
+                await prisma.error_log.create({
+                    data: {
+                        id_usuario: req.user["id_usuario"] || null,
+                        tipo_error: "Error en ingreso de datos",
+                        mensaje_error: "Se intentó ingresar un artículo con cantidad inválida",
+                        ruta_error: "laundry-manager/clothes/remesa-ropa-sucia",
+                        codigo_http: 400
+                    }
+                })
                 return res.status(400).json({ 
                     message: `La cantidad de cada artículo debe ser un número entero positivo. Error en artículo en la posición ${i + 1}`, 
                     success: false 
@@ -459,11 +718,29 @@ async function remesaRopaSucia(req, res) {
         })
 
         if (!result) {
+            await prisma.error_log.create({
+                data: {
+                    id_usuario: req.user["id_usuario"] || null,
+                    tipo_error: "Error en ingreso de datos",
+                    mensaje_error: "Error al crear el registro",
+                    ruta_error: "laundry-manager/clothes/remesa-ropa-sucia",
+                    codigo_http: 400
+                }
+            })
             return res.status(400).json({ message: "Error creando registro", success: false });
         }   
 
         return res.status(200).json({ message: "Registro creado exitosamente", success: true });
     } catch (error) {
+        await prisma.error_log.create({
+            data: {
+                id_usuario: req.user["id_usuario"] || null,
+                tipo_error: "Error interno del servidor",
+                mensaje_error: JSON.stringify(error),
+                ruta_error: "laundry-manager/clothes/remesa-ropa-sucia",
+                codigo_http: 500
+            }
+        })
         return res.status(500).json({ message: "Internal server error", success: false });
     }
 }
@@ -479,6 +756,15 @@ async function recibirRopaLimpia(req, res) {
             const a = data.articulos[i];
             const cantidad = parseInt(a.cantidad);
             if (isNaN(cantidad) || cantidad <= 0) {
+                await prisma.error_log.create({
+                    data: {
+                        id_usuario: req.user["id_usuario"] || null,
+                        tipo_error: "Error en ingreso de datos",
+                        mensaje_error: "Se intentó ingresar un artículo con cantidad inválida",
+                        ruta_error: "laundry-manager/clothes/recibir-ropa-limpia",
+                        codigo_http: 400
+                    }
+                })
                 return res.status(400).json({ 
                     message: `La cantidad de cada artículo debe ser un número entero positivo. Error en artículo en la posición ${i + 1}`, 
                     success: false 
@@ -504,11 +790,29 @@ async function recibirRopaLimpia(req, res) {
         })
 
         if (!result) {
+            await prisma.error_log.create({
+                data: {
+                    id_usuario: req.user["id_usuario"] || null,
+                    tipo_error: "Error en ingreso de datos",
+                    mensaje_error: "Error al crear el registro",
+                    ruta_error: "laundry-manager/clothes/recibir-ropa-limpia",
+                    codigo_http: 400
+                }
+            })
             return res.status(400).json({ message: "Error creando registro", success: false });
         }   
 
         return res.status(200).json({ message: "Registro creado exitosamente", success: true });
     } catch (error) {
+        await prisma.error_log.create({
+            data: {
+                id_usuario: req.user["id_usuario"] || null,
+                tipo_error: "Error interno del servidor",
+                mensaje_error: JSON.stringify(error),
+                ruta_error: "laundry-manager/clothes/recibir-ropa-limpia",
+                codigo_http: 500
+            }
+        })
         return res.status(500).json({ message: "Internal server error", success: false });
     }
 }
