@@ -17,7 +17,7 @@ async function renderHome(req, res) {
         const unidades = await getUnidad();
         const estamentos = await getEstamento();
         const tipoFuncionario = await getTipoFuncionario();
-        const tipoUsuario = req.cookies["tipo_usuario"]; // Obtiene el tipo de usuario desde las cookies
+        const tipoUsuario = req.user.tipo_usuario; // Obtiene el tipo de usuario desde las cookies
 
         // Renderiza la vista 'employee/home' con los datos necesarios
         res.render("employee/home", {
@@ -176,7 +176,6 @@ async function createEmployee(req, res) {
 
         return res.status(201).json(funcionario);
     } catch (error) {
-        console.error("Error en createEmployee:", error);
         return res
             .status(500)
             .json({ message: "Internal server error: " + error.message });
@@ -220,7 +219,6 @@ async function updateEmployee(req, res) {
 
         return res.status(200).json(funcionario);
     } catch (error) {
-        console.error("Error en updateEmployee:", error);
         return res.status(500).json({ message: "Internal server error: " + error.message });
     }
 }

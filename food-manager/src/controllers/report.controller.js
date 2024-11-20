@@ -3,7 +3,7 @@ const prisma = require("../server/prisma");
 async function renderHome(req, res) {
     try {
         const reportes = await getReports();
-        const tipoUsuario = req.cookies['tipo_usuario'];
+        const tipoUsuario = req.user.tipo_usuario;
         return res.render('report/home', { reportes, tipoUsuario: parseInt(tipoUsuario) });
     } catch (error) {
         const errorMessage = `Error al obtener los reportes: ${error.message}`;
@@ -48,7 +48,6 @@ async function fillTable(req, res) {
             message: 'Tabla generada con éxito'
         });
     } catch (error) {
-        console.error('Error al ejecutar GenerarReporte:', error);
         res.status(500).json({ message: "Error al obtener los datos" });
     }
 }
@@ -133,7 +132,6 @@ async function reportHospitalizadoDiario(req, res) {
             pageSize: pageSize,
         });
     } catch (error) {
-        console.error('Error en reportHospitalizadoDiario:', error);
         return res.status(500).json({ message: 'Error al obtener los reportes' });
     }
 }

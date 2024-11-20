@@ -81,7 +81,7 @@ async function renderHome(req, res) {
         : false,
     }));
 
-    const tipoUsuario = req.cookies["tipo_usuario"];
+    const tipoUsuario = req.user.tipo_usuario;
 
     // Renderizar la vista y pasar los datos
     res.render("patient/home", {
@@ -97,7 +97,6 @@ async function renderHome(req, res) {
       altasHoy,
     });
   } catch (error) {
-    console.error("Error en renderHome:", error);
     return res.status(500).json({ message: "Internal server error" });
   }
 }
@@ -133,7 +132,6 @@ async function getPacientes(req, res) {
     });
     return res.status(200).json(pacientes);
   } catch (error) {
-    console.error("Error en getPacientes:", error); // Depuración del error
     return res.status(500).json({ message: "Internal server error" });
   }
 }
@@ -225,7 +223,6 @@ async function createPaciente(req, res) {
         });
     }
   } catch (error) {
-    console.error(error);
     res
       .status(500)
       .json({ message: "Error al crear o reingresar el paciente" });

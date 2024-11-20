@@ -9,7 +9,7 @@ async function renderHome(req, res) {
     const Regimen = await getRegimen(); // Obtiene los regímenes habilitados
     const TipoFuncionario = await getTipoFuncionario(); // Obtiene los tipos de funcionario
     const Contrato = await getContrato(); // Obtiene los tipos de contrato
-    const tipoUsuario = req.cookies['tipo_usuario']; // Tipo de usuario desde las cookies
+    const tipoUsuario = req.user.tipo_usuario; // Tipo de usuario desde las cookies
 
     // Renderiza la vista del mantenedor con los datos obtenidos
     res.render('maintainer/home', {

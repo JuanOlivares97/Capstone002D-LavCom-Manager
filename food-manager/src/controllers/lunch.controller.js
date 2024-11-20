@@ -4,7 +4,7 @@ const moment = require('moment');
 // Renderiza la página principal de colaciones
 async function renderHome(req, res) {
     try {
-        const tipoUsuario = req.cookies['tipo_usuario']; // Obtiene el tipo de usuario desde las cookies
+        const tipoUsuario = req.user.tipo_usuario; // Obtiene el tipo de usuario desde las cookies
         const today = moment().format('YYYY-MM-DD'); // Formatea la fecha actual (YYYY-MM-DD)
 
         // Verifica si el usuario ya registró una colación hoy
@@ -80,7 +80,7 @@ async function registrationLunch(req, res) {
 // Renderiza el listado de colaciones confirmadas
 async function renderLunchList(req, res) {
     try {
-        const tipoUsuario = req.cookies['tipo_usuario']; // Obtiene el tipo de usuario desde las cookies
+        const tipoUsuario = req.user.tipo_usuario; // Obtiene el tipo de usuario desde las cookies
         const today = moment().format('YYYY-MM-DD'); // Formatea la fecha actual (YYYY-MM-DD)
 
         // Obtiene las colaciones confirmadas para hoy
@@ -97,8 +97,6 @@ async function renderLunchList(req, res) {
         // Renderiza la vista con la lista de colaciones
         res.render('totem/LunchList', { lunches, tipoUsuario: parseInt(tipoUsuario) });
     } catch (error) {
-        // Manejo de errores
-        console.error(error);
         res.status(500).send('Error al cargar el listado de colaciones');
     }
 }

@@ -79,10 +79,7 @@ async function renderDashboard(req, res) {
       })
     ]);
 
-    // Recupera datos adicionales de las cookies
-    const tipoUsuariostr = req.cookies['tipo_usuarioStr']; // Tipo de usuario como string
-    const nombreUsuario = req.cookies['NombreUsuario'];   // Nombre del usuario
-    const tipoUsuario = req.cookies['tipo_usuario'];      // Tipo de usuario como entero
+    const tipoUsuario = req.user.tipo_usuario;     // Tipo de usuario como entero
 
     // Renderiza la vista del dashboard con los datos obtenidos
     res.render('dashboard/home', {
@@ -98,13 +95,11 @@ async function renderDashboard(req, res) {
       days, // Fechas de los últimos 7 días
       tendenciasColaciones, // Datos históricos de colaciones y ayunos
       ingresosAltasSemana,  // Datos históricos de ingresos y altas
-      distribucionRegimen,  // Distribución de regímenes
-      tipoUsuariostr,
-      nombreUsuario
+      distribucionRegimen,  // Distribución de regímene
     });
   } catch (error) {
     // Devuelve un error 500 en caso de excepciones
-    res.status(500).json({ error: error.message });
+    return res.status(500).json({ error: error.message });
   }
 }
 
