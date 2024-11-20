@@ -16,11 +16,6 @@
         <div class="grid grid-cols-3 gap-4">
             <div>
                 <div>
-                    <label class="block font-medium text-gray-700 my-2">Numero de Cama</label>
-                    <input type="number" id="infoCama" name="infoCama" class="my-2 w-full p-2 border rounded">
-                </div>
-
-                <div>
                     <label class="block font-medium text-gray-700 my-2">Nombres</label>
                     <input type="text" id="infoNombre" name="infoNombre" class="my-2 w-full p-2 border rounded"
                         readonly>
@@ -107,6 +102,10 @@
                             </option>
                             <% }) %>
                     </select>
+                    <div>
+                        <label class="block font-medium text-gray-700 my-2">Numero de Cama</label>
+                        <input type="number" id="infoCama" name="infoCama" class="my-2 w-full p-2 border rounded">
+                    </div>
                     <button id="changeServicio"
                         class="px-4 py-2 bg-blue-200 text-gray-800 rounded-md shadow-sm hover:bg-gray-300 w-full">Cambiar
                         Servicio</button>
@@ -208,10 +207,6 @@
             <div class="mt-6 flex justify-end">
                 <button onclick="closeModalInfo()"
                     class="px-4 py-2 bg-gray-200 text-gray-800 rounded-md shadow-sm hover:bg-gray-300">Cerrar</button>
-            </div>
-            <div class="mt-6 flex justify-end">
-                <button
-                    class="px-4 py-2 bg-blue-200 text-gray-800 rounded-md shadow-sm hover:bg-gray-300">Editar</button>
             </div>
             <div class="mt-6 flex justify-end">
                 <button onclick="toggleLogs()"
