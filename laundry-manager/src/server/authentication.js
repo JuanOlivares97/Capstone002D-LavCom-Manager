@@ -1,42 +1,56 @@
 const jwt = require("jsonwebtoken");
 const prisma = require("../server/prisma");
 
+// MIDDLEWARE PARA VERIFICAR LA AUTENTICACIÓN
 async function loginRequired(req, res, next) {
     try {
+        // Obtener el token JWT de las cookies
         const token = req.cookies["token"];
+
+        // Verificar si el token no existe
         if (!token) {
+            // Si no existe, redirigir al usuario a la página de login
             return res.redirect("/laundry-manager/auth/login");
         }
 
-        // Verificar el token JWT
+        // Verificar y decodificar el token JWT usando la clave secreta
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+        // Si el token no es válido o no puede ser decodificado, redirigir al login
         if (!decoded) {
             return res.redirect("/laundry-manager/auth/login");
         }
 
-        // Buscar el usuario en la base de datos
+        // Buscar el usuario en la base de datos usando el id_usuario decodificado del token
         const user = await prisma.usuarios.findUnique({
             where: { id_usuario: decoded.id_usuario },
         });
 
+        // Si el usuario no se encuentra en la base de datos, redirigir al login
         if (!user) {
             return res.redirect("/laundry-manager/auth/login");
         }
 
+        // Agregar los datos del usuario al objeto `req.user` para que esté disponible en las siguientes funciones
         req.user = {
             rutLogueado: user.rut_usuario,
             nombreLogueado: user.nombre,
             tipo_usuario: user.id_tipo_usuario,
             id_usuario: user.id_usuario
-        } 
+        };
         
+        // Continuar con la siguiente función en el middleware stack
         next();
     } catch (error) {
+        // Si ocurre un error en cualquier parte del proceso de autenticación, registrar el error
         console.error("Error during authentication:", error);
+
+        // Responder con un error 401 (no autorizado) si la autenticación falla
         return res.status(401).json({ message: "Unauthorized access" });
     }
 }
 
+// FUNCIONES AUXILIARES PARA VALIDAR EL RUT, OBTENIDAS DE INTERNET
 var Fn = {
 	// Valida el rut con su cadena completa "XXXXXXXX-X"
 	validaRut : function (rutCompleto) {
@@ -58,6 +72,7 @@ var Fn = {
 	}
 }
 
+// EXPORTAR FUNCIONES
 module.exports = {
     loginRequired,
     Fn

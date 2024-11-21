@@ -1,9 +1,14 @@
 const prisma = require("../server/prisma");
 
+// FUNCION PARA RENDERIZAR LA VISTA PRINCIPAL (HOME)
 async function renderHome(req, res) {
     try {
+        // Obtener tipo de usuario desde el objeto de usuario en la solicitud
         const tipo_user = req.user["tipo_usuario"];
 
+        // Consultas para obtener datos para el dashboard (unidades y artículos más solicitados, perdidos y dados de baja)
+        
+        // Unidades más solicitadas
         const unidadMasPedidos = await prisma.$queryRaw`
             SELECT 
                 us.unidad_sigcom, 
@@ -17,6 +22,7 @@ async function renderHome(req, res) {
             ORDER BY total_solicitado DESC;
         `;
 
+        // Unidades más perdidas
         const unidadMasPerdidas = await prisma.$queryRaw`
             SELECT 
                 us.unidad_sigcom, 
@@ -30,6 +36,7 @@ async function renderHome(req, res) {
             ORDER BY total_perdido DESC;
         `;
 
+        // Unidades con más bajas
         const unidadMasBajas = await prisma.$queryRaw`
             SELECT 
                 us.unidad_sigcom, 
@@ -43,6 +50,7 @@ async function renderHome(req, res) {
             ORDER BY total_baja DESC;
         `;
 
+        // Artículos más solicitados
         const articulosMasPedidos = await prisma.$queryRaw`
             SELECT 
                 a.nombre_articulo, 
@@ -55,6 +63,7 @@ async function renderHome(req, res) {
             ORDER BY total_pedido DESC;
         `;
 
+        // Artículos más perdidos
         const articulosMasPerdidos = await prisma.$queryRaw`
         SELECT 
             a.nombre_articulo, 
@@ -67,6 +76,7 @@ async function renderHome(req, res) {
         ORDER BY total_perdido DESC;
         `;
 
+        // Artículos más dados de baja
         const articulosMasBajas = await prisma.$queryRaw`
         SELECT 
             a.nombre_articulo, 
@@ -79,7 +89,7 @@ async function renderHome(req, res) {
         ORDER BY total_baja DESC;
         `;
 
-        // Renderizar la vista con datos corregidos
+        // Renderizar la vista con los datos obtenidos de las consultas
         return res.status(200).render("dashboard/home", {
             tipo_usuario: tipo_user,
             unidadMasPedidos,
@@ -91,6 +101,7 @@ async function renderHome(req, res) {
         });
 
     } catch (error) {
+        // En caso de error, registrar el error y devolver respuesta 500
         await prisma.error_log.create({
             data: {
                 id_usuario: req.user["id_usuario"] || null,
@@ -103,6 +114,7 @@ async function renderHome(req, res) {
         return res.status(500).json({ message: "Internal server error" });
     }
 }
+
 
 module.exports = {
     renderHome,
