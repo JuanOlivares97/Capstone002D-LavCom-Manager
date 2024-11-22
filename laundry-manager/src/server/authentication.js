@@ -42,8 +42,16 @@ async function loginRequired(req, res, next) {
         // Continuar con la siguiente función en el middleware stack
         next();
     } catch (error) {
-        // Responder con un error 401 (no autorizado) si la autenticación falla
-        return res.status(401).json({ message: "Unauthorized access" });
+        await prisma.error_log.create({
+            data: {
+                id_usuario: null,
+                tipo_error: "Unauthorized access",
+                mensaje_error: JSON.stringify(error),
+                ruta_error: "Middleware de autenticación",
+                codigo_http: 401
+            },
+        })
+        return res.redirect("/laundry-manager/auth/login");
     }
 }
 
