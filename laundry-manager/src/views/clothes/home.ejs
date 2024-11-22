@@ -1,6 +1,9 @@
 <% if (tipo_usuario === 2) { %>
     <h2 class="text-2xl my-3">Menú de ropa limpia</h2>
     <%- include('../components/menus/menu_ropa_limpia') %>
+    <h1 class="text-2xl text-black mt-3">Artículos</h1>
+    <button type="button" class="bg-yellow-500 text-black p-2 rounded hover:bg-yellow-400 mt-3" id="openModal">Crear Artículo</button>
+    <div id="grid" class="ag-theme-quartz h-96 w-max-screen mt-3"></div>
 <% } %>
 
 <% if (tipo_usuario === 1) { %>
@@ -9,15 +12,16 @@
     <%- include('../components/menus/menu_ropa_limpia') %>
     <h2 class="text-2xl my-3">Menú de ropa sucia</h2>
     <%- include('../components/menus/menu_ropa_sucia') %>
+    <h1 class="text-2xl text-black mt-3">Artículos</h1>
+    <button type="button" class="bg-yellow-500 text-black p-2 rounded hover:bg-yellow-400 mt-3" id="openModal">Crear Artículo</button>
+    <div id="grid" class="ag-theme-quartz h-96 w-max-screen mt-3"></div>
 <% } %>
 
 <% if (tipo_usuario === 3) { %>
     <h2 class="text-2xl my-3">Menú de ropa sucia</h2>
     <%- include('../components/menus/menu_ropa_sucia') %>
 <% } %>
-<h1 class="text-2xl text-black mt-3">Artículos</h1>
-<button type="button" class="bg-yellow-500 text-black p-2 rounded hover:bg-yellow-400 mt-3" id="openModal">Crear Artículo</button>
-<div id="grid" class="ag-theme-quartz h-96 w-max-screen mt-3"></div>
+
 <%- include('../components/modals/clothes/editar_articulo_modal') %>
 <%- include('../components/modals/clothes/crear_articulo_modal') %>
 <%- include('../components/modals/clothes/entregar_ropa_unidad_sigcom_modal') %>
