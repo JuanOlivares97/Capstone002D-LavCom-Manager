@@ -37,9 +37,8 @@ app.use('/reports',loginRequired, reportesRouter);
 app.use('/dashboard',loginRequired, dashboardRouter);
 app.use('/help',loginRequired, helpRouter)
 
-
-app.get("/template", (req, res) => {
-    res.render("error",{layout:false});
+app.use((req, res) => {
+    res.status(404).render('error', { layout: false });
 });
 
 const port = process.env.PORT || 3000;
