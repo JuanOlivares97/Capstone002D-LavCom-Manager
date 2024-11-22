@@ -1,0 +1,115 @@
+<div>
+    <% 
+    const manuales = [
+        { id: 0, nombre: 'Funcionario' },
+        { id: 1, nombre: 'Nutricionista' }, 
+        { id: 2, nombre: 'Administrador' },
+        { id: 3, nombre: 'Tecnico' },
+        { id: 4, nombre: 'Clinico' },
+        { id: 5, nombre: 'RRHH' },
+        { id: 6, nombre: 'Recaudacion' },
+        { id: 7, nombre: 'Cocina' }
+    ];
+    %>
+
+    <% manuales.forEach(manual => { %>
+        <% if (tipoUsuario === manual.id) { %>
+            <div id="pagination" class="flex justify-center items-center gap-4 my-4 w-full">
+                <button id="prev" class="px-4 py-2 bg-blue-500 text-white rounded disabled:opacity-50">Anterior</button>
+                <span id="page-info" class="text-gray-700">Página <span id="current-page">1</span> de <span id="total-pages">1</span></span>
+                <button id="next" class="px-4 py-2 bg-blue-500 text-white rounded disabled:opacity-50">Siguiente</button>
+            </div>
+            <div id="pdf-viewer" class=""></div>
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+            <script>
+                window.pdfjsLib = window.pdfjsLib || pdfjs;
+                
+                pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+                
+                let currentPage = 1;
+                let totalPages = 0;
+                let pdfDoc = null;
+
+                async function loadPDF() {
+                    try {
+                        const url = `/food-manager/pdf/<%= manual.nombre %>.pdf`;
+                        pdfDoc = await pdfjsLib.getDocument(url).promise;
+                        totalPages = pdfDoc.numPages;
+                        document.getElementById('total-pages').textContent = totalPages;
+                        await renderPage(currentPage);
+                        updatePaginationButtons();
+                    } catch (error) {
+                        console.error('Error al cargar el PDF:', error);
+                        const container = document.getElementById('pdf-viewer');
+                        container.innerHTML = '<div class="error-message">Lo sentimos, no se encontró el manual para este tipo de usuario.</div>';
+                    }
+                }
+
+                async function renderPage(pageNumber) {
+                    const container = document.getElementById('pdf-viewer');
+                    container.innerHTML = ''; // Limpiar el contenedor
+
+                    const canvas = document.createElement('canvas');
+                    canvas.className = 'pdf-page';
+                    container.appendChild(canvas);
+
+                    const page = await pdfDoc.getPage(pageNumber);
+                    const viewport = page.getViewport({scale: 1.5});
+                    const context = canvas.getContext('2d');
+                    canvas.height = viewport.height;
+                    canvas.width = viewport.width;
+
+                    await page.render({
+                        canvasContext: context,
+                        viewport: viewport
+                    }).promise;
+
+                    document.getElementById('current-page').textContent = pageNumber;
+                }
+
+                function updatePaginationButtons() {
+                    const prevButton = document.getElementById('prev');
+                    const nextButton = document.getElementById('next');
+                    
+                    prevButton.disabled = currentPage === 1;
+                    nextButton.disabled = currentPage === totalPages;
+                }
+
+                document.getElementById('prev').addEventListener('click', async () => {
+                    if (currentPage > 1) {
+                        currentPage--;
+                        await renderPage(currentPage);
+                        updatePaginationButtons();
+                    }
+                });
+
+                document.getElementById('next').addEventListener('click', async () => {
+                    if (currentPage < totalPages) {
+                        currentPage++;
+                        await renderPage(currentPage);
+                        updatePaginationButtons();
+                    }
+                });
+                
+                document.addEventListener('DOMContentLoaded', loadPDF);
+            </script>
+            <style>
+                
+                .pdf-page {
+                    margin: 10px auto;
+                    display: block;
+                    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+                }
+                .error-message {
+                    text-align: center;
+                    padding: 20px;
+                    color: #721c24;
+                    background-color: #f8d7da;
+                    border: 1px solid #f5c6cb;
+                    border-radius: 4px;
+                    margin-top: 20px;
+                }
+            </style>
+        <% } %>
+    <% }); %>
+</div>
