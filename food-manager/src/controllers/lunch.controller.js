@@ -23,6 +23,15 @@ async function renderHome(req, res) {
         // Si no existe, muestra el menú
         return res.render('lunch/home', { tipoUsuario: parseInt(tipoUsuario), mostrarMenu: true });
     } catch (error) {
+        const errorLog = await prisma.errorLog.create({
+            data: {
+                id_usuario: req.user["id_usuario"] || null,
+                tipo_error: "Error interno del servidor",
+                mensaje_error: JSON.stringify(error),
+                ruta_error: "food-manager/lunch/home",
+                codigo_http: 500
+            }
+        });
         // Manejo de errores
         return res.status(500).json({ message: "Internal server error" });
     }
@@ -35,6 +44,15 @@ async function registrationLunch(req, res) {
 
         // Valida que el menú sea un número válido
         if (!menu || isNaN(parseInt(menu))) {
+            const errorLog = await prisma.errorLog.create({
+                data: {
+                    id_usuario: req.user["id_usuario"] || null,
+                    tipo_error: "Error interno del servidor",
+                    mensaje_error: JSON.stringify(error),
+                    ruta_error: "food-manager/lunch/home",
+                    codigo_http: 400
+                }
+            });
             return res.status(400).json({ message: "Menu selection is invalid" });
         }
 
@@ -52,6 +70,15 @@ async function registrationLunch(req, res) {
         });
 
         if (!funcionario || funcionario.Habilitado !== 'S') {
+            const errorLog = await prisma.errorLog.create({
+                data: {
+                    id_usuario: req.user["id_usuario"] || null,
+                    tipo_error: "Error interno del servidor",
+                    mensaje_error: JSON.stringify(error),
+                    ruta_error: "food-manager/lunch/home",
+                    codigo_http: 404
+                }
+            });
             return res.status(404).json({ message: "Funcionario no habilitado" });
         }
 
@@ -71,6 +98,15 @@ async function registrationLunch(req, res) {
         // Devuelve un mensaje de éxito
         return res.status(200).json({ message: 'Colacion ingresada exitosamente' });
     } catch (error) {
+        const errorLog = await prisma.errorLog.create({
+            data: {
+                id_usuario: req.user["id_usuario"] || null,
+                tipo_error: "Error interno del servidor",
+                mensaje_error: JSON.stringify(error),
+                ruta_error: "food-manager/lunch/home",
+                codigo_http: 500
+            }
+        });
         // Manejo de errores
         console.error(error);
         res.status(500).send('Error al registrar la colación: ' + error);
@@ -97,6 +133,15 @@ async function renderLunchList(req, res) {
         // Renderiza la vista con la lista de colaciones
         res.render('totem/LunchList', { lunches, tipoUsuario: parseInt(tipoUsuario) });
     } catch (error) {
+        const errorLog = await prisma.errorLog.create({
+            data: {
+                id_usuario: req.user["id_usuario"] || null,
+                tipo_error: "Error interno del servidor",
+                mensaje_error: JSON.stringify(error),
+                ruta_error: "food-manager/lunch/home",
+                codigo_http: 500
+            }
+        });
         res.status(500).send('Error al cargar el listado de colaciones');
     }
 }
@@ -133,7 +178,15 @@ async function registrarColacionRetirada(req, res) {
         // Devuelve un mensaje de éxito
         return res.status(200).json({ message: 'Colación retirada exitosamente' });
     } catch (error) {
-        // Manejo de errores
+        const errorLog = await prisma.errorLog.create({
+            data: {
+                id_usuario: req.user["id_usuario"] || null,
+                tipo_error: "Error interno del servidor",
+                mensaje_error: JSON.stringify(error),
+                ruta_error: "food-manager/lunch/home",
+                codigo_http: 500
+            }
+        });
         return res.status(500).json({ message: 'Error al retirar la colación' });
     }
 }

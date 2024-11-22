@@ -29,7 +29,15 @@ async function renderHome(req, res) {
             tipoFuncionario,
         });
     } catch (error) {
-        // Maneja errores devolviendo un estado 500 y un mensaje de error
+        const errorLog = await prisma.errorLog.create({
+            data: {
+                id_usuario: req.user["id_usuario"] || null,
+                tipo_error: "Error interno del servidor",
+                mensaje_error: JSON.stringify(error),
+                ruta_error: "food-manager/employee/home",
+                codigo_http: 500
+            }
+        });
         return res.status(500).json({ message: "Internal server error" });
     }
 }
@@ -89,7 +97,15 @@ async function getFuncionarios(req, res) {
         // Devuelve la lista de funcionarios transformada
         res.status(200).json(funcionariosTransformados);
     } catch (error) {
-        // Maneja errores devolviendo un estado 500 y un mensaje de error
+        const errorLog = await prisma.errorLog.create({
+            data: {
+                id_usuario: req.user["id_usuario"] || null,
+                tipo_error: "Error interno del servidor",
+                mensaje_error: JSON.stringify(error),
+                ruta_error: "food-manager/employee/home",
+                codigo_http: 500
+            }
+        });
         res
             .status(500)
             .json({ message: "Internal server error: " + error.message });
@@ -113,11 +129,29 @@ async function createEmployee(req, res) {
 
         // Validar campos obligatorios
         if (!nombre_usuario || !apellido_paterno || !RutCompleto || !tipoEstamento || !tipoServicio || !tipoUnidad || !tipoContrato || !tipoFuncionario) {
+            const errorLog = await prisma.errorLog.create({
+                data: {
+                    id_usuario: req.user["id_usuario"] || null,
+                    tipo_error: "Error interno del servidor",
+                    mensaje_error: JSON.stringify(error),
+                    ruta_error: "food-manager/employee/home",
+                    codigo_http: 400
+                }
+            });
             return res.status(400).json({ message: "Todos los campos son requeridos" });
         }
 
         // Validar formato del RUT
         if (!RutCompleto.includes("-")) {
+            const errorLog = await prisma.errorLog.create({
+                data: {
+                    id_usuario: req.user["id_usuario"] || null,
+                    tipo_error: "Error interno del servidor",
+                    mensaje_error: JSON.stringify(error),
+                    ruta_error: "food-manager/employee/home",
+                    codigo_http: 400
+                }
+            });
             return res.status(400).json({
                 message: "El RUT debe estar en el formato correcto (12345678-9).",
             });
@@ -176,6 +210,15 @@ async function createEmployee(req, res) {
 
         return res.status(201).json(funcionario);
     } catch (error) {
+        const errorLog = await prisma.errorLog.create({
+            data: {
+                id_usuario: req.user["id_usuario"] || null,
+                tipo_error: "Error interno del servidor",
+                mensaje_error: JSON.stringify(error),
+                ruta_error: "food-manager/employee/home",
+                codigo_http: 500
+            }
+        });
         return res
             .status(500)
             .json({ message: "Internal server error: " + error.message });
@@ -219,6 +262,15 @@ async function updateEmployee(req, res) {
 
         return res.status(200).json(funcionario);
     } catch (error) {
+        const errorLog = await prisma.errorLog.create({
+            data: {
+                id_usuario: req.user["id_usuario"] || null,
+                tipo_error: "Error interno del servidor",
+                mensaje_error: JSON.stringify(error),
+                ruta_error: "food-manager/employee/home",
+                codigo_http: 500
+            }
+        });
         return res.status(500).json({ message: "Internal server error: " + error.message });
     }
 }
@@ -240,6 +292,15 @@ async function deleteEmployee(req, res) {
 
         res.status(201).json(funcionario);
     } catch (error) {
+        const errorLog = await prisma.errorLog.create({
+            data: {
+                id_usuario: req.user["id_usuario"] || null,
+                tipo_error: "Error interno del servidor",
+                mensaje_error: JSON.stringify(error),
+                ruta_error: "food-manager/employee/home",
+                codigo_http: 500
+            }
+        });
         res
             .status(500)
             .json({ message: "Internal server error: " + error.message });

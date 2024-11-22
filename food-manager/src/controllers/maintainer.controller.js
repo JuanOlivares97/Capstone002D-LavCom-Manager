@@ -30,6 +30,15 @@ async function getEstamento() {
         const Estamento = await prisma.TipoEstamento.findMany(); // Consulta todos los registros de TipoEstamento
         return Estamento;
     } catch (error) {
+        const errorLog = await prisma.errorLog.create({
+            data: {
+                id_usuario: req.user["id_usuario"] || null,
+                tipo_error: "Error interno del servidor",
+                mensaje_error: JSON.stringify(error),
+                ruta_error: "food-manager/maintainer/home",
+                codigo_http: 500
+            }
+        });
         throw new Error("Error al obtener los Estamento: " + error.message);
     }
 }
@@ -42,7 +51,15 @@ async function getServicio() {
         });
         return servicios;
     } catch (error) {
-        throw new Error("Error al obtener los servicios: " + error.message);
+        const errorLog = await prisma.errorLog.create({
+            data: {
+                id_usuario: req.user["id_usuario"] || null,
+                tipo_error: "Error interno del servidor",
+                mensaje_error: JSON.stringify(error),
+                ruta_error: "food-manager/maintainer/home",
+                codigo_http: 500
+            }
+        });
     }
 }
 
@@ -54,7 +71,15 @@ async function getUnidad() {
         });
         return Unidad;
     } catch (error) {
-        throw new Error("Error al obtener los Unidad: " + error.message);
+        const errorLog = await prisma.errorLog.create({
+            data: {
+                id_usuario: req.user["id_usuario"] || null,
+                tipo_error: "Error interno del servidor",
+                mensaje_error: JSON.stringify(error),
+                ruta_error: "food-manager/maintainer/home",
+                codigo_http: 500
+            }
+        });
     }
 }
 
@@ -64,7 +89,15 @@ async function getVia() {
         const Via = await prisma.TipoVia.findMany(); // Consulta todos los registros de TipoVia
         return Via;
     } catch (error) {
-        throw new Error("Error al obtener los Via: " + error.message);
+        const errorLog = await prisma.errorLog.create({
+            data: {
+                id_usuario: req.user["id_usuario"] || null,
+                tipo_error: "Error interno del servidor",
+                mensaje_error: JSON.stringify(error),
+                ruta_error: "food-manager/maintainer/home",
+                codigo_http: 500
+            }
+        });
     }
 }
 
@@ -76,7 +109,15 @@ async function getRegimen() {
         });
         return Regimen;
     } catch (error) {
-        throw new Error("Error al obtener los Regimen: " + error.message);
+        const errorLog = await prisma.errorLog.create({
+            data: {
+                id_usuario: req.user["id_usuario"] || null,
+                tipo_error: "Error interno del servidor",
+                mensaje_error: JSON.stringify(error),
+                ruta_error: "food-manager/maintainer/home",
+                codigo_http: 500
+            }
+        });
     }
 }
 
@@ -86,7 +127,15 @@ async function getTipoFuncionario() {
         const TipoFuncionario = await prisma.TipoFuncionario.findMany(); // Consulta todos los registros de TipoFuncionario
         return TipoFuncionario;
     } catch (error) {
-        throw new Error("Error al obtener los TipoFuncionario: " + error.message);
+        const errorLog = await prisma.errorLog.create({
+            data: {
+                id_usuario: req.user["id_usuario"] || null,
+                tipo_error: "Error interno del servidor",
+                mensaje_error: JSON.stringify(error),
+                ruta_error: "food-manager/maintainer/home",
+                codigo_http: 500
+            }
+        });
     }
 }
 
@@ -96,7 +145,15 @@ async function getContrato() {
         const Contrato = await prisma.TipoContrato.findMany(); // Consulta todos los registros de TipoContrato
         return Contrato;
     } catch (error) {
-        throw new Error("Error al obtener los Contrato: " + error.message);
+        const errorLog = await prisma.errorLog.create({
+            data: {
+                id_usuario: req.user["id_usuario"] || null,
+                tipo_error: "Error interno del servidor",
+                mensaje_error: JSON.stringify(error),
+                ruta_error: "food-manager/maintainer/home",
+                codigo_http: 500
+            }
+        });
     }
 }
 
@@ -109,7 +166,15 @@ async function createItem(req, res, model, dataField) {
         });
         res.status(201).json(item); // Devuelve el registro creado
     } catch (error) {
-        res.status(500).json({ error: `Error al crear el item: ${error.message}` }); // Maneja errores
+        const errorLog = await prisma.errorLog.create({
+            data: {
+                id_usuario: req.user["id_usuario"] || null,
+                tipo_error: "Error interno del servidor",
+                mensaje_error: JSON.stringify(error),
+                ruta_error: "food-manager/maintainer/home",
+                codigo_http: 500
+            }
+        });
     }
 }
 
@@ -151,6 +216,15 @@ async function updateItem(req, res, model, dataField, idField) {
         });
 
         if (existingItem[dataField] === data) {
+            const errorLog = await prisma.errorLog.create({
+                data: {
+                    id_usuario: req.user["id_usuario"] || null,
+                    tipo_error: "Error interno del servidor",
+                    mensaje_error: "El nuevo valor debe ser distinto al valor actual.",
+                    ruta_error: "food-manager/maintainer/home",
+                    codigo_http: 400
+                }
+            });
             return res.status(400).json({ error: "El nuevo valor debe ser distinto al valor actual." });
         }
 
@@ -159,8 +233,16 @@ async function updateItem(req, res, model, dataField, idField) {
             data: { [dataField]: data }
         });
         res.status(200).json(item); // Devuelve el ítem actualizado
-    } catch (error) {
-        res.status(500).json({ error: `Error al actualizar el item: ${error.message}` }); // Maneja errores
+        } catch (error) {
+        const errorLog = await prisma.errorLog.create({
+            data: {
+                id_usuario: req.user["id_usuario"] || null,
+                tipo_error: "Error interno del servidor",
+                mensaje_error: JSON.stringify(error),
+                ruta_error: "food-manager/maintainer/home",
+                codigo_http: 500
+            }
+        });
     }
 }
 
@@ -202,7 +284,15 @@ async function deleteItem(req, res, model, idField) {
         });
         res.status(200).json(item); // Devuelve el ítem deshabilitado
     } catch (error) {
-        res.status(500).json({ error: `Error al actualizar el item: ${error.message}` }); // Maneja errores
+        const errorLog = await prisma.errorLog.create({
+            data: {
+                id_usuario: req.user["id_usuario"] || null,
+                tipo_error: "Error interno del servidor",
+                mensaje_error: JSON.stringify(error),
+                ruta_error: "food-manager/maintainer/home",
+                codigo_http: 500
+            }
+        });
     }
 }
 

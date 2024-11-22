@@ -98,7 +98,15 @@ async function renderDashboard(req, res) {
       distribucionRegimen,  // Distribución de regímene
     });
   } catch (error) {
-    // Devuelve un error 500 en caso de excepciones
+    const errorLog = await prisma.errorLog.create({
+      data: {
+        id_usuario: req.user["id_usuario"] || null,
+        tipo_error: "Error interno del servidor",
+        mensaje_error: JSON.stringify(error),
+        ruta_error: "food-manager/dashboard/home",
+        codigo_http: 500
+      }
+    });
     return res.status(500).json({ error: error.message });
   }
 }

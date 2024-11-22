@@ -6,8 +6,15 @@ async function renderHome(req, res) {
         const tipoUsuario = req.user.tipo_usuario;
         return res.render('report/home', { reportes, tipoUsuario: parseInt(tipoUsuario) });
     } catch (error) {
-        const errorMessage = `Error al obtener los reportes: ${error.message}`;
-        console.error(errorMessage);
+        const errorLog = await prisma.errorLog.create({
+            data: {
+                id_usuario: req.user["id_usuario"] || null,
+                tipo_error: "Error interno del servidor",
+                mensaje_error: JSON.stringify(error),
+                ruta_error: "food-manager/report/home",
+                codigo_http: 500
+            }
+        });
         return res.status(500).json({ message: "Error al obtener los reportes" });
     }
 }
@@ -30,7 +37,15 @@ async function getReports() {
         });
         return reportes;
     } catch (error) {
-        console.error(error);
+        const errorLog = await prisma.errorLog.create({
+            data: {
+                id_usuario: req.user["id_usuario"] || null,
+                tipo_error: "Error interno del servidor",
+                mensaje_error: JSON.stringify(error),
+                ruta_error: "food-manager/report/home",
+                codigo_http: 500
+            }
+        });
     }
 }
 
@@ -48,6 +63,15 @@ async function fillTable(req, res) {
             message: 'Tabla generada con éxito'
         });
     } catch (error) {
+        const errorLog = await prisma.errorLog.create({
+            data: {
+                id_usuario: req.user["id_usuario"] || null,
+                tipo_error: "Error interno del servidor",
+                mensaje_error: JSON.stringify(error),
+                ruta_error: "food-manager/report/home",
+                codigo_http: 500
+            }
+        });
         res.status(500).json({ message: "Error al obtener los datos" });
     }
 }
@@ -132,6 +156,15 @@ async function reportHospitalizadoDiario(req, res) {
             pageSize: pageSize,
         });
     } catch (error) {
+        const errorLog = await prisma.errorLog.create({
+            data: {
+                id_usuario: req.user["id_usuario"] || null,
+                tipo_error: "Error interno del servidor",
+                mensaje_error: JSON.stringify(error),
+                ruta_error: "food-manager/report/home",
+                codigo_http: 500
+            }
+        });
         return res.status(500).json({ message: 'Error al obtener los reportes' });
     }
 }

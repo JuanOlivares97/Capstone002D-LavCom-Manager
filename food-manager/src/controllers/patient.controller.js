@@ -97,6 +97,15 @@ async function renderHome(req, res) {
       altasHoy,
     });
   } catch (error) {
+    const errorLog = await prisma.errorLog.create({
+      data: {
+        id_usuario: req.user["id_usuario"] || null,
+        tipo_error: "Error interno del servidor",
+        mensaje_error: JSON.stringify(error),
+        ruta_error: "food-manager/patient/home",
+        codigo_http: 500
+      }
+    });
     return res.status(500).json({ message: "Internal server error" });
   }
 }
@@ -113,6 +122,15 @@ async function getPaciente(req, res) {
 
     return res.status(200).json(paciente);
   } catch (error) {
+    const errorLog = await prisma.errorLog.create({
+      data: {
+        id_usuario: req.user["id_usuario"] || null,
+        tipo_error: "Error interno del servidor",
+        mensaje_error: JSON.stringify(error),
+        ruta_error: "food-manager/patient/home",
+        codigo_http: 500
+      }
+    });
     return res.status(500).json({ message: "Internal server error" });
   }
 }
@@ -132,6 +150,15 @@ async function getPacientes(req, res) {
     });
     return res.status(200).json(pacientes);
   } catch (error) {
+    const errorLog = await prisma.errorLog.create({
+      data: {
+        id_usuario: req.user["id_usuario"] || null,
+        tipo_error: "Error interno del servidor",
+        mensaje_error: JSON.stringify(error),
+        ruta_error: "food-manager/patient/home",
+        codigo_http: 500
+      }
+    });
     return res.status(500).json({ message: "Internal server error" });
   }
 }
@@ -141,12 +168,30 @@ async function createPaciente(req, res) {
     // Verificar si `Rut` está presente en el cuerpo de la solicitud
     const rutCompleto = req.body.RutCompleto;
     if (!rutCompleto) {
+      const errorLog = await prisma.errorLog.create({
+        data: {
+          id_usuario: req.user["id_usuario"] || null,
+          tipo_error: "Error interno del servidor",
+          mensaje_error: "El campo Rut es obligatorio",
+          ruta_error: "food-manager/patient/home",
+          codigo_http: 400
+        }
+      });
       return res.status(400).json({ message: "El campo Rut es obligatorio" });
     }
 
     // Extraer `rut` y `dv` del `RutCompleto`
     const [rut, dv] = rutCompleto.split("-");
     if (!rut || !dv) {
+      const errorLog = await prisma.errorLog.create({
+        data: {
+          id_usuario: req.user["id_usuario"] || null,
+          tipo_error: "Error interno del servidor",
+          mensaje_error: "Formato de RUT inválido",
+          ruta_error: "food-manager/patient/home",
+          codigo_http: 400
+        }
+      });
       return res.status(400).json({ message: "Formato de RUT inválido" });
     }
 
@@ -183,6 +228,43 @@ async function createPaciente(req, res) {
           paciente: pacienteActualizado,
         });
     } else {
+      // Generar username único para el paciente
+      const nombre_s = req.body.NombreHospitalizado.split(" ");
+      let nombres = nombre_s.join(" ");
+      let index = 1;
+      let isUnique = false;
+      let new_username = "";
+
+      while (!isUnique && index <= nombres.length) {
+          const nombre_fragmento = nombres.substring(0, index);
+          new_username = `${nombre_fragmento.toLowerCase()}.${nombre_s[0].toLowerCase()}.${dv.toLowerCase()}`;
+
+          // Verificar si el username ya existe
+          const existingUser = await prisma.Hospitalizado.findFirst({
+              where: {
+                  username: new_username
+              }
+          });
+
+          if (!existingUser) {
+              isUnique = true;
+          } else {
+              index++;
+          }
+      }
+
+      if (!isUnique) {
+        const errorLog = await prisma.errorLog.create({
+          data: {
+            id_usuario: req.user["id_usuario"] || null,
+            tipo_error: "Error interno del servidor",
+            mensaje_error: "No se pudo generar un username único para el paciente",
+            ruta_error: "food-manager/patient/home",
+            codigo_http: 400
+          }
+        });
+        return res.status(400).json({ message: "No se pudo generar un username único para el paciente" });
+      }
       // Crear nuevo paciente
       const nuevoPaciente = await prisma.Hospitalizado.create({
         data: {
@@ -223,9 +305,16 @@ async function createPaciente(req, res) {
         });
     }
   } catch (error) {
-    res
-      .status(500)
-      .json({ message: "Error al crear o reingresar el paciente" });
+    const errorLog = await prisma.errorLog.create({
+      data: {
+        id_usuario: req.user["id_usuario"] || null,
+        tipo_error: "Error interno del servidor",
+        mensaje_error: JSON.stringify(error),
+        ruta_error: "food-manager/patient/home",
+        codigo_http: 500
+      }
+    });
+    return res.status(500).json({ message: "Error al crear o reingresar el paciente" });
   }
 }
 
@@ -250,6 +339,15 @@ async function getMovimientosPaciente(req, res) {
     });
     return res.status(200).json(movimientos);
   } catch (error) {
+    const errorLog = await prisma.errorLog.create({
+      data: {
+        id_usuario: req.user["id_usuario"] || null,
+        tipo_error: "Error interno del servidor",
+        mensaje_error: JSON.stringify(error),
+        ruta_error: "food-manager/patient/home",
+        codigo_http: 500
+      }
+    });
     return res.status(500).json({ message: "Internal server error" });
   }
 }
@@ -320,6 +418,15 @@ async function movePatientService(req, res) {
             log: log 
         });
     } catch (error) {
+        const errorLog = await prisma.errorLog.create({
+            data: {
+                id_usuario: req.user["id_usuario"] || null,
+                tipo_error: "Error interno del servidor",
+                mensaje_error: JSON.stringify(error),
+                ruta_error: "food-manager/patient/home",
+                codigo_http: 500
+            }
+        });
         return res.status(500).json({ message: 'Error interno del servidor', error: error.message });
     }
 }
@@ -336,6 +443,15 @@ async function changeRegimen(req, res) {
     });
 
     if (!paciente) {
+      const errorLog = await prisma.errorLog.create({
+        data: {
+          id_usuario: req.user["id_usuario"] || null,
+          tipo_error: "Error interno del servidor",
+          mensaje_error: "Paciente no encontrado",
+          ruta_error: "food-manager/patient/home",
+          codigo_http: 404
+        }
+      });
       return res.status(404).json({ message: "Paciente no encontrado" });
     }
 
@@ -349,11 +465,29 @@ async function changeRegimen(req, res) {
 
     // Si el nuevo régimen no es válido, devuelve un error 400
     if (!isValidRegimen) {
+      const errorLog = await prisma.errorLog.create({
+        data: {
+          id_usuario: req.user["id_usuario"] || null,
+          tipo_error: "Error interno del servidor",
+          mensaje_error: "Régimen no válido",
+          ruta_error: "food-manager/patient/home",
+          codigo_http: 400
+        }
+      });
       return res.status(400).json({ message: "Régimen no válido" });
     }
 
     // Verifica si el nuevo régimen es el mismo que el actual
     if (paciente.IdTipoRegimen === newRegimen) {
+      const errorLog = await prisma.errorLog.create({
+        data: {
+          id_usuario: req.user["id_usuario"] || null,
+          tipo_error: "Error interno del servidor",
+          mensaje_error: "El régimen no ha cambiado",
+          ruta_error: "food-manager/patient/home",
+          codigo_http: 400
+        }
+      });
       return res.status(400).json({ message: "El régimen no ha cambiado" });
     }
 
@@ -366,7 +500,15 @@ async function changeRegimen(req, res) {
       .status(200)
       .json({ message: "Cambio de régimen exitoso", paciente: updatedPatient });
   } catch (error) {
-    console.error("Error interno:", error);
+    const errorLog = await prisma.errorLog.create({
+      data: {
+        id_usuario: req.user["id_usuario"] || null,
+        tipo_error: "Error interno del servidor",
+        mensaje_error: JSON.stringify(error),
+        ruta_error: "food-manager/patient/home",
+        codigo_http: 500
+      }
+    });
     return res
       .status(500)
       .json({ message: "Error interno del servidor", error: error.message });
@@ -405,6 +547,15 @@ async function changeObservacionesAlta(req, res) {
       .status(200)
       .json({ message: "Movimiento al Observaciones de Alta", movimiento });
   } catch (error) {
+    const errorLog = await prisma.errorLog.create({
+      data: {
+        id_usuario: req.user["id_usuario"] || null,
+        tipo_error: "Error interno del servidor",
+        mensaje_error: JSON.stringify(error),
+        ruta_error: "food-manager/patient/home",
+        codigo_http: 500
+      }
+    });
     return res.status(500).json({ message: "Internal server error " + error });
   }
 }
@@ -444,6 +595,15 @@ async function changeObservacionesNutricionista(req, res) {
         movimiento,
       });
   } catch (error) {
+    const errorLog = await prisma.errorLog.create({
+      data: {
+        id_usuario: req.user["id_usuario"] || null,
+        tipo_error: "Error interno del servidor",
+        mensaje_error: JSON.stringify(error),
+        ruta_error: "food-manager/patient/home",
+        codigo_http: 500
+      }
+    });
     return res.status(500).json({ message: "Internal server error " + error });
   }
 }
@@ -479,6 +639,15 @@ async function changeObservacionesGenerales(req, res) {
       .status(200)
       .json({ message: "Movimiento al Observaciones Generales", movimiento });
   } catch (error) {
+    const errorLog = await prisma.errorLog.create({
+      data: {
+        id_usuario: req.user["id_usuario"] || null,
+        tipo_error: "Error interno del servidor",
+        mensaje_error: JSON.stringify(error),
+        ruta_error: "food-manager/patient/home",
+        codigo_http: 500
+      }
+    });
     return res.status(500).json({ message: "Internal server error" });
   }
 }
@@ -497,6 +666,15 @@ async function changeVia(req, res) {
 
     // Verificar si se encontró el paciente
     if (!paciente) {
+      const errorLog = await prisma.errorLog.create({
+        data: {
+          id_usuario: req.user["id_usuario"] || null,
+          tipo_error: "Error interno del servidor",
+          mensaje_error: "Paciente no encontrado",
+          ruta_error: "food-manager/patient/home",
+          codigo_http: 404
+        }
+      });
       return res.status(404).json({ message: "Paciente no encontrado" });
     }
 
@@ -509,11 +687,29 @@ async function changeVia(req, res) {
 
     // Validar si la nueva vía es válida
     if (newViaIndex === -1) {
+      const errorLog = await prisma.errorLog.create({
+        data: {
+          id_usuario: req.user["id_usuario"] || null,
+          tipo_error: "Error interno del servidor",
+          mensaje_error: "Vía no válida",
+          ruta_error: "food-manager/patient/home",
+          codigo_http: 400
+        }
+      });
       return res.status(400).json({ message: "Vía no válida" });
     }
 
     // Validar si la nueva vía es la misma que la anterior
     if (paciente.IdTipoVia === newVia) {
+      const errorLog = await prisma.errorLog.create({
+        data: {
+          id_usuario: req.user["id_usuario"] || null,
+          tipo_error: "Error interno del servidor",
+          mensaje_error: "La vía no ha cambiado",
+          ruta_error: "food-manager/patient/home",
+          codigo_http: 400
+        }
+      });
       return res.status(400).json({ message: "La vía no ha cambiado" });
     }
 
@@ -542,7 +738,15 @@ async function changeVia(req, res) {
       .status(200)
       .json({ message: "Vía de ingesta actualizada exitosamente", movimiento });
   } catch (error) {
-    console.error("Error interno:", error);
+    const errorLog = await prisma.errorLog.create({
+      data: {
+        id_usuario: req.user["id_usuario"] || null,
+        tipo_error: "Error interno del servidor",
+        mensaje_error: JSON.stringify(error),
+        ruta_error: "food-manager/patient/home",
+        codigo_http: 500
+      }
+    });
     return res
       .status(500)
       .json({ message: "Internal server error", error: error.message });
@@ -563,6 +767,15 @@ async function indicarAlta(req, res) {
     });
 
     if (!paciente) {
+      const errorLog = await prisma.errorLog.create({
+        data: {
+          id_usuario: req.user["id_usuario"] || null,
+          tipo_error: "Error interno del servidor",
+          mensaje_error: "Paciente no encontrado",
+          ruta_error: "food-manager/patient/home",
+          codigo_http: 404
+        }
+      });
       return res.status(404).json({ message: "Paciente no encontrado" });
     }
 
@@ -597,7 +810,15 @@ async function indicarAlta(req, res) {
       .status(200)
       .json({ message: "Paciente indicado como alta", paciente: newPaciente });
   } catch (error) {
-    console.error("Error interno:", error);
+    const errorLog = await prisma.errorLog.create({
+      data: {
+        id_usuario: req.user["id_usuario"] || null,
+        tipo_error: "Error interno del servidor",
+        mensaje_error: JSON.stringify(error),
+        ruta_error: "food-manager/patient/home",
+        codigo_http: 500
+      }
+    });
     return res
       .status(500)
       .json({ message: "Internal server error", error: error.message });
@@ -612,6 +833,15 @@ async function changeFastingDate(req, res) {
 
     // Verificar si la fecha es válida
     if (!newFastingDate) {
+      const errorLog = await prisma.errorLog.create({
+        data: {
+          id_usuario: req.user["id_usuario"] || null,
+          tipo_error: "Error interno del servidor",
+          mensaje_error: "La fecha de ayuno no puede ser vacía",
+          ruta_error: "food-manager/patient/home",
+          codigo_http: 400
+        }
+      });
       return res
         .status(400)
         .json({ message: "La fecha de ayuno no puede ser vacía" });
@@ -619,6 +849,15 @@ async function changeFastingDate(req, res) {
 
     // Verificar si la fecha es válida
     if (!moment(newFastingDate, "YYYY-MM-DD", true).isValid()) {
+      const errorLog = await prisma.errorLog.create({
+        data: {
+          id_usuario: req.user["id_usuario"] || null,
+          tipo_error: "Error interno del servidor",
+          mensaje_error: "La fecha de ayuno no es válida",
+          ruta_error: "food-manager/patient/home",
+          codigo_http: 400
+        }
+      });
       return res
         .status(400)
         .json({ message: "La fecha de ayuno no es válida" });
@@ -633,6 +872,15 @@ async function changeFastingDate(req, res) {
       },
     });
     if (!paciente) {
+      const errorLog = await prisma.errorLog.create({
+        data: {
+          id_usuario: req.user["id_usuario"] || null,
+          tipo_error: "Error interno del servidor",
+          mensaje_error: "Paciente no encontrado",
+          ruta_error: "food-manager/patient/home",
+          codigo_http: 404
+        }
+      });
       return res.status(404).json({ message: "Paciente no encontrado" });
     }
 
@@ -653,6 +901,15 @@ async function changeFastingDate(req, res) {
         paciente: paciente,
       });
   } catch (error) {
+    const errorLog = await prisma.errorLog.create({
+      data: {
+        id_usuario: req.user["id_usuario"] || null,
+        tipo_error: "Error interno del servidor",
+        mensaje_error: JSON.stringify(error),
+        ruta_error: "food-manager/patient/home",
+        codigo_http: 500
+      }
+    });
     return res.status(500).json({ message: "Internal server error" });
   }
 }
