@@ -42,9 +42,6 @@ async function loginRequired(req, res, next) {
         // Continuar con la siguiente función en el middleware stack
         next();
     } catch (error) {
-        // Si ocurre un error en cualquier parte del proceso de autenticación, registrar el error
-        console.error("Error during authentication:", error);
-
         // Responder con un error 401 (no autorizado) si la autenticación falla
         return res.status(401).json({ message: "Unauthorized access" });
     }
@@ -72,8 +69,28 @@ var Fn = {
 	}
 }
 
+// Función para verificar el rol del usuario
+function rolesAllowed(roles) {
+    return (req, res, next) => {
+        try {
+            const role = req.user.tipo_usuario;
+            console.log(role);
+            
+
+            if (!roles.includes(role)) {
+                return res.status(403).render("error", {layout: false, message: "No tienes suficientes permisos para acceder a esta ruta"});
+            }
+
+            next();
+        } catch (error) {
+            return res.status(500).json({ message: "Internal server error" });
+        }
+    }
+}
+
 // EXPORTAR FUNCIONES
 module.exports = {
     loginRequired,
-    Fn
+    Fn,
+    rolesAllowed
 };

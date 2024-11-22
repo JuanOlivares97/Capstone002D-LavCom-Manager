@@ -9,6 +9,7 @@ const dashboardRouter = require('./routes/dashboard.routes')
 const helpRouter = require('./routes/help.routes')
 
 const loginRequired = require('./server/authentication').loginRequired;
+const rolesAllowed = require('./server/authentication').rolesAllowed;
 
 const cookieParser = require('cookie-parser');
 
@@ -31,14 +32,14 @@ app.get('/', (req, res) => {
 })
 
 app.use('/auth', authRouter);
-app.use('/users',loginRequired, userRouter);
+app.use('/users',loginRequired, rolesAllowed([1]), userRouter);
 app.use('/clothes',loginRequired, articulosRouter);
-app.use('/reports',loginRequired, reportesRouter);
-app.use('/dashboard',loginRequired, dashboardRouter);
+app.use('/reports',loginRequired, rolesAllowed([1, 2]), reportesRouter);
+app.use('/dashboard',loginRequired, rolesAllowed([1, 2]), dashboardRouter);
 app.use('/help',loginRequired, helpRouter)
 
 app.use((req, res) => {
-    res.status(404).render('error', { layout: false });
+    res.status(404).render('error', { layout: false, message: "Ruta no encontrada" });
 });
 
 const port = process.env.PORT || 3000;
