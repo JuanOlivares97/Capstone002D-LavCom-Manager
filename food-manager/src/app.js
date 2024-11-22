@@ -6,11 +6,7 @@ const cookieParser = require('cookie-parser');
 const fs = require('fs');
 const http = require('http').createServer(app); // HTTP server para Socket.io
 const io = require('socket.io')(http, {
-    path: '/food-manager/socket.io',
-    cors: {
-        origin: "http://localhost:8080",  // Ajusta esto según tu configuración
-        methods: ["GET", "POST"]
-    }
+    path: '/food-manager/socket.io'
 });
 
 // Configuración de EJS y layouts
@@ -22,6 +18,8 @@ app.set('views', './src/views');
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
+
+require('dotenv').config();
 
 // Guardar la instancia de Socket.io en la aplicación
 app.set('socketio', io);
