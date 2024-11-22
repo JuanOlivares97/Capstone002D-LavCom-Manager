@@ -43,6 +43,16 @@ async function getUsuarios(req, res) {
         // Si se encontraron usuarios, retornar los datos con un código HTTP 200
         return res.status(200).json(users);
     } catch (error) {
+        // Si ocurre un error en el proceso, registrar el error en el log de la base de datos
+        await prisma.error_log.create({
+            data: {
+                id_usuario: req.user["id_usuario"] || null, // Si existe un usuario, guardamos su ID
+                tipo_error: "Error interno del servidor", // Tipo de error
+                mensaje_error: JSON.stringify(error), // Convertir el error a un string para almacenarlo
+                ruta_error: "laundry-manager/users/get-users", // Ruta donde ocurrido el error
+                codigo_http: 500 // Código HTTP para error interno
+            }
+        });
         // Si ocurre un error en el proceso, retornar un error 500 indicando un error interno del servidor
         return res.status(500).json({ message: "Internal server error" });
     }
@@ -288,12 +298,31 @@ async function deleteUsuario(req, res) {
         
         // Si no se encuentra el usuario o no se pudo actualizar, devolver un error
         if (!user) {
+            await prisma.error_log.create({
+                data: {
+                    id_usuario: req.user["id_usuario"] || null,  // ID del usuario que realiza la acción
+                    tipo_error: "Error de base de datos",  // Tipo de error
+                    mensaje_error: "Error al eliminar usuario",  // Mensaje de error
+                    ruta_error: "laundry-manager/users/delete-user",  // Ruta donde ocurrido el error
+                    codigo_http: 400  // Código de error HTTP
+                }
+            })
             return res.status(400).json({ message: "Error al eliminar usuario", success: false });
         }
 
         // Si la actualización fue exitosa, devolver una respuesta positiva
         return res.status(200).json({ message: "Usuario eliminado exitosamente", success: true });
     } catch (error) {
+        // Si ocurre un error inesperado, registrar el error y devolver un mensaje
+        await prisma.error_log.create({
+            data: {
+                id_usuario: req.user["id_usuario"] || null,  // ID del usuario que realiza la acción
+                tipo_error: "Error interno del servidor",  // Tipo de error
+                mensaje_error: JSON.stringify(error),  // Mensaje de error con detalle
+                ruta_error: "laundry-manager/users/delete-user",  // Ruta donde ocurrido el error
+                codigo_http: 500  // Código de error HTTP
+            }
+        })
         // Si ocurre un error en el proceso, devolver un error interno
         return res.status(500).json({ message: "Internal server error", error, success: false });
     }
