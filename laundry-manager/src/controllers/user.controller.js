@@ -17,7 +17,6 @@ async function getUsuarios(req, res) {
                 nombre: true, // Incluir nombre del usuario
                 id_servicio: true, // Incluir ID de servicio asociado al usuario
                 id_tipo_contrato: true, // Incluir ID de tipo de contrato
-                id_unidad_sigcom: true, // Incluir ID de unidad de sigcom
                 id_estamento: true, // Incluir ID de estamento
                 id_tipo_usuario: true, // Incluir ID de tipo de usuario
                 username: true, // Incluir nombre de usuario
@@ -108,7 +107,6 @@ async function createUsuario(req, res) {
                 nombre: req.body.nombre, // Asignar nombre del usuario
                 id_servicio: parseInt(req.body.servicio), // Asignar servicio
                 id_tipo_contrato: parseInt(req.body.tipo_contrato), // Asignar tipo de contrato
-                id_unidad_sigcom: null, // Asignar unidad sigcom (null en este caso)
                 id_estamento: parseInt(req.body.estamento), // Asignar estamento
                 id_tipo_usuario: parseInt(req.body.tipo_usuario), // Asignar tipo de usuario
                 username: req.body.username, // Asignar nombre de usuario
@@ -122,7 +120,6 @@ async function createUsuario(req, res) {
                 nombre: true, // Incluir nombre
                 id_servicio: true, // Incluir servicio
                 id_tipo_contrato: true, // Incluir tipo de contrato
-                id_unidad_sigcom: true, // Incluir unidad sigcom
                 id_estamento: true, // Incluir estamento
                 id_tipo_usuario: true, // Incluir tipo de usuario
                 username: true, // Incluir nombre de usuario
