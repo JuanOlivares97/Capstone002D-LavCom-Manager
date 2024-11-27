@@ -45,15 +45,22 @@ async function checkInLunch(req, res) {
             });
         }
 
-        // Obtener la fecha de hoy en formato 'YYYY-MM-DD'
+        console.log("RUT Solicitante:", rutSolicitante);
         const today = moment().format('YYYY-MM-DD');
-
+        console.log("Buscando colaciones para la fecha:", today);
+        
         // Buscar la colación para el empleado en la fecha actual
         const colacion = await prisma.Colacion.findFirst({
             where: {
                 RutSolicitante: rutSolicitante,
-                FechaSolicitud: new Date(today)
+                FechaSolicitud: new Date(today) // Buscar específicamente para el día de hoy
             },
+        });
+        
+        console.log("Colación encontrada:", colacion);
+        console.log("Query params:", {
+            RutSolicitante: rutSolicitante,
+            FechaSolicitud: new Date(today)
         });
 
         // Si no existe la colación, mostrar el menú
@@ -101,7 +108,10 @@ async function registerLunchAtTotem(req, res) {
         let colacion = await prisma.Colacion.findFirst({
             where: {
                 RutSolicitante: rutSolicitante,
-                FechaSolicitud: new Date(today)
+                FechaSolicitud: {
+                    gte: new Date(moment().startOf('day').format()),  // Inicio del día de hoy
+                    lte: new Date(moment().endOf('day').format())     // Fin del día de hoy
+                }
             },
         });
 

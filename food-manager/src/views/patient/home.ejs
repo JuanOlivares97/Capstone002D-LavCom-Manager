@@ -195,7 +195,7 @@
                                 Dar Alta
                             </button>
 
-                            <% if (paciente.enAyuno===true) { %>
+                            <% if (paciente.enAyuno===false) { %>
                                 <!-- Button to trigger the fasting date modal with SweetAlert -->
                             <button onclick="openFastingDateModal(<%= paciente.IdHospitalizado %>); event.stopPropagation();"
                                 class="w-full my-1 px-4 py-2 bg-blue-200 rounded-md shadow-sm hover:bg-blue-300">

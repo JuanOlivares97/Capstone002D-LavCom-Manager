@@ -27,6 +27,8 @@
 
   <script>
     function editarColacion(idColacion) {
+      const lunchItem = event.target.closest('li');
+      
       fetch(`/food-manager/lunch/update-lunch/${idColacion}`, {
         method: 'PUT',
         headers: {
@@ -35,6 +37,8 @@
       })
         .then(response => {
           if (response.ok) {
+            lunchItem.remove();
+            
             Swal.fire({
               icon: 'success',
               title: 'Edición Completa',

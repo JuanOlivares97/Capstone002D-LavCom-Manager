@@ -38,13 +38,22 @@ async function renderDashboard(req, res) {
       prisma.Funcionario.count({ where: { Habilitado: "S" } }),
 
       // Contar colaciones solicitadas hoy con estado 0 (solicitadas)
-      prisma.Colacion.count({ where: { Estado: 0, FechaSolicitud: new Date(hoy) } }),
+      prisma.Colacion.count({ where: { Estado: 0, FechaSolicitud: {
+        gte: new Date(moment().startOf('day').format()),  // Inicio del día de hoy
+        lte: new Date(moment().endOf('day').format())     // Fin del día de hoy
+      } } }),
 
       // Contar colaciones confirmadas hoy con estado 1 (confirmadas)
-      prisma.Colacion.count({ where: { Estado: 1, FechaSolicitud: new Date(hoy) } }),
+      prisma.Colacion.count({ where: { Estado: 1, FechaSolicitud: {
+        gte: new Date(moment().startOf('day').format()),  // Inicio del día de hoy
+        lte: new Date(moment().endOf('day').format())     // Fin del día de hoy
+      } } }),
 
       // Contar colaciones consumidas hoy con estado 2 (almorzaron)
-      prisma.Colacion.count({ where: { Estado: 2, FechaSolicitud: new Date(hoy) } }),
+      prisma.Colacion.count({ where: { Estado: 2, FechaSolicitud: {
+        gte: new Date(moment().startOf('day').format()),  // Inicio del día de hoy
+        lte: new Date(moment().endOf('day').format())     // Fin del día de hoy
+      } } }),
 
       // Contar el total de pacientes hospitalizados
       prisma.Hospitalizado.count(),

@@ -10,7 +10,7 @@ async function renderHome(req, res) {
         // Verifica si el usuario ya registró una colación hoy
         const existingLunch = await prisma.Colacion.findFirst({
             where: {
-                RutSolicitante: req.cookies["rutLogueado"] + "-" + req.cookies["dvLogueado"], // Combina el RUT y DV del usuario
+                RutSolicitante: req.user["rutLogueado"] + "-" + req.user["DvLogueado"], // Combina el RUT y DV del usuario
                 FechaSolicitud: new Date(today), // Compara con la fecha de hoy
             },
         });
@@ -56,9 +56,9 @@ async function registrationLunch(req, res) {
             return res.status(400).json({ message: "Menu selection is invalid" });
         }
 
-        const rutSolicitante = req.cookies["rutLogueado"] + "-" + req.cookies["dvLogueado"]; // Combina el RUT y DV del usuario
-        const rut = req.cookies["rutLogueado"];
-        const dv = req.cookies["dvLogueado"];
+        const rutSolicitante = req.user["rutLogueado"] + "-" + req.user["DvLogueado"]; // Combina el RUT y DV del usuario
+        const rut = req.user["rutLogueado"];
+        const dv =  req.user["DvLogueado"]
         const today = moment().format('YYYY-MM-DD'); // Formatea la fecha actual (YYYY-MM-DD)
 
         // Verifica si el funcionario está habilitado
@@ -122,7 +122,7 @@ async function renderLunchList(req, res) {
         // Obtiene las colaciones confirmadas para hoy
         const lunches = await prisma.Colacion.findMany({
             where: {
-                FechaSolicitud: new Date(today), // Fecha de solicitud es hoy
+                FechaSolicitud: new Date(today),
                 Estado: 1, // Estado 1 - Confirmado
             },
             orderBy: {
@@ -150,7 +150,6 @@ async function renderLunchList(req, res) {
 async function registrarColacionRetirada(req, res) {
     const idColacion = req.params.id; // Obtiene el ID de la colación desde los parámetros
     const today = moment().format('YYYY-MM-DD'); // Formatea la fecha actual (YYYY-MM-DD)
-
     try {
         // Verifica si existe una colación con el ID y la fecha de hoy
         const existingLunch = await prisma.Colacion.findFirst({

@@ -10,7 +10,7 @@ datasource db {
 model Colacion {
   IdColacion     Int        @id @default(autoincrement())
   RutSolicitante String     @db.VarChar(255)
-  FechaSolicitud DateTime   @db.Date
+  FechaSolicitud DateTime   @db.DateTime(0)
   Estado         Int        @default(0)
   Menu           Int
   IdTipoUnidad   Int
@@ -177,7 +177,7 @@ model error_log {
   tipo_error    String      @db.VarChar(30)
   mensaje_error String      @db.LongText
   ruta_error    String      @db.VarChar(40)
-  codigo_http   Int 
+  codigo_http   Int
   Funcionario   Funcionario @relation(fields: [id_usuario], references: [IdFuncionario], onUpdate: Restrict, map: "fk_user_error")
 
   @@index([id_usuario], map: "fk_user_error")
