@@ -113,7 +113,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         "#ExportGeneralToExcel", 
         generalReport, 
         [
-            { headerName: "Articulo", field: "id_articulo", flex: 1 },
+            { headerName: "Articulo", field: "nombre_articulo", flex: 1 },
             { headerName: "Ropa Limpia en Ropería", field: "roperia_limpio", flex: 1 },
             { headerName: "Ropa en Servicios", field: "ropa_servicios", flex: 1 },
             { headerName: "Ropa sucia en Ropería", field: "roperia_sucio", flex: 1 },
@@ -138,10 +138,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         "#ExportRopaServicios", 
         servicesReport,  
         [
-            { headerName: "Articulo", field: "id_articulo", flex: 1 },
-            { headerName: "Ropa Limpia en Ropería", field: "nombre_articulo", flex: 1 },
-            { headerName: "Ropa en Servicios", field: "unidad_sigcom", flex: 1 },
-            { headerName: "Ropa sucia en Ropería", field: "ropa_servicios", flex: 1 }
+            //{ headerName: "#", field: "id_articulo", flex: 1 },
+            { headerName: "Artículo", field: "nombre_articulo", flex: 1 },
+            { headerName: "Unidad Sigcom", field: "unidad_sigcom", flex: 1 },
+            { headerName: "Ropa en Servicios", field: "ropa_servicios", flex: 1 }
         ],
         'Ropa en Servicios',  // Nombre de la hoja
         'stock_en_servicios.xlsx'      // Nombre del archivo

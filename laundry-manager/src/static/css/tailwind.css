@@ -628,8 +628,8 @@ video {
   top: 0px;
 }
 
-.z-50 {
-  z-index: 50;
+.top-2 {
+  top: 0.5rem;
 }
 
 .m-1 {
