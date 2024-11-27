@@ -17,8 +17,10 @@ document.addEventListener("DOMContentLoaded", async function() {
                     return `${params.data.rut_usuario}-${params.data.dv_usuario}`;
                 },
                 flex: 1,
+                filter: true,
+                floatingFilter: true,
             },
-            { headerName: "Nombre", field: "nombre", flex: 1 },
+            { headerName: "Nombre", field: "nombre", flex: 1, filter: true, floatingFilter: true },
             {
                 headerName: "Acciones",
                 field: "actions",

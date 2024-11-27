@@ -113,7 +113,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         "#ExportGeneralToExcel", 
         generalReport, 
         [
-            { headerName: "Articulo", field: "nombre_articulo", flex: 1 },
+            { headerName: "Articulo", field: "nombre_articulo", flex: 1, filter: true, floatingFilter: true },
             { headerName: "Ropa Limpia en Ropería", field: "roperia_limpio", flex: 1 },
             { headerName: "Ropa en Servicios", field: "ropa_servicios", flex: 1 },
             { headerName: "Ropa sucia en Ropería", field: "roperia_sucio", flex: 1 },
@@ -139,8 +139,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         servicesReport,  
         [
             //{ headerName: "#", field: "id_articulo", flex: 1 },
-            { headerName: "Artículo", field: "nombre_articulo", flex: 1 },
-            { headerName: "Unidad Sigcom", field: "unidad_sigcom", flex: 1 },
+            { headerName: "Artículo", field: "nombre_articulo", flex: 1, filter: true, floatingFilter: true },
+            { headerName: "Unidad Sigcom", field: "unidad_sigcom", flex: 1, filter: true, floatingFilter: true },
             { headerName: "Ropa en Servicios", field: "ropa_servicios", flex: 1 }
         ],
         'Ropa en Servicios',  // Nombre de la hoja
@@ -162,7 +162,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         generalReport,
         [
             { headerName: "#", field: "id_articulo" },
-            { headerName: "Articulo", field: "nombre_articulo", flex: 1 },
+            { headerName: "Articulo", field: "nombre_articulo", flex: 1, filter: true, floatingFilter: true },
             { headerName: "Ropa Sucia Roperia", field: "roperia_sucio", flex: 1 },
         ],
         'Ropa Sucia en Roperia',  // Nombre de la hoja
@@ -179,7 +179,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         generalReport,
         [
             { headerName: "#", field: "id_articulo" },
-            { headerName: "Articulo", field: "nombre_articulo", flex: 1 },
+            { headerName: "Articulo", field: "nombre_articulo", flex: 1, filter: true, floatingFilter: true },
             { headerName: "Ropa en Lavanderia Externa", field: "en_lavanderia", flex: 1 },
         ],
         'Stock de Ropa en Transito',  // Nombre de la hoja
@@ -199,7 +199,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         ropaBajaPerdidas,
         [
             { headerName: "#", field: "id_articulo" },
-            { headerName: "Articulo", field: "nombre_articulo", flex: 1 },
+            { headerName: "Articulo", field: "nombre_articulo", flex: 1, filter: true, floatingFilter: true },
             { headerName: "Perdidas", field: "perdidas_totales", flex: 1 },
             { headerName: "bajas", field: "bajas_totales", flex: 1 },
 
@@ -219,9 +219,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         [
             { headerName: "Mes y año", field: "mes_anio", flex: 1 },
             { headerName: "ID", field: "id_articulo", flex: 1 },
-            { headerName: "Articulo", field: "nombre_articulo", flex: 1 },
+            { headerName: "Articulo", field: "nombre_articulo", flex: 1, filter: true, floatingFilter: true },
             { headerName: "Unidad Sigcom", field: "unidad_sigcom", flex: 1 },
-            { headerName: "Ropa Baja en Servicios", field: "ropa_baja_servicios", flex: 1 }
+            { headerName: "Ropa Baja en Servicios", field: "ropa_baja_servicios", flex: 1, filter: true, floatingFilter: true }
         ],
         'Baja en Servicios',  // Nombre de la hoja
         'baja_en_servicios.xlsx'      // Nombre del archivo
@@ -238,8 +238,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         [
             { headerName: "Mes y año", field: "mes_anio", flex: 1 },
             { headerName: "ID", field: "id_articulo", flex: 1 },
-            { headerName: "Articulo", field: "nombre_articulo", flex: 1 },
-            { headerName: "Unidad Sigcom", field: "unidad_sigcom", flex: 1 },
+            { headerName: "Articulo", field: "nombre_articulo", flex: 1, filter: true, floatingFilter: true },
+            { headerName: "Unidad Sigcom", field: "unidad_sigcom", flex: 1, filter: true, floatingFilter: true },
             { headerName: "Ropa Baja en Servicios", field: "ropa_baja_servicios", flex: 1 }
         ],
         'Baja en Servicios',  // Nombre de la hoja

@@ -18,6 +18,7 @@ window.generateGrid = async function () {
                 field: "nombre_articulo",
                 flex: 1,
                 filter: true,
+                floatingFilter: true,
             },
             { field: "stock", flex: 1 },
             {
