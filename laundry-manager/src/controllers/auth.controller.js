@@ -113,7 +113,7 @@ async function login(req, res) {
         }
 
         // Enviar el token en una cookie de sesión y retornar una respuesta exitosa
-        res.cookie("token", token, { path: "/laundry-manager", httpOnly: true });
+        res.cookie("token", token, { path: "/laundry-manager", httpOnly: true, sameSite: "Strict" });
         return res.status(200).json({ message: "Has iniciado sesión, bienvenido", success: true, emailValidation });
     } catch (error) {
         // En caso de error, se registra un error en el log y se retorna una respuesta 500

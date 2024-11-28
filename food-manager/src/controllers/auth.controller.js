@@ -96,7 +96,7 @@ async function login(req, res) {
         const token = jwt.sign(token_data, process.env.JWT_SECRET, { expiresIn: "8h" });
 
         // Establece cookies para autenticación
-        res.cookie("token", token, { path: "/food-manager" });
+        res.cookie("token", token, { path: "/food-manager", httpOnly: true, sameSite: "Strict" });
 
         return res.status(200).json({ message: "Has iniciado sesión, bienvenido", success: true, user });
     } catch (error) {
