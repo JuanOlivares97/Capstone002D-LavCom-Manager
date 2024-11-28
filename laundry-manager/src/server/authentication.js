@@ -82,8 +82,6 @@ function rolesAllowed(roles) {
     return (req, res, next) => {
         try {
             const role = req.user.tipo_usuario;
-            console.log(role);
-            
 
             if (!roles.includes(role)) {
                 return res.status(403).render("error", {layout: false, message: "No tienes suficientes permisos para acceder a esta ruta"});
