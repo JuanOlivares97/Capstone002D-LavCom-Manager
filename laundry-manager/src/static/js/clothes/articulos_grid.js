@@ -10,6 +10,7 @@ window.generateGrid = async function () {
         // Data to be displayed
         rowData: articulos,
         localeText: AG_GRID_LOCALE_ES,
+        getRowId: (params) => params.data.id_articulo.toString(), 
         // Columns to be displayed (Should match rowData properties)
         columnDefs: [
             { headerName: "ID", field: "id_articulo", flex: 1 },
@@ -90,6 +91,7 @@ window.deleteArticulo = function (rowIndex, articulo) {
         cancelButtonColor: "#d33",
         confirmButtonText: "Sí, bórralo!",
         cancelButtonText: "Cancelar",
+        showCancelButton: true,
     }).then(async (result) => {
         if (result.isConfirmed) {
             await fetch("/laundry-manager/clothes/delete-clothes", {
@@ -110,7 +112,7 @@ window.deleteArticulo = function (rowIndex, articulo) {
                     return;
                 }
                 Swal.fire(data.message).then(() => {
-                    const rowNode = gridApi.getRowNode(rowIndex);
+                    const rowNode = gridApi.getRowNode(articulo.id_articulo);
                     gridApi.applyTransaction({ remove: [rowNode.data] });
                 })
                 return;

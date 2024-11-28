@@ -6,6 +6,7 @@ document.addEventListener("DOMContentLoaded", async function() {
 
     const gridOptions = {
         rowData: users,
+        getRowId: (params) => params.data.id_usuario.toString(),
         localeText: AG_GRID_LOCALE_ES,
         columnDefs: [
             { headerName: "#", field: "id_usuario", flex: 1 },
@@ -90,6 +91,7 @@ document.addEventListener("DOMContentLoaded", async function() {
             title: `¿Estás seguro de que deseas borrar al usuario ${user.rut_usuario}-${user.dv_usuario}?`,
             text: "¡No podrás revertir esto! ¿Deseas continuar? ",
             icon: "warning",
+            showCancelButton: true,
             confirmButtonColor: "#3085d6",
             cancelButtonColor: "#d33",
             confirmButtonText: "Sí, bórralo!",
@@ -114,14 +116,21 @@ document.addEventListener("DOMContentLoaded", async function() {
                         return;
                     }
                     Swal.fire(data.message).then(() => {
-                        const rowNode = gridApi.getRowNode(rowIndex);
-                        gridApi.applyTransaction({ remove: [rowNode.data] });
-                    })
+                        // Encuentra el nodo de la fila usando el `id_usuario` como identificador
+                        const rowNode = gridApi.getRowNode(user.id_usuario);
+    
+                        // Si el nodo se encuentra, elimina la fila de la tabla
+                        if (rowNode) {
+                            gridApi.applyTransaction({ remove: [rowNode.data] });
+                        } else {
+                            console.warn("No se pudo encontrar el nodo de la fila.");
+                        }
+                    });
                     return;
                 });
             }
         });
     };
-
+    
     window.gridApi = gridApi;
 });
