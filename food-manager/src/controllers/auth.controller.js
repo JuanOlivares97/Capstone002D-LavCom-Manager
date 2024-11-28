@@ -182,8 +182,8 @@ async function sendPwdEmail(req, res) {
         const hashedCode = bcrypt.hashSync(code.toString(), 10);
 
         // Guarda el código y el RUT en cookies
-        res.cookie("pwdcode", hashedCode, { path: "/food-manager" });
-        res.cookie("username", rutCompleto, { path: "/food-manager" });
+        res.cookie("pwdcode", hashedCode, { path: "/food-manager", httpOnly: true, sameSite: "Strict" });
+        res.cookie("username", rutCompleto, { path: "/food-manager", httpOnly: true, sameSite: "Strict" });
 
         // Envía el correo con el código
         await mailer.enviarCorreo(email, code.toString());
@@ -242,6 +242,9 @@ async function changePwd(req, res) {
                 contrasena: hashedPwd
             }
         });
+
+        res.clearCookie("pwdcode", {path: "/food-manager"})
+        res.clearCookie("username", {path: "/food-manager"})
 
         return res.status(200).json({ success: true, message: "Contraseña actualizada" });
     } catch (error) {

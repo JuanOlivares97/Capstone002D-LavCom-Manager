@@ -226,8 +226,8 @@ async function sendPwdEmail(req, res) {
         const code = Math.floor(Math.random() * (9999 - 1000 + 1)) + 1000;
 
         // Crear cookies para almacenar el código y el nombre de usuario
-        res.cookie("pwdcode", bcrypt.hashSync(code.toString(), 10), {path: "/laundry-manager", httpOnly: true})
-        res.cookie("username", username, {path: "/laundry-manager", httpOnly: true})
+        res.cookie("pwdcode", bcrypt.hashSync(code.toString(), 10), {path: "/laundry-manager", httpOnly: true, sameSite: "Strict"})
+        res.cookie("username", username, {path: "/laundry-manager", httpOnly: true, sameSite: "Strict"})
 
         // Enviar el código al correo electrónico del usuario
         await mailer.enviarCorreo(email, code.toString())
