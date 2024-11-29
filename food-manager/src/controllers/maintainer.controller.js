@@ -30,7 +30,7 @@ async function getEstamento() {
         const Estamento = await prisma.TipoEstamento.findMany(); // Consulta todos los registros de TipoEstamento
         return Estamento;
     } catch (error) {
-        const errorLog = await prisma.errorLog.create({
+        const error_log = await prisma.error_log.create({
             data: {
                 id_usuario: req.user["id_usuario"] || null,
                 tipo_error: "Error interno del servidor",
@@ -51,7 +51,7 @@ async function getServicio() {
         });
         return servicios;
     } catch (error) {
-        const errorLog = await prisma.errorLog.create({
+        const error_log = await prisma.error_log.create({
             data: {
                 id_usuario: req.user["id_usuario"] || null,
                 tipo_error: "Error interno del servidor",
@@ -71,7 +71,7 @@ async function getUnidad() {
         });
         return Unidad;
     } catch (error) {
-        const errorLog = await prisma.errorLog.create({
+        const error_log = await prisma.error_log.create({
             data: {
                 id_usuario: req.user["id_usuario"] || null,
                 tipo_error: "Error interno del servidor",
@@ -89,7 +89,7 @@ async function getVia() {
         const Via = await prisma.TipoVia.findMany(); // Consulta todos los registros de TipoVia
         return Via;
     } catch (error) {
-        const errorLog = await prisma.errorLog.create({
+        const error_log = await prisma.error_log.create({
             data: {
                 id_usuario: req.user["id_usuario"] || null,
                 tipo_error: "Error interno del servidor",
@@ -109,7 +109,7 @@ async function getRegimen() {
         });
         return Regimen;
     } catch (error) {
-        const errorLog = await prisma.errorLog.create({
+        const error_log = await prisma.error_log.create({
             data: {
                 id_usuario: req.user["id_usuario"] || null,
                 tipo_error: "Error interno del servidor",
@@ -127,7 +127,7 @@ async function getTipoFuncionario() {
         const TipoFuncionario = await prisma.TipoFuncionario.findMany(); // Consulta todos los registros de TipoFuncionario
         return TipoFuncionario;
     } catch (error) {
-        const errorLog = await prisma.errorLog.create({
+        const error_log = await prisma.error_log.create({
             data: {
                 id_usuario: req.user["id_usuario"] || null,
                 tipo_error: "Error interno del servidor",
@@ -145,7 +145,7 @@ async function getContrato() {
         const Contrato = await prisma.TipoContrato.findMany(); // Consulta todos los registros de TipoContrato
         return Contrato;
     } catch (error) {
-        const errorLog = await prisma.errorLog.create({
+        const error_log = await prisma.error_log.create({
             data: {
                 id_usuario: req.user["id_usuario"] || null,
                 tipo_error: "Error interno del servidor",
@@ -166,7 +166,7 @@ async function createItem(req, res, model, dataField) {
         });
         res.status(201).json(item); // Devuelve el registro creado
     } catch (error) {
-        const errorLog = await prisma.errorLog.create({
+        const error_log = await prisma.error_log.create({
             data: {
                 id_usuario: req.user["id_usuario"] || null,
                 tipo_error: "Error interno del servidor",
@@ -216,7 +216,7 @@ async function updateItem(req, res, model, dataField, idField) {
         });
 
         if (existingItem[dataField] === data) {
-            const errorLog = await prisma.errorLog.create({
+            const error_log = await prisma.error_log.create({
                 data: {
                     id_usuario: req.user["id_usuario"] || null,
                     tipo_error: "Error interno del servidor",
@@ -234,7 +234,7 @@ async function updateItem(req, res, model, dataField, idField) {
         });
         res.status(200).json(item); // Devuelve el ítem actualizado
         } catch (error) {
-        const errorLog = await prisma.errorLog.create({
+        const error_log = await prisma.error_log.create({
             data: {
                 id_usuario: req.user["id_usuario"] || null,
                 tipo_error: "Error interno del servidor",
@@ -284,7 +284,7 @@ async function deleteItem(req, res, model, idField) {
         });
         res.status(200).json(item); // Devuelve el ítem deshabilitado
     } catch (error) {
-        const errorLog = await prisma.errorLog.create({
+        const error_log = await prisma.error_log.create({
             data: {
                 id_usuario: req.user["id_usuario"] || null,
                 tipo_error: "Error interno del servidor",

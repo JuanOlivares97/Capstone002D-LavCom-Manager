@@ -6,7 +6,7 @@ async function renderHome(req, res) {
         const tipoUsuario = req.user.tipo_usuario;
         return res.render('report/home', { reportes, tipoUsuario: parseInt(tipoUsuario) });
     } catch (error) {
-        const errorLog = await prisma.errorLog.create({
+        const error_log = await prisma.error_log.create({
             data: {
                 id_usuario: req.user["id_usuario"] || null,
                 tipo_error: "Error interno del servidor",
@@ -37,7 +37,7 @@ async function getReports() {
         });
         return reportes;
     } catch (error) {
-        const errorLog = await prisma.errorLog.create({
+        const error_log = await prisma.error_log.create({
             data: {
                 id_usuario: req.user["id_usuario"] || null,
                 tipo_error: "Error interno del servidor",
@@ -63,7 +63,7 @@ async function fillTable(req, res) {
             message: 'Tabla generada con éxito'
         });
     } catch (error) {
-        const errorLog = await prisma.errorLog.create({
+        const error_log = await prisma.error_log.create({
             data: {
                 id_usuario: req.user["id_usuario"] || null,
                 tipo_error: "Error interno del servidor",
@@ -123,11 +123,13 @@ async function reportHospitalizadoDiario(req, res) {
                     NombreHospitalizado: true,
                     ApellidoP: true,
                     ApellidoM: true,
+                    ObservacionesNutricionista:true,
                     TipoRegimen: {
                         select: {
                             DescTipoRegimen: true,
                         },
                     },
+                    
                 },
                 orderBy: {
                     CodigoCama: 'asc',
@@ -142,6 +144,7 @@ async function reportHospitalizadoDiario(req, res) {
                 RutPaciente: `${paciente.RutHospitalizado}-${paciente.DvHospitalizado}`,
                 NombrePaciente: `${paciente.NombreHospitalizado} ${paciente.ApellidoP} ${paciente.ApellidoM}`,
                 DescTipoRegimen: paciente.TipoRegimen.DescTipoRegimen,
+                ObservacionesNutricionista: paciente.ObservacionesNutricionista
             }));
 
             if (pacientesFormateados.length > 0) {
@@ -156,7 +159,7 @@ async function reportHospitalizadoDiario(req, res) {
             pageSize: pageSize,
         });
     } catch (error) {
-        const errorLog = await prisma.errorLog.create({
+        const error_log = await prisma.error_log.create({
             data: {
                 id_usuario: req.user["id_usuario"] || null,
                 tipo_error: "Error interno del servidor",

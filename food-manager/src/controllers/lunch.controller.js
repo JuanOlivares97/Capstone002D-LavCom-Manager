@@ -23,7 +23,7 @@ async function renderHome(req, res) {
         // Si no existe, muestra el menú
         return res.render('lunch/home', { tipoUsuario: parseInt(tipoUsuario), mostrarMenu: true });
     } catch (error) {
-        const errorLog = await prisma.errorLog.create({
+        const error_log = await prisma.error_log.create({
             data: {
                 id_usuario: req.user["id_usuario"] || null,
                 tipo_error: "Error interno del servidor",
@@ -44,7 +44,7 @@ async function registrationLunch(req, res) {
 
         // Valida que el menú sea un número válido
         if (!menu || isNaN(parseInt(menu))) {
-            const errorLog = await prisma.errorLog.create({
+            const error_log = await prisma.error_log.create({
                 data: {
                     id_usuario: req.user["id_usuario"] || null,
                     tipo_error: "Error interno del servidor",
@@ -70,7 +70,7 @@ async function registrationLunch(req, res) {
         });
 
         if (!funcionario || funcionario.Habilitado !== 'S') {
-            const errorLog = await prisma.errorLog.create({
+            const error_log = await prisma.error_log.create({
                 data: {
                     id_usuario: req.user["id_usuario"] || null,
                     tipo_error: "Error interno del servidor",
@@ -98,7 +98,7 @@ async function registrationLunch(req, res) {
         // Devuelve un mensaje de éxito
         return res.status(200).json({ message: 'Colacion ingresada exitosamente' });
     } catch (error) {
-        const errorLog = await prisma.errorLog.create({
+        const error_log = await prisma.error_log.create({
             data: {
                 id_usuario: req.user["id_usuario"] || null,
                 tipo_error: "Error interno del servidor",
@@ -133,7 +133,7 @@ async function renderLunchList(req, res) {
         // Renderiza la vista con la lista de colaciones
         res.render('totem/LunchList', { lunches, tipoUsuario: parseInt(tipoUsuario) });
     } catch (error) {
-        const errorLog = await prisma.errorLog.create({
+        const error_log = await prisma.error_log.create({
             data: {
                 id_usuario: req.user["id_usuario"] || null,
                 tipo_error: "Error interno del servidor",
@@ -177,7 +177,7 @@ async function registrarColacionRetirada(req, res) {
         // Devuelve un mensaje de éxito
         return res.status(200).json({ message: 'Colación retirada exitosamente' });
     } catch (error) {
-        const errorLog = await prisma.errorLog.create({
+        const error_log = await prisma.error_log.create({
             data: {
                 id_usuario: req.user["id_usuario"] || null,
                 tipo_error: "Error interno del servidor",

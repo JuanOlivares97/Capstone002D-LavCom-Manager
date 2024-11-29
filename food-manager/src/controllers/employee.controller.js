@@ -29,7 +29,7 @@ async function renderHome(req, res) {
             tipoFuncionario,
         });
     } catch (error) {
-        const errorLog = await prisma.errorLog.create({
+        const error_log = await prisma.error_log.create({
             data: {
                 id_usuario: req.user["id_usuario"] || null,
                 tipo_error: "Error interno del servidor",
@@ -97,7 +97,7 @@ async function getFuncionarios(req, res) {
         // Devuelve la lista de funcionarios transformada
         res.status(200).json(funcionariosTransformados);
     } catch (error) {
-        const errorLog = await prisma.errorLog.create({
+        const error_log = await prisma.error_log.create({
             data: {
                 id_usuario: req.user["id_usuario"] || null,
                 tipo_error: "Error interno del servidor",
@@ -113,6 +113,21 @@ async function getFuncionarios(req, res) {
 }
 
 // Crea un nuevo empleado
+// Generar un username único
+async function generateUniqueUsername(nombre_usuario, apellido_paterno, dv_usuario) {
+    let baseUsername = `${nombre_usuario.charAt(0).toLowerCase()}.${apellido_paterno.toLowerCase()}.${dv_usuario}`;
+    let username = baseUsername;
+    let suffix = 1;
+
+    // Verifica si el username ya existe en la base de datos
+    while (await prisma.Funcionario.findUnique({ where: { username } })) {
+        username = `${baseUsername}${suffix}`; // Añade un sufijo numérico
+        suffix++;
+    }
+
+    return username;
+}
+
 async function createEmployee(req, res) {
     try {
         const {
@@ -129,28 +144,29 @@ async function createEmployee(req, res) {
 
         // Validar campos obligatorios
         if (!nombre_usuario || !apellido_paterno || !RutCompleto || !tipoEstamento || !tipoServicio || !tipoUnidad || !tipoContrato || !tipoFuncionario) {
-            const errorLog = await prisma.errorLog.create({
+            await prisma.error_log.create({
                 data: {
                     id_usuario: req.user["id_usuario"] || null,
-                    tipo_error: "Error interno del servidor",
-                    mensaje_error: JSON.stringify(error),
+                    tipo_error: "Validación de campos",
+                    mensaje_error: "Faltan campos requeridos",
                     ruta_error: "food-manager/employee/home",
-                    codigo_http: 400
-                }
+                    codigo_http: 400,
+                },
             });
             return res.status(400).json({ message: "Todos los campos son requeridos" });
         }
 
         // Validar formato del RUT
         if (!RutCompleto.includes("-")) {
-            const errorLog = await prisma.errorLog.create({
+            
+            await prisma.error_log.create({
                 data: {
                     id_usuario: req.user["id_usuario"] || null,
-                    tipo_error: "Error interno del servidor",
-                    mensaje_error: JSON.stringify(error),
+                    tipo_error: "Validación de formato",
+                    mensaje_error: "El RUT no tiene el formato correcto",
                     ruta_error: "food-manager/employee/home",
-                    codigo_http: 400
-                }
+                    codigo_http: 400,
+                },
             });
             return res.status(400).json({
                 message: "El RUT debe estar en el formato correcto (12345678-9).",
@@ -186,6 +202,9 @@ async function createEmployee(req, res) {
             });
         }
 
+        // Genera un username único
+        const username = await generateUniqueUsername(nombre_usuario, apellido_paterno, dv_usuario);
+
         // Genera una contraseña para el nuevo empleado
         const password = await bcrypt.hash(rut_usuario + dv_usuario, 10);
 
@@ -194,10 +213,10 @@ async function createEmployee(req, res) {
             data: {
                 NombreFuncionario: nombre_usuario.toUpperCase(),
                 apellido_paterno: apellido_paterno.toUpperCase(),
-                apellido_materno: apellido_materno.toUpperCase(),
+                apellido_materno: apellido_materno?.toUpperCase() || '',
                 RutFuncionario: rut_usuario,
                 DvFuncionario: dv_usuario,
-                username: nombre_usuario.charAt(0).toLowerCase() + apellido_paterno.toLowerCase(),
+                username:username,
                 contrasena: password,
                 Habilitado: "S",
                 TipoEstamento: { connect: { IdTipoEstamento: parseInt(tipoEstamento) } },
@@ -210,19 +229,34 @@ async function createEmployee(req, res) {
 
         return res.status(201).json(funcionario);
     } catch (error) {
-        const errorLog = await prisma.errorLog.create({
+        console.log(error)
+        await prisma.error_log.create({
             data: {
                 id_usuario: req.user["id_usuario"] || null,
                 tipo_error: "Error interno del servidor",
                 mensaje_error: JSON.stringify(error),
                 ruta_error: "food-manager/employee/home",
-                codigo_http: 500
-            }
+                codigo_http: 500,
+            },
         });
         return res
             .status(500)
-            .json({ message: "Internal server error: " + error.message });
+            .json({ message: "Internal server error" });
     }
+}
+
+async function generateUniqueUsername(nombre_usuario, apellido_paterno, dv_usuario) {
+    let baseUsername = `${nombre_usuario.charAt(0).toLowerCase()}.${apellido_paterno.toLowerCase()}.${dv_usuario}`;
+    let username = baseUsername;
+    let suffix = 1;
+
+    // Verifica si el username ya existe en la base de datos
+    while (await prisma.Funcionario.findUnique({ where: { username } })) {
+        username = `${baseUsername}${suffix}`; // Añade un sufijo numérico
+        suffix++;
+    }
+
+    return username;
 }
 
 // Actualiza los datos de un empleado existente
@@ -262,7 +296,7 @@ async function updateEmployee(req, res) {
 
         return res.status(200).json(funcionario);
     } catch (error) {
-        const errorLog = await prisma.errorLog.create({
+        const error_log = await prisma.error_log.create({
             data: {
                 id_usuario: req.user["id_usuario"] || null,
                 tipo_error: "Error interno del servidor",
@@ -292,7 +326,7 @@ async function deleteEmployee(req, res) {
 
         res.status(201).json(funcionario);
     } catch (error) {
-        const errorLog = await prisma.errorLog.create({
+        const error_log = await prisma.error_log.create({
             data: {
                 id_usuario: req.user["id_usuario"] || null,
                 tipo_error: "Error interno del servidor",

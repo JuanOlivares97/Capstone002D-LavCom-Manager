@@ -8,7 +8,7 @@ async function renderLogin(req, res) {
     try {
         return res.render("auth/login", { layout: false }); // Renderiza la vista sin layout
     } catch (error) {
-        const errorLog = await prisma.errorLog.create({
+        const error_log = await prisma.error_log.create({
             data: {
                 id_usuario: req.user["id_usuario"] || null,
                 tipo_error: "Error de renderizado",
@@ -26,7 +26,7 @@ async function renderRecuperarContrasenaForm(req, res) {
     try {
         return res.render("auth/recuperar_pwd_form", { layout: false }); // Renderiza la vista sin layout
     } catch (error) {
-        const errorLog = await prisma.errorLog.create({
+        const error_log = await prisma.error_log.create({
             data: {
                 id_usuario: req.user["id_usuario"] || null,
                 tipo_error: "Error de renderizado",
@@ -44,7 +44,7 @@ async function renderRecuperarContrasenaInfo(req, res) {
     try {
         return res.render("auth/recuperar_pwd_info", { layout: false }); // Renderiza la vista sin layout
     } catch (error) {
-        const errorLog = await prisma.errorLog.create({
+        const error_log = await prisma.error_log.create({
             data: {
                 id_usuario: req.user["id_usuario"] || null,
                 tipo_error: "Error de renderizado",
@@ -100,7 +100,7 @@ async function login(req, res) {
 
         return res.status(200).json({ message: "Has iniciado sesión, bienvenido", success: true, user });
     } catch (error) {
-        const errorLog = await prisma.errorLog.create({
+        const error_log = await prisma.error_log.create({
             data: {
                 id_usuario: req.user["id_usuario"] || null,
                 tipo_error: "Error de autenticación",
@@ -139,7 +139,7 @@ async function setEmail(req, res) {
 
         return res.status(200).json({ message: "Correo electrónico establecido", success: true });
     } catch (error) {
-        const errorLog = await prisma.errorLog.create({
+        const error_log = await prisma.error_log.create({
             data: {
                 id_usuario: req.user["id_usuario"] || null,
                 tipo_error: "Error al actualizar el correo electrónico",
@@ -190,7 +190,7 @@ async function sendPwdEmail(req, res) {
 
         return res.redirect("/food-manager/auth/recuperar-pwd-info");
     } catch (error) {
-        const errorLog = await prisma.errorLog.create({
+        const error_log = await prisma.error_log.create({
             data: {
                 id_usuario: req.user["id_usuario"] || null,
                 tipo_error: "Error al enviar el correo electrónico",
@@ -248,7 +248,7 @@ async function changePwd(req, res) {
 
         return res.status(200).json({ success: true, message: "Contraseña actualizada" });
     } catch (error) {
-        const errorLog = await prisma.errorLog.create({
+        const error_log = await prisma.error_log.create({
             data: {
                 id_usuario: req.user["id_usuario"] || null,
                 tipo_error: "Error al cambiar la contraseña",
@@ -268,7 +268,7 @@ async function logout(req, res) {
         res.clearCookie("token", { path: '/food-manager' });
         return res.status(200).json({ message: "Has cerrado sesión", success: true });
     } catch (error) {
-        const errorLog = await prisma.errorLog.create({
+        const error_log = await prisma.error_log.create({
             data: {
                 id_usuario: req.user["id_usuario"] || null,
                 tipo_error: "Error al cerrar sesión",

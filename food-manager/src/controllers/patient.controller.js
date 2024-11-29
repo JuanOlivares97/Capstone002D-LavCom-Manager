@@ -75,6 +75,11 @@ async function renderHome(req, res) {
     // Calcular la edad y determinar el estado de Ayuno para cada paciente
     const pacientesConDatos = pacientes.map((paciente) => ({
       ...paciente,
+      nombreCompleto: [
+        paciente.NombreHospitalizado ?? '',
+        paciente.ApellidoP ?? '',
+        paciente.ApellidoM ?? ''
+      ].filter(Boolean).join(' '),
       edad: calcularEdad(paciente.FechaNacimiento),
       enAyuno: paciente.FechaFinAyuno
         ? moment(paciente.FechaFinAyuno).isAfter(startOfTodayUTC)
@@ -97,7 +102,7 @@ async function renderHome(req, res) {
       altasHoy,
     });
   } catch (error) {
-    const errorLog = await prisma.errorLog.create({
+    const error_log = await prisma.error_log.create({
       data: {
         id_usuario: req.user["id_usuario"] || null,
         tipo_error: "Error interno del servidor",
@@ -122,7 +127,7 @@ async function getPaciente(req, res) {
 
     return res.status(200).json(paciente);
   } catch (error) {
-    const errorLog = await prisma.errorLog.create({
+    const error_log = await prisma.error_log.create({
       data: {
         id_usuario: req.user["id_usuario"] || null,
         tipo_error: "Error interno del servidor",
@@ -150,7 +155,7 @@ async function getPacientes(req, res) {
     });
     return res.status(200).json(pacientes);
   } catch (error) {
-    const errorLog = await prisma.errorLog.create({
+    const error_log = await prisma.error_log.create({
       data: {
         id_usuario: req.user["id_usuario"] || null,
         tipo_error: "Error interno del servidor",
@@ -168,7 +173,7 @@ async function createPaciente(req, res) {
     // Verificar si `Rut` está presente en el cuerpo de la solicitud
     const rutCompleto = req.body.RutCompleto;
     if (!rutCompleto) {
-      const errorLog = await prisma.errorLog.create({
+      const error_log = await prisma.error_log.create({
         data: {
           id_usuario: req.user["id_usuario"] || null,
           tipo_error: "Error interno del servidor",
@@ -183,7 +188,7 @@ async function createPaciente(req, res) {
     // Extraer `rut` y `dv` del `RutCompleto`
     const [rut, dv] = rutCompleto.split("-");
     if (!rut || !dv) {
-      const errorLog = await prisma.errorLog.create({
+      const error_log = await prisma.error_log.create({
         data: {
           id_usuario: req.user["id_usuario"] || null,
           tipo_error: "Error interno del servidor",
@@ -254,7 +259,7 @@ async function createPaciente(req, res) {
       }
 
       if (!isUnique) {
-        const errorLog = await prisma.errorLog.create({
+        const error_log = await prisma.error_log.create({
           data: {
             id_usuario: req.user["id_usuario"] || null,
             tipo_error: "Error interno del servidor",
@@ -305,7 +310,7 @@ async function createPaciente(req, res) {
         });
     }
   } catch (error) {
-    const errorLog = await prisma.errorLog.create({
+    const error_log = await prisma.error_log.create({
       data: {
         id_usuario: req.user["id_usuario"] || null,
         tipo_error: "Error interno del servidor",
@@ -339,7 +344,7 @@ async function getMovimientosPaciente(req, res) {
     });
     return res.status(200).json(movimientos);
   } catch (error) {
-    const errorLog = await prisma.errorLog.create({
+    const error_log = await prisma.error_log.create({
       data: {
         id_usuario: req.user["id_usuario"] || null,
         tipo_error: "Error interno del servidor",
@@ -418,7 +423,7 @@ async function movePatientService(req, res) {
             log: log 
         });
     } catch (error) {
-        const errorLog = await prisma.errorLog.create({
+        const error_log = await prisma.error_log.create({
             data: {
                 id_usuario: req.user["id_usuario"] || null,
                 tipo_error: "Error interno del servidor",
@@ -443,7 +448,7 @@ async function changeRegimen(req, res) {
     });
 
     if (!paciente) {
-      const errorLog = await prisma.errorLog.create({
+      const error_log = await prisma.error_log.create({
         data: {
           id_usuario: req.user["id_usuario"] || null,
           tipo_error: "Error interno del servidor",
@@ -465,7 +470,7 @@ async function changeRegimen(req, res) {
 
     // Si el nuevo régimen no es válido, devuelve un error 400
     if (!isValidRegimen) {
-      const errorLog = await prisma.errorLog.create({
+      const error_log = await prisma.error_log.create({
         data: {
           id_usuario: req.user["id_usuario"] || null,
           tipo_error: "Error interno del servidor",
@@ -479,7 +484,7 @@ async function changeRegimen(req, res) {
 
     // Verifica si el nuevo régimen es el mismo que el actual
     if (paciente.IdTipoRegimen === newRegimen) {
-      const errorLog = await prisma.errorLog.create({
+      const error_log = await prisma.error_log.create({
         data: {
           id_usuario: req.user["id_usuario"] || null,
           tipo_error: "Error interno del servidor",
@@ -500,7 +505,7 @@ async function changeRegimen(req, res) {
       .status(200)
       .json({ message: "Cambio de régimen exitoso", paciente: updatedPatient });
   } catch (error) {
-    const errorLog = await prisma.errorLog.create({
+    const error_log = await prisma.error_log.create({
       data: {
         id_usuario: req.user["id_usuario"] || null,
         tipo_error: "Error interno del servidor",
@@ -547,7 +552,7 @@ async function changeObservacionesAlta(req, res) {
       .status(200)
       .json({ message: "Movimiento al Observaciones de Alta", movimiento });
   } catch (error) {
-    const errorLog = await prisma.errorLog.create({
+    const error_log = await prisma.error_log.create({
       data: {
         id_usuario: req.user["id_usuario"] || null,
         tipo_error: "Error interno del servidor",
@@ -595,7 +600,7 @@ async function changeObservacionesNutricionista(req, res) {
         movimiento,
       });
   } catch (error) {
-    const errorLog = await prisma.errorLog.create({
+    const error_log = await prisma.error_log.create({
       data: {
         id_usuario: req.user["id_usuario"] || null,
         tipo_error: "Error interno del servidor",
@@ -639,7 +644,7 @@ async function changeObservacionesGenerales(req, res) {
       .status(200)
       .json({ message: "Movimiento al Observaciones Generales", movimiento });
   } catch (error) {
-    const errorLog = await prisma.errorLog.create({
+    const error_log = await prisma.error_log.create({
       data: {
         id_usuario: req.user["id_usuario"] || null,
         tipo_error: "Error interno del servidor",
@@ -666,7 +671,7 @@ async function changeVia(req, res) {
 
     // Verificar si se encontró el paciente
     if (!paciente) {
-      const errorLog = await prisma.errorLog.create({
+      const error_log = await prisma.error_log.create({
         data: {
           id_usuario: req.user["id_usuario"] || null,
           tipo_error: "Error interno del servidor",
@@ -687,7 +692,7 @@ async function changeVia(req, res) {
 
     // Validar si la nueva vía es válida
     if (newViaIndex === -1) {
-      const errorLog = await prisma.errorLog.create({
+      const error_log = await prisma.error_log.create({
         data: {
           id_usuario: req.user["id_usuario"] || null,
           tipo_error: "Error interno del servidor",
@@ -701,7 +706,7 @@ async function changeVia(req, res) {
 
     // Validar si la nueva vía es la misma que la anterior
     if (paciente.IdTipoVia === newVia) {
-      const errorLog = await prisma.errorLog.create({
+      const error_log = await prisma.error_log.create({
         data: {
           id_usuario: req.user["id_usuario"] || null,
           tipo_error: "Error interno del servidor",
@@ -738,7 +743,7 @@ async function changeVia(req, res) {
       .status(200)
       .json({ message: "Vía de ingesta actualizada exitosamente", movimiento });
   } catch (error) {
-    const errorLog = await prisma.errorLog.create({
+    const error_log = await prisma.error_log.create({
       data: {
         id_usuario: req.user["id_usuario"] || null,
         tipo_error: "Error interno del servidor",
@@ -767,7 +772,7 @@ async function indicarAlta(req, res) {
     });
 
     if (!paciente) {
-      const errorLog = await prisma.errorLog.create({
+      const error_log = await prisma.error_log.create({
         data: {
           id_usuario: req.user["id_usuario"] || null,
           tipo_error: "Error interno del servidor",
@@ -810,7 +815,7 @@ async function indicarAlta(req, res) {
       .status(200)
       .json({ message: "Paciente indicado como alta", paciente: newPaciente });
   } catch (error) {
-    const errorLog = await prisma.errorLog.create({
+    const error_log = await prisma.error_log.create({
       data: {
         id_usuario: req.user["id_usuario"] || null,
         tipo_error: "Error interno del servidor",
@@ -833,7 +838,7 @@ async function changeFastingDate(req, res) {
 
     // Verificar si la fecha es válida
     if (!newFastingDate) {
-      const errorLog = await prisma.errorLog.create({
+      const error_log = await prisma.error_log.create({
         data: {
           id_usuario: req.user["id_usuario"] || null,
           tipo_error: "Error interno del servidor",
@@ -849,7 +854,7 @@ async function changeFastingDate(req, res) {
 
     // Verificar si la fecha es válida
     if (!moment(newFastingDate, "YYYY-MM-DD", true).isValid()) {
-      const errorLog = await prisma.errorLog.create({
+      const error_log = await prisma.error_log.create({
         data: {
           id_usuario: req.user["id_usuario"] || null,
           tipo_error: "Error interno del servidor",
@@ -872,7 +877,7 @@ async function changeFastingDate(req, res) {
       },
     });
     if (!paciente) {
-      const errorLog = await prisma.errorLog.create({
+      const error_log = await prisma.error_log.create({
         data: {
           id_usuario: req.user["id_usuario"] || null,
           tipo_error: "Error interno del servidor",
@@ -901,7 +906,7 @@ async function changeFastingDate(req, res) {
         paciente: paciente,
       });
   } catch (error) {
-    const errorLog = await prisma.errorLog.create({
+    const error_log = await prisma.error_log.create({
       data: {
         id_usuario: req.user["id_usuario"] || null,
         tipo_error: "Error interno del servidor",

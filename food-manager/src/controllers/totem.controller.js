@@ -85,7 +85,7 @@ async function checkInLunch(req, res) {
         return res.render('totem/ticket', { colacion: newColacion, layout: false });
 
     } catch (error) {
-        const errorLog = await prisma.errorLog.create({
+        const error_log = await prisma.error_log.create({
             data: {
                 id_usuario: req.user["id_usuario"] || null,
                 tipo_error: "Error interno del servidor",
@@ -146,7 +146,7 @@ async function registerLunchAtTotem(req, res) {
         // Renderizar el ticket
         res.render('totem/ticket', { colacion, layout: false });
     } catch (error) {
-        const errorLog = await prisma.errorLog.create({
+        const error_log = await prisma.error_log.create({
             data: {
                 id_usuario: req.user["id_usuario"] || null,
                 tipo_error: "Error interno del servidor",
