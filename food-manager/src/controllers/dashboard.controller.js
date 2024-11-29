@@ -7,12 +7,12 @@ async function renderDashboard(req, res) {
     // Obtener la fecha actual y los últimos 7 días en formato YYYY-MM-DD
     const today = new Date(); // Fecha de hoy
     const days = Array.from({ length: 7 }, (_, i) => {
-      const date = new Date(today);
-      date.setDate(today.getDate() - i); // Retrocede 'i' días desde hoy
-      return date.toISOString().split('T')[0]; // Devuelve solo la fecha en formato ISO
+      const date = new Date();
+      date.setDate(date.getDate() - i); // Retrocede 'i' días desde hoy
+      return date.toISOString().split('T')[0]; // Solo fecha en formato ISO
     }).reverse(); // Invierte el orden para mostrar del día más antiguo al más reciente
-
-    const hoy = moment().format('YYYY-MM-DD'); // Fecha actual en formato YYYY-MM-DD usando Moment.js
+    const startOfDayUTC = new Date(Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate()));
+    const endOfDayUTC = new Date(Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate() + 1) - 1);
 
     // Ejecutar consultas a la base de datos de forma paralela usando Promise.all
     const [
@@ -24,36 +24,52 @@ async function renderDashboard(req, res) {
       pacientesEnAyuno,        // Total de pacientes que finalizaron el ayuno antes de hoy
       ingresosHoy,             // Total de ingresos de pacientes hoy
       altasHoy,                // Total de altas de pacientes hoy
-      
+
       // Datos históricos de colaciones confirmadas y pacientes en ayuno por día
-      tendenciasColaciones,    
-      
+      tendenciasColaciones,
+
       // Datos históricos de ingresos y altas por día
       ingresosAltasSemana,
 
-      // Distribución de tipos de régimen
-      distribucionRegimen      
+      // Agrupación de tipos de régimen
+      groupedRegimenData
     ] = await Promise.all([
       // Contar el total de funcionarios habilitados
       prisma.Funcionario.count({ where: { Habilitado: "S" } }),
 
       // Contar colaciones solicitadas hoy con estado 0 (solicitadas)
-      prisma.Colacion.count({ where: { Estado: 0, FechaSolicitud: {
-        gte: new Date(moment().startOf('day').format()),  // Inicio del día de hoy
-        lte: new Date(moment().endOf('day').format())     // Fin del día de hoy
-      } } }),
+      prisma.Colacion.count({
+        where: {
+          FechaSolicitud: {
+            gte: startOfDayUTC,  // Inicio del día de hoy
+            lte: endOfDayUTC     // Fin del día de hoy
+          }
+        }
+      }),
 
       // Contar colaciones confirmadas hoy con estado 1 (confirmadas)
-      prisma.Colacion.count({ where: { Estado: 1, FechaSolicitud: {
-        gte: new Date(moment().startOf('day').format()),  // Inicio del día de hoy
-        lte: new Date(moment().endOf('day').format())     // Fin del día de hoy
-      } } }),
+      prisma.Colacion.count({
+        where: {
+          OR: [
+            { Estado: 1 },
+            { Estado: 2 }
+          ],
+          FechaSolicitud: {
+            gte: startOfDayUTC,  // Inicio del día de hoy
+            lte: endOfDayUTC     // Fin del día de hoy
+          }
+        }
+      }),
 
       // Contar colaciones consumidas hoy con estado 2 (almorzaron)
-      prisma.Colacion.count({ where: { Estado: 2, FechaSolicitud: {
-        gte: new Date(moment().startOf('day').format()),  // Inicio del día de hoy
-        lte: new Date(moment().endOf('day').format())     // Fin del día de hoy
-      } } }),
+      prisma.Colacion.count({
+        where: {
+          Estado: 2, FechaSolicitud: {
+            gte: startOfDayUTC,  // Inicio del día de hoy
+            lte: endOfDayUTC     // Fin del día de hoy
+          }
+        }
+      }),
 
       // Contar el total de pacientes hospitalizados
       prisma.Hospitalizado.count(),
@@ -68,10 +84,10 @@ async function renderDashboard(req, res) {
       prisma.Hospitalizado.count({ where: { FechaAlta: today } }),
 
       // Colaciones confirmadas y pacientes en ayuno por los últimos 7 días
-      Promise.all(days.map(async (day) => ({
+      Promise.all(days.map(async (day) => ({ 
         day,
-        confirmados: await prisma.Colacion.count({ where: { Estado: 0, FechaSolicitud: new Date(day) } }),
-        ayuno: await prisma.Hospitalizado.count({ where: { FechaFinAyuno: { lt: new Date(day) } } })
+        confirmados: await prisma.Colacion.count({ where: { Estado: 2, FechaSolicitud: { gte: new Date(day), lte: new Date(day) } } }),
+        ayuno: await prisma.Hospitalizado.count({ where: { FechaFinAyuno: { gte: new Date(day) } } })
       }))),
 
       // Ingresos y altas por los últimos 7 días
@@ -84,9 +100,22 @@ async function renderDashboard(req, res) {
       // Agrupar pacientes por tipo de régimen y contar cada grupo
       prisma.Hospitalizado.groupBy({
         by: ['IdTipoRegimen'], // Agrupa por el campo 'IdTipoRegimen'
-        _count: { IdTipoRegimen: true } // Cuenta la cantidad de pacientes por régimen
+        _count: { IdTipoRegimen: true }
       })
     ]);
+
+    // Obtener información de los regímenes relacionados
+    const distribucionRegimen = await Promise.all(
+      groupedRegimenData.map(async (group) => {
+        const regimen = await prisma.TipoRegimen.findUnique({
+          where: { IdTipoRegimen: group.IdTipoRegimen }
+        });
+        return {
+          ...group,
+          TipoRegimen: regimen
+        };
+      })
+    );
 
     const tipoUsuario = req.user.tipo_usuario;     // Tipo de usuario como entero
 
@@ -104,18 +133,11 @@ async function renderDashboard(req, res) {
       days, // Fechas de los últimos 7 días
       tendenciasColaciones, // Datos históricos de colaciones y ayunos
       ingresosAltasSemana,  // Datos históricos de ingresos y altas
-      distribucionRegimen,  // Distribución de regímene
+      distribucionRegimen,  // Distribución de regímenes
     });
+
+    console.log(distribucionRegimen);
   } catch (error) {
-    const errorLog = await prisma.errorLog.create({
-      data: {
-        id_usuario: req.user["id_usuario"] || null,
-        tipo_error: "Error interno del servidor",
-        mensaje_error: JSON.stringify(error),
-        ruta_error: "food-manager/dashboard/home",
-        codigo_http: 500
-      }
-    });
     return res.status(500).json({ error: error.message });
   }
 }
