@@ -16,17 +16,17 @@
             <div id="sidebarUnits"
                 class="fixed right-0 top-0 w-80 h-full bg-white shadow-xl transform translate-x-full transition-transform duration-300 ease-in-out z-50">
                 <div class="p-4 border-b flex justify-between items-center">
-                    <h2 class="text-lg font-bold text-gray-700">Unidades</h2>
+                    <h2 class="text-lg font-bold text-gray-700">Servicios</h2>
                     <button onclick="closeSidebar()" class="text-gray-700 hover:text-red-600">
                         &times; <!-- Icono de cerrar -->
                     </button>
                 </div>
                 <!-- Contenedor de las unidades con scroll -->
                 <div class="p-4 overflow-y-auto h-[calc(100%-4rem)]">
-                    <% unidades.forEach(unidad=> { %>
+                    <% servicios.forEach(servicio=> { %>
                         <label class="block px-4 py-2 text-gray-700 hover:bg-indigo-500 hover:text-white rounded my-1"
-                            onclick="filterByUnit('<%= unidad.IdTipoUnidad %>')">
-                            <%= unidad.DescTipoUnidad %>
+                            onclick="filterByUnit('<%= servicio.IdTipoServicio %>')">
+                            <%= servicio.DescTipoServicio %>
                         </label>
                         <% }) %>
                 </div>
@@ -85,7 +85,7 @@
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
                         </svg>
-                        Filtrar por unidad
+                        Filtrar por Servicio
                     </button>
                     <button onclick="clearFilters()"
                         class="px-4 py-2 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600 transition duration-300 flex items-center gap-2 shadow-md">
@@ -137,10 +137,10 @@
             <!-- Contenedor de pacientes -->
 
             <div id="cardGridPacientes"
-                class=" grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-5 p-6">
+                class=" grid grid-cols-1 md:grid-col-3 gap-5 p-6">
                 <% pacientes.forEach(paciente=> { %>
                     <div class="z-0 relative bg-white rounded-lg shadow-lg p-5 cursor-pointer transition-transform duration-300 ease-in-out hover:transform hover:-translate-y-1"
-                        data-unidad="<%= paciente.IdTipoUnidad %>"
+                        data-unidad="<%= paciente.IdTipoServicio %>"
                         onclick='openModalInfo(<%= JSON.stringify(paciente) %>); event.stopPropagation();'>
 
                         <!-- Icono de Ayuno en la esquina superior derecha -->
@@ -160,7 +160,7 @@
 
                         <!-- Patient Details -->
                         <h2 class="text-gray-800 font-bold text-xl mb-2">
-                            <%= paciente.NombreHospitalizado %>
+                            <%= paciente.nombreCompleto %> 
                         </h2>
                         <span id="rutSpan">
                             <%= paciente.RutHospitalizado %>-<%= paciente.DvHospitalizado %>
@@ -168,6 +168,8 @@
                         <p class="text-gray-600">Edad: <%= paciente.edad %>
                         </p>
                         <p class="text-gray-600">Régimen: <%= paciente.TipoRegimen.DescTipoRegimen %>
+                        </p>
+                        <p class="text-gray-600">Observaciones: <%= paciente.ObservacionesNutricionista %>
                         </p>
 
                         <!-- Fasting Date Information -->
