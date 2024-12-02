@@ -1,165 +1,177 @@
-<!-- Modal -->
 <div id="modalReporteHospitalizados"
     class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden">
     <div class="bg-white rounded-lg shadow-lg p-6 w-full h-5/6 overflow-auto">
-        <h2 class="text-2xl font-semibold mb-4 text-center">Rutas de Entrega por Unidad</h2>
+        <h2 class="text-2xl font-semibold mb-4 text-center">Reporte de Pacientes Hospitalizados</h2>
+        
+        <!-- Filtro por Unidad -->
+        <div class="mb-4">
+            <label for="unidadFilter" class="block text-lg font-semibold">Filtrar por Unidad:</label>
+            <input id="unidadFilter" type="text" class="w-full px-4 py-2 border rounded"
+                placeholder="Buscar Unidad..." />
+            <ul id="unidadSuggestions" class="absolute bg-white border rounded w-full hidden"></ul>
+        </div>
+
         <!-- Contenedor para los reportes -->
         <div id="reportesContainer">
             <!-- Aquí se renderizarán los reportes por unidad -->
         </div>
-        <!-- Botones de paginación -->
-        <div class="mt-4 flex justify-between items-center">
-            <button id="prevPage" class="bg-gray-300 px-4 py-2 rounded disabled:opacity-50">Anterior</button>
-            <span id="currentPage" class="text-lg"></span>
-            <button id="nextPage" class="bg-gray-300 px-4 py-2 rounded disabled:opacity-50">Siguiente</button>
-        </div>
-        <!-- Botones de acción -->
+
+        <!-- Botones -->
         <div class="mt-6 flex justify-end space-x-4">
-            <button id="printPDF" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-500">
-                Imprimir PDF
-            </button>
-            <button id="closeModalReporteHospitalizados"
-                class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-500">
-                Cerrar
-            </button>
+            <button id="printPDF" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-500">Imprimir PDF</button>
+            <button id="closeModalReparto" class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-500">Cerrar</button>
         </div>
     </div>
 </div>
 
+
 <script>
-    document.addEventListener('DOMContentLoaded', () => {
-        const openModalBtn = document.getElementById('openModalReporteDiario');
-        const closeModalBtn = document.getElementById('closeModalReporteHospitalizados');
-        const modal = document.getElementById('modalReporteHospitalizados');
-        const reportesContainer = document.getElementById('reportesContainer');
-        const prevPageBtn = document.getElementById('prevPage');
-        const nextPageBtn = document.getElementById('nextPage');
-        const currentPageSpan = document.getElementById('currentPage');
-        const printPDFBtn = document.getElementById('printPDF');
+   document.addEventListener('DOMContentLoaded', () => {
+    const unidadFilterInput = document.getElementById('unidadFilter');
+    const unidadSuggestions = document.getElementById('unidadSuggestions');
+    const reportesContainer = document.getElementById('reportesContainer');
+    const printPDFBtn = document.getElementById('printPDF');
+    const closeModalBtn = document.getElementById('closeModal');
 
-        let currentPage = 1;
-        const pageSize = 10; // Ajusta el tamaño de página según tus necesidades
+    let unidades = [];
+    let reportes = {};
 
-        // Función para obtener y renderizar los reportes
-        async function fetchAndRenderReportes(page) {
-            try {
-                const response = await axios.get(`/food-manager/report/reporte-hospitalizados-diario?page=${page}&pageSize=${pageSize}`);
-                const data = response.data.data;
-                currentPage = page;
+    // Obtener unidades y reportes del servidor
+    async function fetchReportes() {
+        try {
+            const response = await axios.get('/food-manager/report/reporte-hospitalizados-diario');
+            reportes = response.data.data;
+            unidades = Object.keys(reportes);
+            renderReportes();
+        } catch (error) {
+            console.error("Error al obtener los reportes:", error);
+        }
+    }
 
-                // Limpiar el contenedor
-                reportesContainer.innerHTML = '';
+    // Mostrar reportes por unidad
+    function renderReportes(unidad = '') {
+        reportesContainer.innerHTML = '';
 
-                // Renderizar los reportes por unidad
-                for (const unidad in data) {
-                    const pacientes = data[unidad];
+        for (const [unidadKey, pacientes] of Object.entries(reportes)) {
+            if (unidad && unidadKey !== unidad) continue;
 
-                    const unidadDiv = document.createElement('div');
-                    unidadDiv.classList.add('mb-6');
+            const unidadDiv = document.createElement('div');
+            unidadDiv.classList.add('mb-6');
 
-                    const unidadTitle = document.createElement('h3');
-                    unidadTitle.classList.add('text-xl', 'font-semibold', 'mb-2');
-                    unidadTitle.textContent = `Unidad: ${unidad}`;
-                    unidadDiv.appendChild(unidadTitle);
+            const unidadTitle = document.createElement('h3');
+            unidadTitle.classList.add('text-xl', 'font-semibold', 'mb-2');
+            unidadTitle.textContent = `Unidad: ${unidadKey}`;
+            unidadDiv.appendChild(unidadTitle);
 
-                    const table = document.createElement('table');
-                    table.classList.add('min-w-full', 'text-left', 'text-base', 'text-black', 'whitespace-nowrap');
+            const table = document.createElement('table');
+            table.classList.add('min-w-full', 'text-left', 'text-base', 'text-black', 'whitespace-nowrap');
+            table.innerHTML = `
+                <thead class="bg-gray-200">
+                    <tr>
+                        <th class="px-2 py-2">Código de Cama</th>
+                        <th class="px-2 py-2">RUT Paciente</th>
+                        <th class="px-2 py-2">Nombre Paciente</th>
+                        <th class="px-2 py-2">Régimen</th>
+                        <th class="px-2 py-2">Observaciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${pacientes
+                        .map(
+                            (p) => `
+                        <tr class="border-b">
+                            <td class="px-2 py-2">${p.CodigoCama}</td>
+                            <td class="px-2 py-2">${p.RutPaciente}</td>
+                            <td class="px-2 py-2">${p.NombrePaciente}</td>
+                            <td class="px-2 py-2">${p.DescTipoRegimen}</td>
+                            <td class="px-2 py-2">${p.ObservacionesNutricionista}</td>
+                        </tr>`
+                        )
+                        .join('')}
+                </tbody>
+            `;
+            unidadDiv.appendChild(table);
+            reportesContainer.appendChild(unidadDiv);
+        }
+    }
 
-                    // Table head
-                    const thead = document.createElement('thead');
-                    thead.classList.add('bg-gray-200');
-                    thead.innerHTML = `
-    <tr class="flex">
-        <th class="px-2 py-2 flex-1">Código de Cama</th>
-        <th class="px-2 py-2 flex-1">RUT Paciente</th>
-        <th class="px-2 py-2 flex-1">Nombre Paciente</th>
-        <th class="px-2 py-2 flex-1">Régimen</th>
-        <th class="px-2 py-2 flex-1">Obs Nutricionista</th>
-    </tr>
-`;
-                    table.appendChild(thead);
+    // Filtrar reportes
+    unidadFilterInput.addEventListener('input', (e) => {
+        const query = e.target.value.toLowerCase();
+        const filteredUnidades = unidades.filter((unidad) =>
+            unidad.toLowerCase().includes(query)
+        );
 
-                    // Table body
-                    const tbody = document.createElement('tbody');
-                    pacientes.forEach((paciente) => {
-                        const tr = document.createElement('tr');
-                        tr.classList.add('border-b', 'flex');
+        unidadSuggestions.innerHTML = filteredUnidades
+            .map((unidad) => `<li class="px-4 py-2 cursor-pointer hover:bg-gray-200">${unidad}</li>`)
+            .join('');
 
-                        tr.innerHTML = `
-        <td class="px-2 py-2 flex-1">${paciente.CodigoCama}</td>
-        <td class="px-2 py-2 flex-1">${paciente.RutPaciente}</td>
-        <td class="px-2 py-2 flex-1">${paciente.NombrePaciente}</td>
-        <td class="px-2 py-2 flex-1">${paciente.DescTipoRegimen}</td>
-        <td class="px-2 py-2 flex-1">${paciente.ObservacionesNutricionista}</td>
-    `;
-                        tbody.appendChild(tr);
-                    });
-                    table.appendChild(tbody);
+        unidadSuggestions.classList.remove('hidden');
+        unidadSuggestions.querySelectorAll('li').forEach((item) =>
+            item.addEventListener('click', () => {
+                unidadFilterInput.value = item.textContent;
+                unidadSuggestions.classList.add('hidden');
+                renderReportes(item.textContent);
+            })
+        );
+    });
 
-                    unidadDiv.appendChild(table);
-                    reportesContainer.appendChild(unidadDiv);
-                }
+    // Imprimir PDF
+    printPDFBtn.addEventListener('click', () => {
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF();
+    const reportesContainer = document.getElementById('reportesContainer');
 
-                // Actualizar paginación
-                currentPageSpan.textContent = `Página ${currentPage}`;
-                prevPageBtn.disabled = currentPage === 1;
-                // Aquí podrías agregar lógica para deshabilitar nextPageBtn si es la última página
-            } catch (error) {
-                console.error('Error al obtener los reportes:', error);
-            }
+    // Título del PDF
+    let yOffset = 10; // Coordenada Y inicial
+    pdf.setFontSize(16);
+    pdf.text("Reporte de Pacientes Hospitalizados", 10, yOffset);
+    yOffset += 10;
+
+    // Iterar sobre cada sección de la unidad en el contenedor
+    const unidades = reportesContainer.querySelectorAll('div.mb-6'); // Cada unidad está en un div con clase "mb-6"
+
+    unidades.forEach((unidadDiv) => {
+        // Título de la unidad
+        const unidadTitle = unidadDiv.querySelector('h3');
+        if (unidadTitle) {
+            pdf.setFontSize(14);
+            pdf.text(unidadTitle.textContent, 10, yOffset);
+            yOffset += 10;
         }
 
-        // Eventos de los botones
-        openModalBtn.addEventListener('click', () => {
-            modal.classList.remove('hidden');
-            fetchAndRenderReportes(currentPage);
+        // Tabla de pacientes
+        const rows = [];
+        const tableHeaders = ["Código de Cama", "RUT Paciente", "Nombre Paciente", "Régimen", "Observaciones"];
+        const pacientes = unidadDiv.querySelectorAll('tbody tr');
+        pacientes.forEach((pacienteRow) => {
+            const columns = pacienteRow.querySelectorAll('td');
+            const rowData = Array.from(columns).map((col) => col.textContent.trim());
+            rows.push(rowData);
         });
 
-        closeModalBtn.addEventListener('click', () => {
-            modal.classList.add('hidden');
-        });
-
-        prevPageBtn.addEventListener('click', () => {
-            if (currentPage > 1) {
-                fetchAndRenderReportes(currentPage - 1);
-            }
-        });
-
-        nextPageBtn.addEventListener('click', () => {
-            // Deberías verificar si hay más páginas disponibles
-            fetchAndRenderReportes(currentPage + 1);
-        });
-
-        // Función para imprimir el reporte en PDF
-        printPDFBtn.addEventListener('click', () => {
-            const modalContent = document.getElementById('reportesContainer')
-
-            html2canvas(modalContent, { scale: 1 }).then((canvas) => {
-                const imgData = canvas.toDataURL('image/png');
-                const { jsPDF } = window.jspdf;
-
-                const pdf = new jsPDF('p', 'pt', 'letter'); // Tamaño de página 'letter'
-                const pageWidth = pdf.internal.pageSize.getWidth();
-                const pageHeight = pdf.internal.pageSize.getHeight();
-                const padding = 20; // Valor de padding en puntos
-
-                const imgWidth = pageWidth - padding * 2;
-                const imgHeight = (canvas.height * imgWidth) / canvas.width;
-                let heightLeft = imgHeight;
-                let position = padding;
-
-                pdf.addImage(imgData, 'PNG', padding, position, imgWidth, imgHeight);
-                heightLeft -= pageHeight - padding * 2;
-
-                while (heightLeft > 0) {
-                    position = heightLeft - imgHeight + padding * 2;
-                    pdf.addPage();
-                    pdf.addImage(imgData, 'PNG', padding, position, imgWidth, imgHeight);
-                    heightLeft -= pageHeight - padding * 2;
-                }
-
-                pdf.save('ReporteHospitalizados.pdf');
+        // Renderizar la tabla
+        if (rows.length > 0) {
+            pdf.setFontSize(12);
+            pdf.autoTable({
+                startY: yOffset,
+                head: [tableHeaders],
+                body: rows,
+                margin: { top: 10, left: 10, right: 10 },
+                theme: 'grid',
+                styles: { fontSize: 10 },
             });
-        });
+            yOffset = pdf.lastAutoTable.finalY + 10; // Actualizar la posición Y después de la tabla
+        }
     });
+
+    // Guardar el PDF
+    pdf.save('ReporteHospitalizados.pdf');
+});
+
+
+    fetchReportes();
+});
+
+
 </script>

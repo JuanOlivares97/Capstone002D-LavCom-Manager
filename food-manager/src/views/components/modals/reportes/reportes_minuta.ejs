@@ -1,6 +1,6 @@
 <div class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden opacity-0 transition-opacity duration-300 overflow-y-auto"
      id="modal_minuta_diaria">
-    <div class="bg-white rounded-lg shadow-lg p-6 transform scale-95 transition-transform duration-300 h-5/6 overflow-y-auto">
+    <div class="bg-white rounded-lg shadow-lg p-6 transform scale-95 transition-transform duration-300 h-5/6 w-full overflow-y-auto">
         <h2 class="text-2xl font-semibold mb-4 text-center">Reporte de Raciones</h2>
         <div class="mb-6 flex flex-col sm:flex-row justify-center sm:justify-end space-y-2 sm:space-y-0 sm:space-x-4">
             <button id="ExportGeneralToExcel"
@@ -14,7 +14,18 @@
         </div>
         <div class="overflow-x-auto overflow-y-auto">
             <!-- Table responsive wrapper -->
-            <table id="reporteRacionesTable" class="min-w-full text-left text-base text-black whitespace-nowrap">
+            <div class="flex w-full gap-2">
+                <div class="flex-1 text-center bg-blue-500 text-white h-12 cursor-pointer" onclick="filterReports(6, 2024)">06 - 2024</div>
+                <div class="flex-1 text-center bg-blue-500 text-white h-12 cursor-pointer" onclick="filterReports(7, 2024)">07 - 2024</div>
+                <div class="flex-1 text-center bg-blue-500 text-white h-12 cursor-pointer" onclick="filterReports(8, 2024)">08 - 2024</div>
+                <div class="flex-1 text-center bg-blue-500 text-white h-12 cursor-pointer" onclick="filterReports(9, 2024)">09 - 2024</div>
+                <div class="flex-1 text-center bg-blue-500 text-white h-12 cursor-pointer" onclick="filterReports(10, 2024)">10 - 2024</div>
+                <div class="flex-1 text-center bg-blue-500 text-white h-12 cursor-pointer" onclick="filterReports(11, 2024)">11 - 2024</div>
+                <div class="flex-1 text-center bg-blue-500 text-white h-12 cursor-pointer" onclick="filterReports(new Date().getMonth() + 1, new Date().getFullYear())">Actual</div>
+            </div>
+            
+
+             <table id="reporteRacionesTable" class="w-full text-left text-base text-black whitespace-nowrap">
                 <!-- Table head -->
                 <thead class="bg-gray-200 sticky top-0">
                     <tr>
@@ -84,4 +95,59 @@
         // Generar el archivo Excel y forzar su descarga
         XLSX.writeFile(workbook, 'ReporteRaciones.xlsx');
     });
+
+     // Obtenemos el JSON de reportes desde el backend
+     const reportes = <%- JSON.stringify(reportes) %>;
+
+function filterReports(month, year) {
+    // Filtrar los reportes según el mes y año seleccionados
+    const filteredReports = reportes.filter(reporte => reporte.Mes === month && reporte.Anio === year);
+
+    // Actualizar la tabla
+    updateTable(filteredReports);
+}
+
+function updateTable(filteredReports) {
+    const tableBody = document.querySelector('#reporteRacionesTable tbody');
+    const tableFooter = document.querySelector('#reporteRacionesTable tfoot');
+    tableBody.innerHTML = ''; // Limpia la tabla
+    tableFooter.innerHTML = ''; // Limpia el pie de tabla
+    let totalFuncionarios = 0;
+    let totalHospitalizados = 0;
+
+    if (filteredReports.length > 0) {
+        filteredReports.forEach(reporte => {
+            const row = `
+                <tr class="border-b hover:bg-gray-100">
+                    <td class="px-6 py-4">${reporte.TipoUnidad?.DescTipoUnidad || 'Sin información'}</td>
+                    <td class="px-6 py-4">${reporte.RacionesFuncionarios}</td>
+                    <td class="px-6 py-4">${reporte.RacionesHospitalizados}</td>
+                </tr>
+            `;
+            tableBody.innerHTML += row;
+
+            // Acumular totales
+            totalFuncionarios += reporte.RacionesFuncionarios;
+            totalHospitalizados += reporte.RacionesHospitalizados;
+        });
+
+        const footer = `
+            <tr class="bg-gray-200">
+                <th class="px-6 py-3 text-left">Total:</th>
+                <th class="px-6 py-3">${totalFuncionarios}</th>
+                <th class="px-6 py-3">${totalHospitalizados}</th>
+            </tr>
+        `;
+        tableFooter.innerHTML += footer;
+    } else {
+        tableBody.innerHTML = `
+            <tr>
+                <td colspan="3" class="px-6 py-4 text-center">No se encontraron reportes.</td>
+            </tr>
+        `;
+    }
+}
+
+// Cargar la tabla inicialmente con todos los reportes
+updateTable(reportes);
 </script>

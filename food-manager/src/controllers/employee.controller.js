@@ -8,7 +8,6 @@ const {
     getTipoFuncionario,
 } = require("./maintainer.controller");
 
-// Renderiza la página principal de empleados
 async function renderHome(req, res) {
     try {
         // Obtiene los datos necesarios para renderizar la vista desde funciones externas

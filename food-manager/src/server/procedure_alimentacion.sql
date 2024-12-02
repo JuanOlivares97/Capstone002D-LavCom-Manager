@@ -17,7 +17,7 @@ BEGIN
         p_mes,
         p_anio,
         TU.IdTipoUnidad,
-        COALESCE(SUM(CASE WHEN C.Estado = 1 THEN 1 ELSE 0 END), 0) AS racionesFuncionarios,
+        COALESCE(SUM(CASE WHEN C.Estado = 2 THEN 1 ELSE 0 END), 0) AS racionesFuncionarios,
         COALESCE(SUM(CASE WHEN H.IdTipoRegimen IS NOT NULL THEN 1 ELSE 0 END), 0) AS racionesHospitalizado
     FROM
         TipoUnidad TU
@@ -25,7 +25,7 @@ BEGIN
         C.IdTipoUnidad = TU.IdTipoUnidad 
         AND MONTH(C.FechaSolicitud) = p_mes
         AND YEAR(C.FechaSolicitud) = p_anio
-        AND C.Estado = 1
+        AND C.Estado = 2
     LEFT JOIN Hospitalizado H ON
         H.IdTipoUnidad = TU.IdTipoUnidad 
         AND MONTH(H.FechaIngreso) <= p_mes
