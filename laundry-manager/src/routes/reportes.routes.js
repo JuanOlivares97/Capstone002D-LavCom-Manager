@@ -14,4 +14,7 @@ router.get("/get-bp-date/:mes/:anio", reportesController.getBajasyPerdidasDate);
 router.get("/get-general-date-usigcom/:mes/:anio/:tipo/:usigcom", reportesController.generalReportDateUsigcom);
 router.get("/get-bp-date-usigcom/:mes/:anio/:usigcom", reportesController.getBajasyPerdidasDateUsigcom);
 
+router.get("/get-daily-report/:fecha/:tipo", reportesController.getDailyReport)
+router.get("/get-bp-daily/:fecha", reportesController.getDailyBp);
+
 module.exports = router;

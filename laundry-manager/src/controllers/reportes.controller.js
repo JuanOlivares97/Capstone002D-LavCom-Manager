@@ -1,4 +1,5 @@
 const prisma = require("../server/prisma");
+const tempo = require("@formkit/tempo");
 
 // FUNCIÓN PARA RENDERIZAR LA PÁGINA PRINCIPAL (HOME)
 async function renderHome(req, res) {
@@ -436,6 +437,110 @@ async function getBajasyPerdidasDateUsigcom(req, res) {
     }
 }
 
+async function getDailyReport(req, res) {
+    try {
+        const fecha_raw = req.params.fecha;
+        const fecha_format = tempo.format(fecha_raw, "YYYY-MM-DD", "cl");
+        const fecha = new Date(fecha_format);
+
+        const anio = fecha.getFullYear();
+        const mes = fecha.getMonth() + 1;
+        const dia = fecha.getDate() + 1;
+        const tipo = parseInt(req.params.tipo);
+
+        const result = await prisma.$queryRaw`
+            SELECT 
+            a.nombre_articulo,
+                COALESCE(SUM(
+                    CASE WHEN r.id_tipo_registro = ${tipo}
+                        AND DAY(r.fecha) = ${dia}
+                        AND MONTH(r.fecha) = ${mes}
+                        AND YEAR(r.fecha) = ${anio}
+                    THEN dr.cantidad 
+                    ELSE NULL END
+                ), 0) as cantidad_total
+            FROM articulo a
+            LEFT JOIN detalle_registro dr ON a.id_articulo = dr.id_articulo
+            LEFT JOIN registro r ON r.id_registro = dr.id_registro
+            GROUP BY a.id_articulo, a.nombre_articulo
+            ORDER BY a.id_articulo;
+        `;
+
+        const tipo_registro = await prisma.tipo_registro.findUnique({
+            where: {
+                id_tipo_registro: parseInt(tipo)
+            },
+            select: {
+                tipo_registro: true
+            }
+        })
+
+        return res.status(200).json({ success: true, result, file: `${tipo_registro["tipo_registro"].toLowerCase()} ${dia}_${mes}_${anio}.xlsx` });
+    } catch (error) {
+        await prisma.error_log.create({
+            data: {
+                id_usuario: req.user["id_usuario"] || null, // Si existe un usuario, guardamos su ID
+                tipo_error: "Error interno del servidor", // Tipo de error
+                mensaje_error: JSON.stringify(error), // Descripción detallada del error en formato JSON
+                ruta_error: "laundry-manager/reports/get-daily-report", // Ruta donde ocurrió el error
+                codigo_http: 500, // Código HTTP correspondiente a un error interno
+            }
+        })
+        return res.status(500).json({ message: "Internal server error", success: false });
+    }
+}
+
+async function getDailyBp(req, res) {
+    try {
+        const fecha_raw = req.params.fecha;
+        const fecha_format = tempo.format(fecha_raw, "YYYY-MM-DD", "cl");
+        const fecha = new Date(fecha_format);
+
+        const anio = fecha.getFullYear();
+        const mes = fecha.getMonth() + 1;
+        const dia = fecha.getDate() + 1;
+
+        const result = await prisma.$queryRaw`
+            SELECT  
+                a.id_articulo,
+                a.nombre_articulo,
+                COALESCE(registros.perdida_ex, 0) as perdidas_externas,
+                COALESCE(registros.perdida_int, 0) as perdidas_internas,
+                COALESCE(registros.perdida_ex, 0) + COALESCE(registros.perdida_int, 0) as perdidas_totales,
+                COALESCE(registros.bajas_serv, 0) as bajas_servicio,
+                COALESCE(registros.bajas_roperia, 0) as bajas_roperia,
+                COALESCE(registros.bajas_serv, 0) + COALESCE(registros.bajas_roperia, 0) as bajas_totales
+            FROM articulo a
+            LEFT JOIN (
+                SELECT
+                    dr.id_articulo,
+                    SUM(CASE WHEN r.id_tipo_registro = 5 THEN dr.cantidad ELSE 0 END) as perdida_ex,
+                    SUM(CASE WHEN r.id_tipo_registro = 6 THEN dr.cantidad ELSE 0 END) as perdida_int,
+                    SUM(CASE WHEN r.id_tipo_registro = 7 THEN dr.cantidad ELSE 0 END) as bajas_serv,
+                    SUM(CASE WHEN r.id_tipo_registro = 8 THEN dr.cantidad ELSE 0 END) as bajas_roperia
+                FROM detalle_registro dr
+                INNER JOIN registro r on r.id_registro = dr.id_registro
+                WHERE YEAR(r.fecha) = ${anio} AND MONTH(r.fecha) = ${mes} AND DAY(r.fecha) = ${dia}
+                GROUP BY dr.id_articulo
+            ) as registros ON a.id_articulo = registros.id_articulo 
+            ORDER BY a.id_articulo;
+        `;
+
+        return res.status(200).json({ success: true, file: `bajas y perdidas ${dia}_${mes}_${anio}.xlsx`,result });
+    } catch (error) {
+        await prisma.error_log.create({
+            data: {
+                id_usuario: req.user["id_usuario"] || null, // Si existe un usuario, guardamos su ID
+                tipo_error: "Error interno del servidor", // Tipo de error
+                mensaje_error: JSON.stringify(error), // Descripción detallada del error en formato JSON
+                ruta_error: "laundry-manager/reports/get-daily-bp", // Ruta donde ocurrido el error
+                codigo_http: 500, // Código HTTP correspondiente a un error interno
+            }
+        })
+        return res.status(500).json({ message: "Internal server error", success: false });
+    }
+}
+
 // EXPORTAR FUNCIONES
 module.exports = {
     renderHome,
@@ -447,5 +552,7 @@ module.exports = {
     generalReportDate,
     getBajasyPerdidasDate,
     generalReportDateUsigcom,
-    getBajasyPerdidasDateUsigcom
+    getBajasyPerdidasDateUsigcom,
+    getDailyReport,
+    getDailyBp
 };
