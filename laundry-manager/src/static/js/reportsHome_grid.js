@@ -1,5 +1,14 @@
 import { AG_GRID_LOCALE_ES } from './utils.js';
 document.addEventListener('DOMContentLoaded', async () => {
+    function mesAnio() {
+        const mesSelect = document.getElementById('mes');
+        const anioSelect = document.getElementById('anio');
+
+        const mes = mesSelect.value;
+        const anio = anioSelect.value;
+
+        console.log(mes, anio);
+    }
     function toggleModal(idModal, btnAbrirModal, btnCerrarModal, gridId, buttonToDownload, rowData, columnDefs, sheetName, fileName) {
         const modal = document.querySelector(idModal);
         const openModal = document.querySelector(btnAbrirModal);
