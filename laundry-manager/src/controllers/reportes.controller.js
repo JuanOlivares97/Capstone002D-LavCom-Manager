@@ -5,9 +5,10 @@ async function renderHome(req, res) {
     try {
         // Obtener el tipo de usuario desde la solicitud
         const tipo_user = req.user["tipo_usuario"];
+        const unidades = await prisma.unidad_sigcom.findMany();
 
         // Renderiza la vista 'reports/home' y pasa el tipo de usuario convertido a entero
-        return res.status(200).render('reports/home', {tipo_usuario: parseInt(tipo_user)});
+        return res.status(200).render('reports/home', {tipo_usuario: parseInt(tipo_user), unidades});
         
     } catch (error) {
         // Si ocurre un error, se guarda en el registro de errores de la base de datos
@@ -325,6 +326,116 @@ async function getBajasyPerdidasDate(req, res) {
     }
 }
 
+async function generalReportDateUsigcom(req, res) {
+    try {
+        const mes = parseInt(req.params.mes);
+        const anio = parseInt(req.params.anio);
+        const tipo = parseInt(req.params.tipo);
+        const usigcom = parseInt(req.params.usigcom);
+
+        const result = await prisma.$queryRaw`
+            SELECT 
+                a.nombre_articulo,
+                COALESCE(SUM(
+                    CASE WHEN r.id_tipo_registro = ${tipo} 
+                        AND MONTH(r.fecha) = ${mes} 
+                        AND YEAR(r.fecha) = ${anio} 
+                        AND r.id_unidad_sigcom = ${usigcom}
+                    THEN dr.cantidad 
+                    ELSE NULL END
+                ), 0) as cantidad_total
+            FROM articulo a
+            LEFT JOIN detalle_registro dr ON a.id_articulo = dr.id_articulo
+            LEFT JOIN registro r ON r.id_registro = dr.id_registro
+            GROUP BY a.id_articulo, a.nombre_articulo
+            ORDER BY a.id_articulo;
+        `;
+
+        const name_tipo = await prisma.tipo_registro.findUnique({
+            where: {
+                id_tipo_registro: parseInt(tipo)
+            },
+            select: {
+                tipo_registro: true
+            }
+        })
+
+        const unidad = await prisma.unidad_sigcom.findUnique({
+            where: {
+                id_unidad_sigcom: parseInt(usigcom)
+            },
+            select: {
+                unidad_sigcom: true
+            }
+        })
+
+        return res.status(200).json({ success: true, file: `${name_tipo["tipo_registro"].toLowerCase()} ${unidad["unidad_sigcom"]} ${mes}_${anio}.xlsx`,result });
+    } catch (error) {
+        await prisma.error_log.create({
+            data: {
+                id_usuario: req.user["id_usuario"] || null, // Si existe un usuario, guardamos su ID
+                tipo_error: "Error interno del servidor", // Tipo de error
+                mensaje_error: JSON.stringify(error), // Descripción detallada del error en formato JSON
+                ruta_error: "laundry-manager/reports/get-general-date-usigcom", // Ruta donde ocurrió el error
+                codigo_http: 500, // Código HTTP correspondiente a un error interno
+            }
+        })
+        return res.status(500).json({ message: "Internal server error", success: false });
+    }
+}
+
+async function getBajasyPerdidasDateUsigcom(req, res) {
+    try {
+        const mes = parseInt(req.params.mes);
+        const anio = parseInt(req.params.anio);
+        const usigcom = parseInt(req.params.usigcom);
+
+        const result = await prisma.$queryRaw`
+            SELECT  
+                a.id_articulo,
+                a.nombre_articulo,
+                COALESCE(registros.perdida_int, 0) as perdidas_internas,
+                COALESCE(registros.bajas_serv, 0) as bajas_servicio
+            FROM articulo a
+            LEFT JOIN (
+                SELECT
+                    dr.id_articulo,
+                    SUM(CASE WHEN r.id_tipo_registro = 6 THEN dr.cantidad ELSE 0 END) as perdida_int,
+                    SUM(CASE WHEN r.id_tipo_registro = 7 THEN dr.cantidad ELSE 0 END) as bajas_serv
+                FROM detalle_registro dr
+                INNER JOIN registro r on r.id_registro = dr.id_registro
+                WHERE YEAR(r.fecha) = ${anio} 
+                AND MONTH(r.fecha) = ${mes}
+                AND r.id_unidad_sigcom = ${usigcom}
+                GROUP BY dr.id_articulo
+            ) as registros ON a.id_articulo = registros.id_articulo 
+            ORDER BY a.id_articulo;
+        `;
+
+        const unidad = await prisma.unidad_sigcom.findUnique({
+            where: {
+                id_unidad_sigcom: parseInt(usigcom)
+            },
+            select: {
+                unidad_sigcom: true
+            }
+        })    
+
+        return res.status(200).json({ success: true, file: `bajas y perdidas ${mes}_${anio} ${unidad["unidad_sigcom"]}.xlsx`,result });
+    } catch (error) {
+        await prisma.error_log.create({
+            data: {
+                id_usuario: req.user["id_usuario"] || null, // Si existe un usuario, guardamos su ID
+                tipo_error: "Error interno del servidor", // Tipo de error
+                mensaje_error: JSON.stringify(error), // Descripción detallada del error en formato JSON
+                ruta_error: "laundry-manager/reports/get-bajasyperdidas-date", // Ruta donde ocur：rrio el error
+                codigo_http: 500, // Código HTTP correspondiente a un error interno
+            }
+        })
+        return res.status(500).json({ message: "Internal server error", success: false });
+    }
+}
+
 // EXPORTAR FUNCIONES
 module.exports = {
     renderHome,
@@ -334,5 +445,7 @@ module.exports = {
     getServicesDownReport,
     getRegistros,
     generalReportDate,
-    getBajasyPerdidasDate
+    getBajasyPerdidasDate,
+    generalReportDateUsigcom,
+    getBajasyPerdidasDateUsigcom
 };

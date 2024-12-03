@@ -1,0 +1,30 @@
+<h1 class="text-2xl text-center">Seleccione mes, año y unidad sigcom</h1>
+<div class="grid grid-cols-3">
+    <select name="usigcom" id="rep_usigcom" class="w-full p-2 border rounded">
+        <option value="0" selected disabled>Seleccionar unidad sigcom</option>
+        <% unidades.forEach(u => { %>
+            <option value="<%= u.id_unidad_sigcom %>"><%= u.unidad_sigcom %></option>
+        <% }) %>
+    </select>
+    <select name="mes" id="mes_usigcom" class="w-full p-2 border rounded">
+        <option value="0" selected disabled>Seleccionar mes</option>
+        <option value="1">Enero</option>
+        <option value="2">Febrero</option>
+        <option value="3">Marzo</option>
+        <option value="4">Abril</option>
+        <option value="5">Mayo</option>
+        <option value="6">Junio</option>
+        <option value="7">Julio</option>
+        <option value="8">Agosto</option>
+        <option value="9">Septiembre</option>
+        <option value="10">Octubre</option>
+        <option value="11">Noviembre</option>
+        <option value="12">Diciembre</option>
+    </select>
+    <select name="anio" id="anio_usigcom" class="w-full p-2 border rounded">
+        <option value="0" selected disabled>Seleccionar año</option>
+        <option value="2024">2024</option>
+        <option value="2025">2025</option>
+        <option value="2026">2026</option>
+    </select>
+</div>
