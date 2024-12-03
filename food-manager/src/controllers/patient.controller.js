@@ -233,43 +233,7 @@ async function createPaciente(req, res) {
           paciente: pacienteActualizado,
         });
     } else {
-      // Generar username único para el paciente
-      const nombre_s = req.body.NombreHospitalizado.split(" ");
-      let nombres = nombre_s.join(" ");
-      let index = 1;
-      let isUnique = false;
-      let new_username = "";
-
-      while (!isUnique && index <= nombres.length) {
-          const nombre_fragmento = nombres.substring(0, index);
-          new_username = `${nombre_fragmento.toLowerCase()}.${nombre_s[0].toLowerCase()}.${dv.toLowerCase()}`;
-
-          // Verificar si el username ya existe
-          const existingUser = await prisma.Hospitalizado.findFirst({
-              where: {
-                  username: new_username
-              }
-          });
-
-          if (!existingUser) {
-              isUnique = true;
-          } else {
-              index++;
-          }
-      }
-
-      if (!isUnique) {
-        const error_log = await prisma.error_log.create({
-          data: {
-            id_usuario: req.user["id_usuario"] || null,
-            tipo_error: "Error interno del servidor",
-            mensaje_error: "No se pudo generar un username único para el paciente",
-            ruta_error: "food-manager/patient/home",
-            codigo_http: 400
-          }
-        });
-        return res.status(400).json({ message: "No se pudo generar un username único para el paciente" });
-      }
+      
       // Crear nuevo paciente
       const nuevoPaciente = await prisma.Hospitalizado.create({
         data: {
