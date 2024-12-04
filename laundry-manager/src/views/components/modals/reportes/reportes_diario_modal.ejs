@@ -1,6 +1,9 @@
 <div id="reportes_diario_modal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden opacity-0 transition-opacity duration-300">  
     <div class="bg-white rounded-lg shadow-lg p-8 w-5/6 transform scale-95 transition-transform duration-300">
-        <input type="date" name="fecha" id="fecha_input">
+        <div class="flex flex-col items-center">
+            <h1 class="text-2xl text-center">Seleccione fecha</h1>
+            <input type="date" name="fecha" id="fecha_input" class="w-1/2 p-2 border border-gray-300 rounded mt-2 text-center">
+        </div>
         <h1 class="text-2xl text-center">Ropa limpia entregada a unidades sigcom</h1>
         <button class="w-full mt-2 bg-green-500 text-white p-2 rounded hover:bg-green-400 report-daily" data-tipo="1">Generar Excel</button>
         <hr>
