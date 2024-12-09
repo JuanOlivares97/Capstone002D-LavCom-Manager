@@ -28,10 +28,8 @@ app.set('socketio', io);
 const foodManagerNamespace = io.of('/food-manager');
 
 foodManagerNamespace.on('connection', (socket) => {
-    console.log('New client connected to /food-manager');
 
     socket.on('disconnect', () => {
-        console.log('Client disconnected from /food-manager');
     });
 });
 
