@@ -270,8 +270,6 @@ document.getElementById('formEditarEmpleado').addEventListener('submit', async f
                         IdTipoFuncionario: tipoFuncionario
                     }
                 };
-                console.log("Existing Data:", existingData);
-                console.log("Merged Data:", mergedData);
 
                 // Aplicar la transacción con todos los campos combinados en AG Grid
                 gridApi.applyTransaction({ update: [mergedData] });
