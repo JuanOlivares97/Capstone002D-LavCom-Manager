@@ -233,7 +233,7 @@ async function createPaciente(req, res) {
           paciente: pacienteActualizado,
         });
     } else {
-      
+
       // Crear nuevo paciente
       const nuevoPaciente = await prisma.Hospitalizado.create({
         data: {
@@ -322,82 +322,144 @@ async function getMovimientosPaciente(req, res) {
 }
 
 async function movePatientService(req, res) {
-    try {
-        const paciente = await prisma.Hospitalizado.findFirst({
-            where: { IdHospitalizado: parseInt(req.params.id) },
-            include: { TipoServicio_Hospitalizado_IdTipoServicioToTipoServicio: true }
-        });
+  try {
+    const paciente = await prisma.Hospitalizado.findFirst({
+      where: { IdHospitalizado: parseInt(req.params.id) },
+      include: { TipoServicio_Hospitalizado_IdTipoServicioToTipoServicio: true }
+    });
 
-        if (!paciente) {
-            return res.status(404).json({ message: 'Paciente no encontrado' });
-        }
-
-        const newService = parseInt(req.body.newService);
-
-        // Obtén la lista de servicios válidos
-        const servicios = await getServicio();
-        const isValidService = servicios.some(servicio => servicio.IdTipoServicio === newService);
-
-        // Si el nuevo servicio no es válido, devuelve un error 400
-        if (!isValidService) {
-            return res.status(400).json({ message: 'Servicio no válido' });
-        }
-
-        const newCodigoCama = req.body.newCodigoCama ? parseInt(req.body.newCodigoCama) : null;
-        const oldCodigoCama = paciente.CodigoCama;
-        
-        // Actualizar el servicio del paciente si es válido
-        const updatedPatient = await prisma.Hospitalizado.update({
-            where: { IdHospitalizado: paciente.IdHospitalizado },
-            data: { IdTipoServicio: newService, CodigoCama: newCodigoCama }
-        });
-
-        let log;
-        
-        // Si el servicio es el mismo, solo registrar cambio de cama si hay
-        if (paciente.IdTipoServicio === newService) {
-            if (oldCodigoCama !== newCodigoCama) {
-                log = await prisma.logMovimientosPaciente.create({
-                    data: {
-                        descripcionLog: `Cambio de Cama: ${oldCodigoCama} a ${newCodigoCama}`,
-                        fechaLog: new Date(),
-                        idPaciente: paciente.IdHospitalizado
-                    }
-                });
-            }
-        } else {
-            // Si el servicio es diferente, registrar cambio de servicio y cama si hay
-            let descripcion = `Movimiento al Servicio: ${paciente.TipoServicio_Hospitalizado_IdTipoServicioToTipoServicio.DescTipoServicio} a ${servicios.find(servicio => servicio.IdTipoServicio === newService).DescTipoServicio}`;
-            
-            if (oldCodigoCama !== newCodigoCama) {
-                descripcion += ` y Cambio de Cama: ${oldCodigoCama} a ${newCodigoCama}`;
-            }
-            
-            log = await prisma.logMovimientosPaciente.create({
-                data: {
-                    descripcionLog: descripcion,
-                    fechaLog: new Date(),
-                    idPaciente: paciente.IdHospitalizado
-                }
-            });
-        }
-
-        return res.status(200).json({ 
-            message: 'Movimiento realizado exitosamente', 
-            log: log 
-        });
-    } catch (error) {
-        const error_log = await prisma.error_log.create({
-            data: {
-                id_usuario: req.user["id_usuario"] || null,
-                tipo_error: "Error interno del servidor",
-                mensaje_error: JSON.stringify(error),
-                ruta_error: "food-manager/patient/home",
-                codigo_http: 500
-            }
-        });
-        return res.status(500).json({ message: 'Error interno del servidor', error: error.message });
+    if (!paciente) {
+      return res.status(404).json({ message: 'Paciente no encontrado' });
     }
+
+    const newService = parseInt(req.body.newService);
+
+    // Obtén la lista de servicios válidos
+    const servicios = await getServicio();
+    const isValidService = servicios.some(servicio => servicio.IdTipoServicio === newService);
+
+    // Si el nuevo servicio no es válido, devuelve un error 400
+    if (!isValidService) {
+      return res.status(400).json({ message: 'Servicio no válido' });
+    }
+
+    const newCodigoCama = req.body.newCodigoCama ? parseInt(req.body.newCodigoCama) : null;
+    const oldCodigoCama = paciente.CodigoCama;
+
+    // Actualizar el servicio del paciente si es válido
+    const updatedPatient = await prisma.Hospitalizado.update({
+      where: { IdHospitalizado: paciente.IdHospitalizado },
+      data: { IdTipoServicio: newService, CodigoCama: newCodigoCama }
+    });
+
+    let log;
+
+    // Si el servicio es el mismo, solo registrar cambio de cama si hay
+    if (paciente.IdTipoServicio === newService) {
+      if (oldCodigoCama !== newCodigoCama) {
+        log = await prisma.logMovimientosPaciente.create({
+          data: {
+            descripcionLog: `Cambio de Cama: ${oldCodigoCama} a ${newCodigoCama}`,
+            fechaLog: new Date(),
+            idPaciente: paciente.IdHospitalizado
+          }
+        });
+      }
+    } else {
+      // Si el servicio es diferente, registrar cambio de servicio y cama si hay
+      let descripcion = `Movimiento al Servicio: ${paciente.TipoServicio_Hospitalizado_IdTipoServicioToTipoServicio.DescTipoServicio} a ${servicios.find(servicio => servicio.IdTipoServicio === newService).DescTipoServicio}`;
+
+      if (oldCodigoCama !== newCodigoCama) {
+        descripcion += ` y Cambio de Cama: ${oldCodigoCama} a ${newCodigoCama}`;
+      }
+
+      log = await prisma.logMovimientosPaciente.create({
+        data: {
+          descripcionLog: descripcion,
+          fechaLog: new Date(),
+          idPaciente: paciente.IdHospitalizado
+        }
+      });
+    }
+
+    return res.status(200).json({
+      message: 'Movimiento realizado exitosamente',
+      log: log
+    });
+  } catch (error) {
+    const error_log = await prisma.error_log.create({
+      data: {
+        id_usuario: req.user["id_usuario"] || null,
+        tipo_error: "Error interno del servidor",
+        mensaje_error: JSON.stringify(error),
+        ruta_error: "food-manager/patient/home",
+        codigo_http: 500
+      }
+    });
+    return res.status(500).json({ message: 'Error interno del servidor', error: error.message });
+  }
+}
+
+async function movePatientUnidad(req, res) {
+  try {
+    const paciente = await prisma.Hospitalizado.findFirst({
+      where: { IdHospitalizado: parseInt(req.params.id) },
+      include: { TipoUnidad: true }
+    });
+
+    if (!paciente) {
+      return res.status(404).json({ message: 'Paciente no encontrado' });
+    }
+
+    const newUnidad = parseInt(req.body.newUnidad);
+
+    // Obtén la lista de servicios válidos
+    const unidad = await getUnidad();
+    const isValidUnidad = unidad.some(unidad => unidad.IdTipoUnidad === newUnidad);
+
+    // Si el nuevo servicio no es válido, devuelve un error 400
+    if (!isValidUnidad) {
+      return res.status(400).json({ message: 'Servicio no válido' });
+    }
+
+    // Actualizar el servicio del paciente si es válido
+    const updatedPatient = await prisma.Hospitalizado.update({
+      where: { IdHospitalizado: paciente.IdHospitalizado },
+      data: { IdTipoUnidad: newUnidad }
+    });
+
+    let log;
+
+    // Si el servicio es el mismo, solo registrar cambio de cama si hay
+    if (paciente.IdTipoUnidad === newUnidad) {
+      // Si el servicio es diferente, registrar cambio de servicio y cama si hay
+      let descripcion = `Movimiento al Servicio: ${paciente.TipoUnidad.DescTipoUnidad} a ${unidad.find(unidad => unidad.IdTipoUnidad === newUnidad).DescTipoUnidad}`;
+
+      log = await prisma.logMovimientosPaciente.create({
+        data: {
+          descripcionLog: descripcion,
+          fechaLog: new Date(),
+          idPaciente: paciente.IdHospitalizado
+        }
+      });
+    }
+
+    return res.status(200).json({
+      message: 'Movimiento realizado exitosamente',
+      log: log
+    });
+  } catch (error) {
+    const error_log = await prisma.error_log.create({
+      data: {
+        id_usuario: req.user["id_usuario"] || null,
+        tipo_error: "Error interno del servidor",
+        mensaje_error: JSON.stringify(error),
+        ruta_error: "food-manager/patient/home",
+        codigo_http: 500
+      }
+    });
+    return res.status(500).json({ message: 'Error interno del servidor', error: error.message });
+  }
 }
 
 async function changeRegimen(req, res) {
@@ -883,6 +945,42 @@ async function changeFastingDate(req, res) {
   }
 }
 
+async function removeFastingDate(req, res) {
+  try {
+    const idPaciente = parseInt(req.params.id);
+
+    const paciente = await prisma.Hospitalizado.update({
+      where: {
+        IdHospitalizado: idPaciente,
+      },
+      data: {
+        FechaFinAyuno: null, // Quitar el ayuno
+      },
+    });
+
+    if (!paciente) {
+      return res.status(404).json({ message: "Paciente no encontrado" });
+    }
+
+    // Crear un log de movimiento
+    await prisma.logMovimientosPaciente.create({
+      data: {
+        descripcionLog: "Paciente ya no está en ayuno",
+        idPaciente: paciente.IdHospitalizado,
+        fechaLog: new Date(), // Fecha actual
+      },
+    });
+
+    return res.status(200).json({
+      message: "El ayuno ha sido quitado para el paciente",
+      paciente: paciente,
+    });
+  } catch (error) {
+    return res.status(500).json({ message: "Internal server error" });
+  }
+}
+
+
 module.exports = {
   renderHome,
   getPacientes,
@@ -897,4 +995,6 @@ module.exports = {
   indicarAlta,
   changeFastingDate,
   getPaciente,
+  movePatientUnidad,
+  removeFastingDate
 };
