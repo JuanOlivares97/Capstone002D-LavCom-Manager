@@ -228,7 +228,6 @@ async function createEmployee(req, res) {
 
         return res.status(201).json(funcionario);
     } catch (error) {
-        console.log(error)
         await prisma.error_log.create({
             data: {
                 id_usuario: req.user["id_usuario"] || null,
