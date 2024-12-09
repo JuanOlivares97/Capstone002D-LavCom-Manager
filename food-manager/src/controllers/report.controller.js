@@ -137,10 +137,12 @@ async function reportHospitalizadoDiario(req, res) {
             const pacientes = await prisma.Hospitalizado.findMany({
                 where: {
                     IdTipoUnidad: unidad.IdTipoUnidad,
+                    FechaFinAyuno: {gte: new Date()},
                     OR: [
                         { FechaAlta: null },
                         { FechaAlta: { gt: new Date() } },
                     ],
+                    
                 },
                 select: {
                     CodigoCama: true,
