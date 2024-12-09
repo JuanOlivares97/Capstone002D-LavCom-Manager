@@ -47,7 +47,10 @@ async function getEstamento() {
 async function getServicio() {
     try {
         const servicios = await prisma.TipoServicio.findMany({
-            where: { Habilitado: 'S' } // Filtra solo los servicios habilitados
+            where: { Habilitado: 'S' },
+            include:{
+                TipoUnidad: true
+            } // Filtra solo los servicios habilitados
         });
         return servicios;
     } catch (error) {
