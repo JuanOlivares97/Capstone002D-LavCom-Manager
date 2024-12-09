@@ -1,13 +1,19 @@
-function filterByUnit(unit) {
-    const cards = document.querySelectorAll('#cardGridPacientes > div');
-    cards.forEach(card => {
-        if (card.getAttribute('data-unidad') === unit) {
-            card.classList.remove('hidden');
+function filterByUnitName() {
+    const filterText = document.getElementById('filterInput').value.toLowerCase();
+    const items = document.querySelectorAll('.item');
+
+    items.forEach(item => {
+        const name = item.dataset.name;
+        if (name.includes(filterText)) {
+            // Mostrar el ítem si coincide
+            item.style.display = 'block';
         } else {
-            card.classList.add('hidden');
+            // Ocultar el ítem si no coincide
+            item.style.display = 'none';
         }
     });
 }
+
 
 function removeAccents(str) {
     return str.normalize("NFD").replace(/[\u0300-\u036f]/g, ""); // Elimina tildes
