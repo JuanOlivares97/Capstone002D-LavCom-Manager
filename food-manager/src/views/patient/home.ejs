@@ -10,35 +10,41 @@
             <!-- Secciones de navegación -->
             <!-- Botón para alternar la visibilidad de las unidades -->
             <!-- Contenedor del overlay (cubrirá toda la pantalla) -->
-            <div id="overlay" class="fixed inset-0 bg-black bg-opacity-50 hidden z-40" onclick="closeSidebar()"></div>
+            <div id="overlay" class="fixed inset-0 z-40 hidden bg-black bg-opacity-50" onclick="closeSidebar()"></div>
 
             <!-- Contenedor del sidebar -->
             <div id="sidebarUnits"
-                class="fixed right-0 top-0 w-80 h-full bg-white shadow-xl transform translate-x-full transition-transform duration-300 ease-in-out z-50">
-                <div class="p-4 border-b flex justify-between items-center">
+                class="fixed top-0 right-0 z-50 h-full transition-transform duration-300 ease-in-out transform translate-x-full bg-white shadow-xl w-80">
+                <div class="flex items-center justify-between p-4 border-b">
                     <h2 class="text-lg font-bold text-gray-700">Servicios</h2>
                     <button onclick="closeSidebar()" class="text-gray-700 hover:text-red-600">
                         &times; <!-- Icono de cerrar -->
                     </button>
                 </div>
                 <!-- Contenedor de las unidades con scroll -->
+                <div class="p-4">
+                    <input type="text" id="filterInput" 
+                           class="w-full px-4 py-2 mb-4 border rounded" 
+                           placeholder="Buscar unidad..." 
+                           oninput="filterByUnitName()">
+                </div>
                 <div class="p-4 overflow-y-auto h-[calc(100%-4rem)]">
-                    <% servicios.forEach(servicio=> { %>
-                        <label class="block px-4 py-2 text-gray-700 hover:bg-indigo-500 hover:text-white rounded my-1"
-                            onclick="filterByUnit('<%= servicio.IdTipoServicio %>')">
+                    <% servicios.forEach(servicio => { %>
+                        <label class="block px-4 py-2 my-1 text-gray-700 rounded hover:bg-indigo-500 hover:text-white item"
+                               data-name="<%= servicio.DescTipoServicio.toLowerCase() %>">
                             <%= servicio.DescTipoServicio %>
                         </label>
-                        <% }) %>
+                    <% }) %>
                 </div>
             </div>
 
             <!-- Barra de búsqueda y agregar paciente -->
-            <div class="mx-4 p-6">
-                <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+            <div class="p-6 mx-4">
+                <div class="grid grid-cols-1 gap-6 lg:grid-cols-4">
                     <!-- Botón Ingresar Paciente -->
                     <div >
                         <button id="addPatient" 
-                            class="w-full p-3 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600 transition duration-300 flex items-center justify-center gap-2 shadow-md">
+                            class="flex items-center justify-center w-full gap-2 p-3 text-white transition duration-300 bg-indigo-500 rounded-lg shadow-md hover:bg-indigo-600">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
                                 class="w-5 h-5">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
@@ -54,8 +60,8 @@
                                 class="w-full px-4 py-2 border border-gray-300 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
                                 aria-label="Buscar">
                             <button type="submit"
-                                class="px-6 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600 transition duration-300">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                class="px-6 text-white transition duration-300 bg-indigo-500 rounded-lg hover:bg-indigo-600">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                                 </svg>
                             </button>
@@ -69,8 +75,8 @@
                                 class="w-full px-4 py-2 border border-indigo-300 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
                                 oninput="formatRut(this)">
                             <button onclick="searchByRut()"
-                                class="px-6 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600 transition duration-300">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                class="px-6 text-white transition duration-300 bg-indigo-500 rounded-lg hover:bg-indigo-600">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                                 </svg>
                             </button>
@@ -81,15 +87,15 @@
                 <!-- Botones de Filtro -->
                 <div class="flex justify-end gap-4 mt-6">
                     <button onclick="openSidebar()"
-                        class="px-4 py-2 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600 transition duration-300 flex items-center gap-2 shadow-md">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        class="flex items-center gap-2 px-4 py-2 text-white transition duration-300 bg-indigo-500 rounded-lg shadow-md hover:bg-indigo-600">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
                         </svg>
                         Filtrar por Servicio
                     </button>
                     <button onclick="clearFilters()"
-                        class="px-4 py-2 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600 transition duration-300 flex items-center gap-2 shadow-md">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        class="flex items-center gap-2 px-4 py-2 text-white transition duration-300 bg-indigo-500 rounded-lg shadow-md hover:bg-indigo-600">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                         </svg>
                         Limpiar filtros
@@ -98,9 +104,9 @@
             </div>
 
             <!-- KPI: Pacientes Hospitalizados -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5 p-6">
-                <div class="bg-white rounded-lg shadow-md p-6">
-                    <h2 class="text-xl font-semibold text-gray-800 mb-2">Pacientes Hospitalizados</h2>
+            <div class="grid grid-cols-1 gap-5 p-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+                <div class="p-6 bg-white rounded-lg shadow-md">
+                    <h2 class="mb-2 text-xl font-semibold text-gray-800">Pacientes Hospitalizados</h2>
                     <p class="text-3xl font-bold text-purple-600">
                         <%= pacientesHospitalizados %>
                     </p>
@@ -108,8 +114,8 @@
                 </div>
 
                 <!-- KPI: Pacientes en Ayuno -->
-                <div class="bg-white rounded-lg shadow-md p-6">
-                    <h2 class="text-xl font-semibold text-gray-800 mb-2">Pacientes en Ayuno</h2>
+                <div class="p-6 bg-white rounded-lg shadow-md">
+                    <h2 class="mb-2 text-xl font-semibold text-gray-800">Pacientes en Ayuno</h2>
                     <p class="text-3xl font-bold text-red-600">
                         <%= pacientesEnAyuno %>
                     </p>
@@ -117,8 +123,8 @@
                 </div>
 
                 <!-- KPI: Ingresos del Día -->
-                <div class="bg-white rounded-lg shadow-md p-6">
-                    <h2 class="text-xl font-semibold text-gray-800 mb-2">Ingresos del Día</h2>
+                <div class="p-6 bg-white rounded-lg shadow-md">
+                    <h2 class="mb-2 text-xl font-semibold text-gray-800">Ingresos del Día</h2>
                     <p class="text-3xl font-bold text-indigo-600">
                         <%= ingresosHoy %>
                     </p>
@@ -126,8 +132,8 @@
                 </div>
 
                 <!-- KPI: Altas del Día -->
-                <div class="bg-white rounded-lg shadow-md p-6">
-                    <h2 class="text-xl font-semibold text-gray-800 mb-2">Altas del Día</h2>
+                <div class="p-6 bg-white rounded-lg shadow-md">
+                    <h2 class="mb-2 text-xl font-semibold text-gray-800">Altas del Día</h2>
                     <p class="text-3xl font-bold text-pink-600">
                         <%= altasHoy %>
                     </p>
@@ -137,9 +143,9 @@
             <!-- Contenedor de pacientes -->
 
             <div id="cardGridPacientes"
-                class=" grid grid-cols-1 md:grid-cols-3 gap-5 p-6">
+                class="grid grid-cols-1 gap-5 p-6 md:grid-cols-3">
                 <% pacientes.forEach(paciente=> { %>
-                    <div class="z-0 relative bg-white rounded-lg shadow-lg p-5 cursor-pointer transition-transform duration-300 ease-in-out hover:transform hover:-translate-y-1"
+                    <div class="relative z-0 p-5 transition-transform duration-300 ease-in-out bg-white rounded-lg shadow-lg cursor-pointer hover:transform hover:-translate-y-1"
                         data-unidad="<%= paciente.IdTipoServicio %>"
                         onclick='openModalInfo(<%= JSON.stringify(paciente) %>); event.stopPropagation();'>
 
@@ -152,14 +158,14 @@
                                 </div>
                                 <% } else { %>
                                     <div id="fastingIcon-<%= paciente.IdHospitalizado %>"
-                                        class="absolute top-0 right-0 p-2 hidden">
+                                        class="absolute top-0 right-0 hidden p-2">
                                         <%- include('../icons/enAyuno') %>
                                     </div>
                                     <% } %>
                         </div>
 
                         <!-- Patient Details -->
-                        <h2 class="text-gray-800 font-bold text-xl mb-2">
+                        <h2 class="mb-2 text-xl font-bold text-gray-800">
                             <%= paciente.nombreCompleto %> 
                         </h2>
                         <span id="rutSpan">
@@ -192,18 +198,24 @@
                         <!-- Action Buttons -->
                         <div class="my-2">
                             <!-- Botón Dar Alta -->
-                            <button class="w-full my-1 px-4 py-2 bg-blue-200 rounded-md shadow-sm hover:bg-blue-300"
+                            <button class="w-full px-4 py-2 my-1 bg-blue-200 rounded-md shadow-sm hover:bg-blue-300"
                                 onclick="darAltaPaciente(<%= JSON.stringify(paciente) %>); event.stopPropagation();">
                                 Dar Alta
                             </button>
 
                             <% if (paciente.enAyuno===false) { %>
                                 <!-- Button to trigger the fasting date modal with SweetAlert -->
-                            <button onclick="openFastingDateModal(<%= paciente.IdHospitalizado %>); event.stopPropagation();"
-                                class="w-full my-1 px-4 py-2 bg-blue-200 rounded-md shadow-sm hover:bg-blue-300">
+                            <button onclick="indicateFasting(<%= paciente.IdHospitalizado %>); event.stopPropagation();"
+                                class="w-full px-4 py-2 my-1 bg-blue-200 rounded-md shadow-sm hover:bg-blue-300">
                                 Indicar Ayuno
                             </button>
-                            <% } %>
+                            <% } else { %>
+                            <!-- Botón para quitar ayuno -->
+    <button onclick="removeFasting(<%= paciente.IdHospitalizado %>); event.stopPropagation();"
+        class="w-full px-4 py-2 my-1 bg-red-200 rounded-md shadow-sm hover:bg-red-300">
+        Quitar Ayuno
+    </button>
+                                <% } %>
                         </div>
                     </div>
                     <% }) %>
@@ -256,13 +268,10 @@
 
                 // Function to open SweetAlert modal and send fasting date to the server
                 // Function to open SweetAlert modal with a date picker and send fasting date to the server
-async function openFastingDateModal(idPaciente) {
-    // Custom HTML content for the date input
+                async function indicateFasting(idPaciente) {
     const { value: fastingDate } = await Swal.fire({
         title: 'Seleccione la fecha de ayuno',
-        html: `
-            <input type="datetime-local" id="fastingDateInput" class="swal2-input" placeholder="aaaa-mm-dd" required>
-        `,
+        html: `<input type="datetime-local" id="fastingDateInput" class="swal2-input" placeholder="aaaa-mm-dd" required>`,
         focusConfirm: false,
         showCancelButton: true,
         confirmButtonText: 'Confirmar',
@@ -274,55 +283,59 @@ async function openFastingDateModal(idPaciente) {
                 return false;
             }
             return fastingDateValue;
-        }
+        },
     });
 
     if (fastingDate) {
         try {
-            // Send the selected date to the server
             const response = await fetch(`/food-manager/patient/change-fasting-date/${idPaciente}`, {
                 method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ fastingDate })
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ fastingDate }),
             });
 
             const data = await response.json();
             if (response.ok) {
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Fecha de ayuno actualizada',
-                    text: data.message
-                });
-
-                // Update the UI dynamically with the new date
-                const fastingDateElement = document.querySelector(`#fastingDate-${idPaciente}`);
-                const fastingIconElement = document.querySelector(`#fastingIcon-${idPaciente}`);
-                
-                if (fastingDateElement) {
-                    fastingDateElement.textContent = `Ayuno hasta: ${fastingDate}`;
-                }
-                
-                if (fastingIconElement) {
-                    fastingIconElement.classList.remove('hidden'); // Show the icon if it exists
-                }
+                Swal.fire('Éxito', data.message, 'success');
+                location.reload(); // Refrescar la página o actualizar dinámicamente el DOM
             } else {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error',
-                    text: data.message || 'No se pudo actualizar la fecha de ayuno'
-                });
+                Swal.fire('Error', data.message, 'error');
             }
         } catch (error) {
-            Swal.fire({
-                icon: 'error',
-                title: 'Error',
-                text: 'Hubo un problema al actualizar la fecha de ayuno '
-            });
+            Swal.fire('Error', 'Hubo un problema al indicar ayuno', 'error');
         }
     }
 }
 
+
+async function removeFasting(idPaciente) {
+    const confirm = await Swal.fire({
+        title: '¿Está seguro?',
+        text: 'Esto quitará el estado de ayuno del paciente',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Sí, quitar',
+        cancelButtonText: 'Cancelar',
+    });
+
+    if (confirm.isConfirmed) {
+        try {
+            const response = await fetch(`/food-manager/patient/remove-fasting/${idPaciente}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+            });
+
+            const data = await response.json();
+            if (response.ok) {
+                Swal.fire('Éxito', data.message, 'success');
+                location.reload(); // Refrescar la página o actualizar dinámicamente el DOM
+            } else {
+                Swal.fire('Error', data.message, 'error');
+            }
+        } catch (error) {
+            Swal.fire('Error', 'Hubo un problema al quitar ayuno '+error, 'error');
+        }
+    }
+}
 
             </script>
