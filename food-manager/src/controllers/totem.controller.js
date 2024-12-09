@@ -45,27 +45,24 @@ async function checkInLunch(req, res) {
             });
         }
 
-        console.log("RUT Solicitante:", rutSolicitante);
         const today = moment().format('YYYY-MM-DD');
-        console.log("Buscando colaciones para la fecha:", today);
         
         // Buscar la colación para el empleado en la fecha actual
         const colacion = await prisma.Colacion.findFirst({
             where: {
                 RutSolicitante: rutSolicitante,
-                FechaSolicitud: new Date(today) // Buscar específicamente para el día de hoy
+                FechaSolicitud: new Date(today), // Buscar específicamente para el día de hoy
             },
         });
         
-        console.log("Colación encontrada:", colacion);
-        console.log("Query params:", {
-            RutSolicitante: rutSolicitante,
-            FechaSolicitud: new Date(today)
-        });
 
         // Si no existe la colación, mostrar el menú
-        if (!colacion) {
+        if (colacion.Estado == 0) {
             return res.render('totem/home', { rutSolicitante, mostrarMenu: true, layout: false });
+        }
+
+        if (colacion.Estado == 1) {
+            return res.render('404', { layout: false, message : 'Ya Solicitaste una colacion' });
         }
 
         // Actualizar el estado de la colación a 1
