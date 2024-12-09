@@ -100,7 +100,13 @@ async function renderDashboard(req, res) {
       // Agrupar pacientes por tipo de régimen y contar cada grupo
       prisma.Hospitalizado.groupBy({
         by: ['IdTipoRegimen'], // Agrupa por el campo 'IdTipoRegimen'
-        _count: { IdTipoRegimen: true }
+        _count: { IdTipoRegimen: true },
+        where:{
+          OR: [
+            { FechaAlta: { gte: today } },
+            { FechaAlta: null },
+          ]
+        }
       })
     ]);
 
@@ -136,7 +142,6 @@ async function renderDashboard(req, res) {
       distribucionRegimen,  // Distribución de regímenes
     });
 
-    console.log(distribucionRegimen);
   } catch (error) {
     return res.status(500).json({ error: error.message });
   }
