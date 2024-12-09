@@ -96,6 +96,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const changeViaButton = document.getElementById('changeVia');
     const changeRegimenButton = document.getElementById('changeRegimen');
     const changeServicioButton = document.getElementById('changeServicio');
+    const changeUnidadButton = document.getElementById('changeUnidad');
 
     // Verificar que los botones existen antes de añadir el evento
     if (changeObservacionesGeneralesButton) {
@@ -117,6 +118,11 @@ document.addEventListener('DOMContentLoaded', () => {
     if (changeServicioButton) {
         changeServicioButton.addEventListener('click', sendNewServicio);
     }
+
+    if(changeUnidadButton){
+        changeUnidadButton.addEventListener('click', sendNewUnidad)
+    }
+    
 });
 
 async function sendNewServicio(event) {
@@ -408,6 +414,60 @@ async function sendNewRegimen(event) {
             icon: 'error',
             title: 'Error',
             text: `Error al enviar el cambio de régimen: ${error.message}`,
+            confirmButtonText: 'Ok'
+        });
+    }
+}
+
+async function sendNewUnidad(event) {
+    event.preventDefault();
+
+    // Obtener los valores del select y del ID del paciente
+    const newUnidad = document.getElementById('infoUnidad').value;
+    const idPaciente = document.getElementById('idPaciente').value;
+
+    // Convertir el valor del régimen en número y verificar que sea válido
+    const newUnidadValue = parseInt(newUnidad);
+    if (isNaN(newUnidadValue)) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'El valor seleccionado no es válido',
+            confirmButtonText: 'Ok'
+        });
+        return;
+    }
+
+    try {
+        // Hacer la petición PUT al servidor para actualizar el régimen
+        const response = await fetch(`/food-manager/patient/change-unidad/${idPaciente}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ newUnidad: newUnidadValue })
+        });
+
+        // Verificar si la respuesta del servidor fue exitosa
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Error al enviar el cambio de régimen');
+        }
+
+        // Mostrar mensaje de éxito si la solicitud fue correcta
+        Swal.fire({
+            icon: 'success',
+            title: 'Actualización exitosa',
+            text: 'La Unidad se ha actualizado correctamente',
+            confirmButtonText: 'Ok'
+        });
+
+    } catch (error) {
+        // Mostrar alerta en caso de error al enviar la solicitud y loguear el error
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: `Error al enviar el cambio de Unidad: ${error.message}`,
             confirmButtonText: 'Ok'
         });
     }
