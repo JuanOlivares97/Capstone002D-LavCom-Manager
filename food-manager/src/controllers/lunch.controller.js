@@ -1,28 +1,41 @@
 const prisma = require('../server/prisma');
-const moment = require('moment');
+const moment = require('moment-timezone');
 
-// Renderiza la página principal de colaciones
 async function renderHome(req, res) {
     try {
         const tipoUsuario = req.user.tipo_usuario; // Obtiene el tipo de usuario desde las cookies
-        const today = moment().format('YYYY-MM-DD'); // Formatea la fecha actual (YYYY-MM-DD)
+
+        // Obtener el inicio y fin del día actual en la zona horaria de Santiago
+        const startOfDay = moment().tz('America/Santiago').startOf('day').toISOString();
+        const endOfDay = moment().tz('America/Santiago').endOf('day').toISOString();
 
         // Verifica si el usuario ya registró una colación hoy
         const existingLunch = await prisma.Colacion.findFirst({
             where: {
                 RutSolicitante: req.user["rutLogueado"] + "-" + req.user["DvLogueado"], // Combina el RUT y DV del usuario
-                FechaSolicitud: new Date(today), // Compara con la fecha de hoy
+                FechaSolicitud: {
+                    gte: new Date(startOfDay), // Inicio del día
+                    lte: new Date(endOfDay),   // Fin del día
+                },
             },
         });
 
         // Si ya existe una colación, muestra un mensaje y oculta el menú
         if (existingLunch) {
-            return res.render('lunch/home', { tipoUsuario: parseInt(tipoUsuario), Message: 'Ya has registrado una colación hoy', mostrarMenu: false });
+            return res.render('lunch/home', {
+                tipoUsuario: parseInt(tipoUsuario),
+                Message: 'Ya has registrado una colación hoy',
+                mostrarMenu: false
+            });
         }
 
         // Si no existe, muestra el menú
-        return res.render('lunch/home', { tipoUsuario: parseInt(tipoUsuario), mostrarMenu: true });
+        return res.render('lunch/home', {
+            tipoUsuario: parseInt(tipoUsuario),
+            mostrarMenu: true
+        });
     } catch (error) {
+        // Registrar el error en la base de datos
         const error_log = await prisma.error_log.create({
             data: {
                 id_usuario: req.user["id_usuario"] || null,
@@ -37,6 +50,7 @@ async function renderHome(req, res) {
     }
 }
 
+
 // Registra una nueva colación
 async function registrationLunch(req, res) {
     try {
@@ -44,22 +58,24 @@ async function registrationLunch(req, res) {
 
         // Valida que el menú sea un número válido
         if (!menu || isNaN(parseInt(menu))) {
-            const error_log = await prisma.error_log.create({
+            await prisma.error_log.create({
                 data: {
                     id_usuario: req.user["id_usuario"] || null,
-                    tipo_error: "Error interno del servidor",
-                    mensaje_error: JSON.stringify(error),
+                    tipo_error: "Solicitud inválida",
+                    mensaje_error: "El menú proporcionado no es válido",
                     ruta_error: "food-manager/lunch/home",
                     codigo_http: 400
                 }
             });
-            return res.status(400).json({ message: "Menu selection is invalid" });
+            return res.status(400).json({ message: "Selección de menú no válida" });
         }
 
         const rutSolicitante = req.user["rutLogueado"] + "-" + req.user["DvLogueado"]; // Combina el RUT y DV del usuario
         const rut = req.user["rutLogueado"];
-        const dv =  req.user["DvLogueado"]
-        const today = moment().format('YYYY-MM-DD'); // Formatea la fecha actual (YYYY-MM-DD)
+        const dv = req.user["DvLogueado"];
+
+        // Obtener la fecha actual ajustada a la zona horaria de Santiago
+        const today = moment().tz('America/Santiago').startOf('day').toISOString();
 
         // Verifica si el funcionario está habilitado
         const funcionario = await prisma.Funcionario.findFirst({
@@ -70,11 +86,11 @@ async function registrationLunch(req, res) {
         });
 
         if (!funcionario || funcionario.Habilitado !== 'S') {
-            const error_log = await prisma.error_log.create({
+            await prisma.error_log.create({
                 data: {
                     id_usuario: req.user["id_usuario"] || null,
-                    tipo_error: "Error interno del servidor",
-                    mensaje_error: JSON.stringify(error),
+                    tipo_error: "Funcionario no habilitado",
+                    mensaje_error: "El funcionario no está habilitado",
                     ruta_error: "food-manager/lunch/home",
                     codigo_http: 404
                 }
@@ -86,7 +102,7 @@ async function registrationLunch(req, res) {
         const nuevaColacion = await prisma.Colacion.create({
             data: {
                 RutSolicitante: rutSolicitante, // RUT completo del solicitante
-                FechaSolicitud: new Date(today), // Fecha de solicitud
+                FechaSolicitud: new Date(today), // Fecha de solicitud en formato compatible con Prisma
                 Menu: parseInt(menu), // Menú seleccionado
                 Estado: 0, // Estado inicial: 0 - Solicitado
                 TipoUnidad: {
@@ -96,9 +112,9 @@ async function registrationLunch(req, res) {
         });
 
         // Devuelve un mensaje de éxito
-        return res.status(200).json({ message: 'Colacion ingresada exitosamente' });
+        return res.status(200).json({ message: 'Colación ingresada exitosamente' });
     } catch (error) {
-        const error_log = await prisma.error_log.create({
+        await prisma.error_log.create({
             data: {
                 id_usuario: req.user["id_usuario"] || null,
                 tipo_error: "Error interno del servidor",
@@ -116,13 +132,19 @@ async function registrationLunch(req, res) {
 // Renderiza el listado de colaciones confirmadas
 async function renderLunchList(req, res) {
     try {
-        const tipoUsuario = req.user.tipo_usuario; // Obtiene el tipo de usuario desde las cookies
-        const today = moment().format('YYYY-MM-DD'); // Formatea la fecha actual (YYYY-MM-DD)
+        const tipoUsuario = req.user.tipo_usuario;
+
+        // Obtener fecha y hora de Santiago en formato ISO-8601
+        const santiagoTime = moment().tz('America/Santiago').startOf('day').toISOString();
+        const endOfSantiagoDay = moment().tz('America/Santiago').endOf('day').toISOString();
 
         // Obtiene las colaciones confirmadas para hoy
         const lunches = await prisma.Colacion.findMany({
             where: {
-                FechaSolicitud: new Date(today),
+                FechaSolicitud: {
+                    gte: new Date(santiagoTime), // Inicio del día
+                    lte: new Date(endOfSantiagoDay), // Fin del día
+                },
                 Estado: 1, // Estado 1 - Confirmado
             },
             orderBy: {
@@ -133,6 +155,7 @@ async function renderLunchList(req, res) {
         // Renderiza la vista con la lista de colaciones
         res.render('totem/LunchList', { lunches, tipoUsuario: parseInt(tipoUsuario) });
     } catch (error) {
+        // Registrar el error en la base de datos
         const error_log = await prisma.error_log.create({
             data: {
                 id_usuario: req.user["id_usuario"] || null,
@@ -142,20 +165,26 @@ async function renderLunchList(req, res) {
                 codigo_http: 500
             }
         });
-        res.status(500).send('Error al cargar el listado de colaciones');
+        res.status(500).send('Error al cargar el listado de colaciones: ' + error.message);
     }
 }
 
-// Registra una colación como retirada
 async function registrarColacionRetirada(req, res) {
     const idColacion = req.params.id; // Obtiene el ID de la colación desde los parámetros
-    const today = moment().format('YYYY-MM-DD'); // Formatea la fecha actual (YYYY-MM-DD)
+
     try {
+        // Obtener el inicio y fin del día actual en la zona horaria de Santiago
+        const startOfDay = moment().tz('America/Santiago').startOf('day').toISOString();
+        const endOfDay = moment().tz('America/Santiago').endOf('day').toISOString();
+
         // Verifica si existe una colación con el ID y la fecha de hoy
         const existingLunch = await prisma.Colacion.findFirst({
             where: {
                 IdColacion: parseInt(idColacion),
-                FechaSolicitud: new Date(today),
+                FechaSolicitud: {
+                    gte: new Date(startOfDay), // Inicio del día
+                    lte: new Date(endOfDay),   // Fin del día
+                },
             },
         });
 
@@ -177,6 +206,7 @@ async function registrarColacionRetirada(req, res) {
         // Devuelve un mensaje de éxito
         return res.status(200).json({ message: 'Colación retirada exitosamente' });
     } catch (error) {
+        // Registrar el error en la base de datos
         const error_log = await prisma.error_log.create({
             data: {
                 id_usuario: req.user["id_usuario"] || null,
@@ -186,9 +216,10 @@ async function registrarColacionRetirada(req, res) {
                 codigo_http: 500
             }
         });
-        return res.status(500).json({ message: 'Error al retirar la colación' });
+        return res.status(500).json({ message: 'Error al retirar la colación', error });
     }
 }
+
 
 module.exports = {
     renderHome, // Renderiza la página principal de colaciones
