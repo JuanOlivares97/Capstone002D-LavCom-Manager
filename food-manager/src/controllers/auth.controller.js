@@ -141,7 +141,7 @@ async function setEmail(req, res) {
     } catch (error) {
         const error_log = await prisma.error_log.create({
             data: {
-                id_usuario: req.user["id_usuario"] || null,
+                id_usuario:  null,
                 tipo_error: "Error al actualizar el correo electrónico",
                 mensaje_error: JSON.stringify(error),
                 ruta_error: "food-manager/auth/login",
@@ -192,7 +192,7 @@ async function sendPwdEmail(req, res) {
     } catch (error) {
         const error_log = await prisma.error_log.create({
             data: {
-                id_usuario: req.user["id_usuario"] || null,
+                id_usuario: null,
                 tipo_error: "Error al enviar el correo electrónico",
                 mensaje_error: JSON.stringify(error),
                 ruta_error: "food-manager/auth/login",
@@ -250,7 +250,7 @@ async function changePwd(req, res) {
     } catch (error) {
         const error_log = await prisma.error_log.create({
             data: {
-                id_usuario: req.user["id_usuario"] || null,
+                id_usuario: null,
                 tipo_error: "Error al cambiar la contraseña",
                 mensaje_error: JSON.stringify(error),
                 ruta_error: "food-manager/auth/login",
@@ -270,7 +270,7 @@ async function logout(req, res) {
     } catch (error) {
         const error_log = await prisma.error_log.create({
             data: {
-                id_usuario: req.user["id_usuario"] || null,
+                id_usuario: null,
                 tipo_error: "Error al cerrar sesión",
                 mensaje_error: JSON.stringify(error),
                 ruta_error: "food-manager/auth/login",

@@ -172,13 +172,13 @@ model logMovimientosPaciente {
 
 /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 model error_log {
-  id_error      Int         @id @default(autoincrement())
-  id_usuario    Int
-  tipo_error    String      @db.VarChar(30)
-  mensaje_error String      @db.LongText
-  ruta_error    String      @db.VarChar(40)
+  id_error      Int          @id @default(autoincrement())
+  id_usuario    Int?
+  tipo_error    String       @db.VarChar(30)
+  mensaje_error String       @db.LongText
+  ruta_error    String       @db.VarChar(40)
   codigo_http   Int
-  Funcionario   Funcionario @relation(fields: [id_usuario], references: [IdFuncionario], onUpdate: Restrict, map: "fk_user_error")
+  Funcionario   Funcionario? @relation(fields: [id_usuario], references: [IdFuncionario], onDelete: Restrict, onUpdate: Restrict, map: "fk_user_error")
 
   @@index([id_usuario], map: "fk_user_error")
 }
