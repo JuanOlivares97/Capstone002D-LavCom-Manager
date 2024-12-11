@@ -15,6 +15,7 @@ async function checkInLunch(req, res) {
     try {
         var { rutSolicitante } = req.body;
         rutSolicitante = rutSolicitante.trim().replace(/\s+/g, '');
+
         // Verificación del formato del RUT
         if (typeof rutSolicitante !== 'string' || !rutSolicitante.includes('-')) {
             return res.render('totem/home', { errorMessage: 'El rut solicitante no es válido', mostrarMenu: false, layout: false });
@@ -45,14 +46,18 @@ async function checkInLunch(req, res) {
             });
         }
 
-        // Usar la fecha actual de Santiago en formato ISO-8601
-        const today = moment().tz('America/Santiago').format('YYYY-MM-DD');
+        // Obtener el inicio y fin del día actual en la zona horaria de Santiago
+        const startOfDay = moment().tz('America/Santiago').startOf('day').toISOString();
+        const endOfDay = moment().tz('America/Santiago').endOf('day').toISOString();
 
         // Buscar la colación para el empleado en la fecha actual
         const colacion = await prisma.Colacion.findFirst({
             where: {
                 RutSolicitante: rutSolicitante.trim(),
-                FechaSolicitud: new Date(today),
+                FechaSolicitud: {
+                    gte: new Date(startOfDay), // Inicio del día
+                    lte: new Date(endOfDay),   // Fin del día
+                },
             },
         });
 
@@ -61,8 +66,8 @@ async function checkInLunch(req, res) {
             return res.render('totem/home', { rutSolicitante, mostrarMenu: true, layout: false });
         }
 
-        if (colacion.Estado == 1) {
-            return res.render('404', { layout: false, message: 'Ya Solicitaste una colacion' });
+        if (colacion.Estado === 1) {
+            return res.render('404', { layout: false, message: 'Ya Solicitaste una colación' });
         }
 
         // Actualizar el estado de la colación a 1
@@ -81,7 +86,7 @@ async function checkInLunch(req, res) {
         return res.render('totem/ticket', { colacion: newColacion, layout: false });
 
     } catch (error) {
-        const error_log = await prisma.error_log.create({
+        await prisma.error_log.create({
             data: {
                 id_usuario: null,
                 tipo_error: "Error interno del servidor",
