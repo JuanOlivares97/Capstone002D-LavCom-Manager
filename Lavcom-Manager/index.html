@@ -4,13 +4,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hospital de Melipilla</title>
-    <link rel="stylesheet" href="/food-manager/css/tailwind.css" />
+    <script src="https://cdn.tailwindcss.com"></script>
 
-    <style>
-        .bg-hospital-waiting-room{
-            background-image: url('/img/bg-main.webp');            
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    backgroundImage: {
+                        'hospital-waiting-room': "url('/img/bg-main.webp')"
+                    }
+                }
+            }
         }
-    </style>
+    </script>
 </head>
 <body class="flex flex-col items-center justify-center min-h-screen bg-center bg-cover bg-hospital-waiting-room">
     <div class="absolute inset-0 bg-black opacity-50"></div>
