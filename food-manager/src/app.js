@@ -3,7 +3,6 @@ const app = express();
 const expressLayout = require('express-ejs-layouts');
 const path = require('path');
 const cookieParser = require('cookie-parser');
-const fs = require('fs');
 const http = require('http').createServer(app); // HTTP server para Socket.io
 const io = require('socket.io')(http, {
     path: '/food-manager/socket.io'

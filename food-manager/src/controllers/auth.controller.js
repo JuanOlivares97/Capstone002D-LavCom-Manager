@@ -102,7 +102,7 @@ async function login(req, res) {
     } catch (error) {
         const error_log = await prisma.error_log.create({
             data: {
-                id_usuario: req.user["id_usuario"] || null,
+                id_usuario: null,
                 tipo_error: "Error de autenticación",
                 mensaje_error: JSON.stringify(error),
                 ruta_error: "food-manager/auth/login",
