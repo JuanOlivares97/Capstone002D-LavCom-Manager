@@ -1,14 +1,14 @@
 <div id="modalReporteHospitalizados"
-    class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden">
-    <div class="bg-white rounded-lg shadow-lg p-6 w-full h-5/6 overflow-auto">
-        <h2 class="text-2xl font-semibold mb-4 text-center">Reporte de Pacientes Hospitalizados</h2>
+    class="fixed inset-0 flex items-center justify-center hidden bg-black bg-opacity-50">
+    <div class="w-5/6 p-6 overflow-auto bg-white rounded-lg shadow-lg h-5/6">
+        <h2 class="mb-4 text-2xl font-semibold text-center">Reporte de Pacientes Hospitalizados</h2>
         
         <!-- Filtro por Unidad -->
         <div class="mb-4">
             <label for="unidadFilter" class="block text-lg font-semibold">Filtrar por Unidad:</label>
             <input id="unidadFilter" type="text" class="w-full px-4 py-2 border rounded"
                 placeholder="Buscar Unidad..." />
-            <ul id="unidadSuggestions" class="absolute bg-white border rounded w-full hidden"></ul>
+            <ul id="unidadSuggestions" class="absolute hidden w-full bg-white border rounded"></ul>
         </div>
 
         <!-- Contenedor para los reportes -->
@@ -17,13 +17,28 @@
         </div>
 
         <!-- Botones -->
-        <div class="mt-6 flex justify-end space-x-4">
-            <button id="printPDF" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-500">Imprimir PDF</button>
-            <button id="closeModalReparto" class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-500">Cerrar</button>
+        <div class="flex justify-end mt-6 space-x-4">
+            <button id="printPDF" class="px-4 py-2 text-white bg-green-600 rounded hover:bg-green-500">Imprimir PDF</button>
+            <button id="closeModalReparto" class="px-4 py-2 text-white bg-red-600 rounded hover:bg-red-500">Cerrar</button>
         </div>
     </div>
 </div>
 
+<style> table {
+    table-layout: fixed; /* Habilita el tamaño fijo de columnas */
+    width: 100%; /* Asegura que la tabla ocupe el ancho completo */
+    border-collapse: collapse; /* Combina bordes para un diseño limpio */
+}
+th, td {
+    text-align: left; /* Alinea el texto a la izquierda */
+    border: 1px solid #ddd; /* Añade bordes para mejor visualización */
+    padding: 8px; /* Espaciado interno en las celdas */
+    width: 16.6%; /* Define ancho fijo para todas las columnas */
+}
+thead th {
+    background-color: #f3f4f6; /* Color de fondo del encabezado */
+    font-weight: bold; /* Texto en negrita */
+}</style>
 
 <script>
    document.addEventListener('DOMContentLoaded', () => {
@@ -50,71 +65,63 @@
 
     // Mostrar reportes por unidad
     function renderReportes(unidad = '') {
-        reportesContainer.innerHTML = '';
+    reportesContainer.innerHTML = '';
 
-        for (const [unidadKey, pacientes] of Object.entries(reportes)) {
-            if (unidad && unidadKey !== unidad) continue;
+    for (const [unidadKey, pacientes] of Object.entries(reportes)) {
+        if (unidad && unidadKey !== unidad) continue;
 
-            const unidadDiv = document.createElement('div');
-            unidadDiv.classList.add('mb-6');
+        const unidadDiv = document.createElement('div');
+        unidadDiv.classList.add('mb-6');
 
-            const unidadTitle = document.createElement('h3');
-            unidadTitle.classList.add('text-xl', 'font-semibold', 'mb-2');
-            unidadTitle.textContent = `Unidad: ${unidadKey}`;
-            unidadDiv.appendChild(unidadTitle);
+        const unidadTitle = document.createElement('h3');
+        unidadTitle.classList.add('text-xl', 'font-semibold', 'mb-2');
+        unidadTitle.textContent = `Unidad: ${unidadKey}`;
+        unidadDiv.appendChild(unidadTitle);
 
-            const table = document.createElement('table');
-            table.classList.add('min-w-full', 'text-left', 'text-base', 'text-black', 'whitespace-nowrap');
-            table.innerHTML = `
-                <thead class="bg-gray-200">
+        const table = document.createElement('table');
+        table.classList.add('w-full', 'border', 'border-gray-300');
+        table.innerHTML = `
+            <thead>
+                <tr>
+                    <th># Cama</th>
+                    <th>RUT Paciente</th>
+                    <th>Nombre Paciente</th>
+                    <th>Régimen</th>
+                    <th>Observaciones</th>
+                    <th>Ayuno</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${pacientes
+                    .map(
+                        (p) => `
                     <tr>
-                        <th class="px-2 py-2">Código de Cama</th>
-                        <th class="px-2 py-2">RUT Paciente</th>
-                        <th class="px-2 py-2">Nombre Paciente</th>
-                        <th class="px-2 py-2">Régimen</th>
-                        <th class="px-2 py-2">Observaciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    ${pacientes
-                        .map(
-                            (p) => `
-                        <tr class="border-b">
-                            <td class="px-2 py-2">${p.CodigoCama}</td>
-                            <td class="px-2 py-2">${p.RutPaciente}</td>
-                            <td class="px-2 py-2">${p.NombrePaciente}</td>
-                            <td class="px-2 py-2">${p.DescTipoRegimen}</td>
-                            <td class="px-2 py-2">${p.ObservacionesNutricionista}</td>
-                        </tr>`
-                        )
-                        .join('')}
-                </tbody>
-            `;
-            unidadDiv.appendChild(table);
-            reportesContainer.appendChild(unidadDiv);
-        }
+                        <td>${p.CodigoCama}</td>
+                        <td>${p.RutPaciente}</td>
+                        <td>${p.NombrePaciente}</td>
+                        <td>${p.DescTipoRegimen}</td>
+                        <td>${p.ObservacionesNutricionista}</td>
+                        <td>
+                            ${
+                                p.enAyuno
+                                    ? `<div class="flex items-center justify-center">
+                                           <%- include('../../../icons/enAyuno') %>
+                                       </div>`
+                                    : `<div class="flex items-center justify-center px-2 py-1 text-sm text-gray-500 rounded-full">
+                                           🌟 No en ayuno 🌟
+                                       </div>`
+                            }
+                        </td>
+                    </tr>`
+                    )
+                    .join('')}
+            </tbody>
+        `;
+        unidadDiv.appendChild(table);
+        reportesContainer.appendChild(unidadDiv);
     }
+}
 
-    // Filtrar reportes
-    unidadFilterInput.addEventListener('input', (e) => {
-        const query = e.target.value.toLowerCase();
-        const filteredUnidades = unidades.filter((unidad) =>
-            unidad.toLowerCase().includes(query)
-        );
-
-        unidadSuggestions.innerHTML = filteredUnidades
-            .map((unidad) => `<li class="px-4 py-2 cursor-pointer hover:bg-gray-200">${unidad}</li>`)
-            .join('');
-
-        unidadSuggestions.classList.remove('hidden');
-        unidadSuggestions.querySelectorAll('li').forEach((item) =>
-            item.addEventListener('click', () => {
-                unidadFilterInput.value = item.textContent;
-                unidadSuggestions.classList.add('hidden');
-                renderReportes(item.textContent);
-            })
-        );
-    });
 
     // Imprimir PDF
     printPDFBtn.addEventListener('click', () => {
