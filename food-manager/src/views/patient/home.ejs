@@ -31,7 +31,7 @@
                 <div class="p-4 overflow-y-auto h-[calc(100%-4rem)]">
                     <% servicios.forEach(servicio => { %>
                         <label class="block px-4 py-2 my-1 text-gray-700 rounded hover:bg-indigo-500 hover:text-white item"
-                               data-name="<%= servicio.DescTipoServicio.toLowerCase() %>">
+                               onclick="filterByUnit('<%= servicio.IdTipoServicio %>')">
                             <%= servicio.DescTipoServicio %>
                         </label>
                     <% }) %>
@@ -142,12 +142,29 @@
             </div>
             <!-- Contenedor de pacientes -->
 
+
+    <% 
+    const regimenColors = {
+    'SIN SAL': 'card-rosa',
+    'LIQUIDO': 'card-azul',
+    'SIN RESIDUO': 'card-amarillo',
+    'LIVIANO': 'card-beige',
+    'DIABETICO CON SAL': 'card-verde',
+    'DIABETICO SIN SAL': 'card-verde-oscuro',
+    'VEGETARIANO' : 'card-vegetariano',
+    'ESPECIAL': 'card-especial',
+    'CREMA DE ARROZ': 'card-crema',
+    
+    // Agrega más mapeos si es necesario
+};
+ %>
             <div id="cardGridPacientes"
                 class="grid grid-cols-1 gap-5 p-6 md:grid-cols-3">
                 <% pacientes.forEach(paciente=> { %>
-                    <div class="relative z-0 p-5 transition-transform duration-300 ease-in-out bg-white rounded-lg shadow-lg cursor-pointer hover:transform hover:-translate-y-1"
-                        data-unidad="<%= paciente.IdTipoServicio %>"
-                        onclick='openModalInfo(<%= JSON.stringify(paciente) %>); event.stopPropagation();'>
+                    <div class="relative z-0 p-5 transition-transform duration-300 ease-in-out rounded-lg shadow-lg cursor-pointer hover:transform hover:-translate-y-1 
+<%= regimenColors[paciente.TipoRegimen.DescTipoRegimen] || 'card-default' %>"
+data-unidad="<%= paciente.IdTipoServicio %>"
+onclick='openModalInfo(<%= JSON.stringify(paciente) %>); event.stopPropagation();'>
 
                         <!-- Icono de Ayuno en la esquina superior derecha -->
                         <div class="relative">
@@ -222,7 +239,15 @@
 
             </div>
 
-
+            <style>
+            .card-rosa { background-color: #f8d7da; } /* Rosa */
+.card-azul { background-color: #cce5ff; } /* Azul */
+.card-amarillo { background-color: #fff3cd; } /* Amarillo */
+.card-beige { background-color: #f5f5dc; } /* Beige */
+.card-verde { background-color: #d4edda; }
+.card-verde-oscuro { background-color: #4ec267; }  /* Verde */
+.card-default { background-color: #ffffff; } /* Blanco por defecto */
+</style>
 
             <script>
                 function openSidebar() {
