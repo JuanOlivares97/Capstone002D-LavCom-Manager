@@ -137,10 +137,9 @@ async function reportHospitalizadoDiario(req, res) {
             const pacientes = await prisma.Hospitalizado.findMany({
                 where: {
                     IdTipoUnidad: unidad.IdTipoUnidad,
-                    FechaFinAyuno: {gte: new Date()},
                     OR: [
                         { FechaAlta: null },
-                        { FechaAlta: { gt: new Date() } },
+                        { FechaAlta: { gte: new Date() } },
                     ],
                     
                 },
@@ -166,6 +165,9 @@ async function reportHospitalizadoDiario(req, res) {
                 NombrePaciente: `${paciente.NombreHospitalizado} ${paciente.ApellidoP} ${paciente.ApellidoM}`,
                 DescTipoRegimen: paciente.TipoRegimen?.DescTipoRegimen || 'No especificado',
                 ObservacionesNutricionista: paciente.ObservacionesNutricionista || '-',
+                enAyuno: paciente.FechaFinAyuno
+        ? moment(paciente.FechaFinAyuno).isAfter(startOfTodayUTC)
+        : false,
             }));
 
             // Añadir la unidad solo si tiene pacientes

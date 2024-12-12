@@ -27,6 +27,10 @@ async function renderHome(req, res) {
         TipoVia: true,
         logMovimientosPaciente: true,
       },
+      orderBy: [
+        { IdTipoServicio: 'asc' }, // Ordenar primero por tipo de servicio
+        { CodigoCama: 'asc' },     // Luego ordenar por número de cama dentro del tipo de servicio
+      ],
     });
 
     // Obtener la fecha actual en la zona horaria de Chile y definir el inicio y fin del día
