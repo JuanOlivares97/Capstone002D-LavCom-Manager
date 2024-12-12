@@ -2,8 +2,11 @@ function filterByUnitName() {
     const filterText = document.getElementById('filterInput').value.toLowerCase();
     const items = document.querySelectorAll('.item');
 
+    console.log("Texto a filtrar:", filterText);
     items.forEach(item => {
         const name = item.dataset.name;
+        console.log("Nombre del elemento:", name);
+
         if (name.includes(filterText)) {
             // Mostrar el ítem si coincide
             item.style.display = 'block';
@@ -13,6 +16,18 @@ function filterByUnitName() {
         }
     });
 }
+
+function filterByUnit(unit) {
+    const cards = document.querySelectorAll('#cardGridPacientes > div');
+    cards.forEach(card => {
+        if (card.getAttribute('data-unidad') === unit) {
+            card.classList.remove('hidden');
+        } else {
+            card.classList.add('hidden');
+        }
+    });
+}
+
 
 
 function removeAccents(str) {
