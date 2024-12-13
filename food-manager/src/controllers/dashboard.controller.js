@@ -1,5 +1,5 @@
 const prisma = require('../server/prisma');
-const moment = require('moment');
+const {parse, format} = require('@formkit/tempo')
 
 // Renderiza la página de dashboard
 async function renderDashboard(req, res) {
@@ -40,10 +40,7 @@ async function renderDashboard(req, res) {
       // Contar colaciones solicitadas hoy con estado 0 (solicitadas)
       prisma.Colacion.count({
         where: {
-          FechaSolicitud: {
-            gte: startOfDayUTC,  // Inicio del día de hoy
-            lte: endOfDayUTC     // Fin del día de hoy
-          }
+          FechaSolicitud:format(new Date(), 'YYYY-MM-DD', 'cl') 
         }
       }),
 
@@ -54,21 +51,15 @@ async function renderDashboard(req, res) {
             { Estado: 1 },
             { Estado: 2 }
           ],
-          FechaSolicitud: {
-            gte: startOfDayUTC,  // Inicio del día de hoy
-            lte: endOfDayUTC     // Fin del día de hoy
-          }
-        }
+          FechaSolicitud: format(new Date(), 'YYYY-MM-DD', 'cl') }
       }),
 
       // Contar colaciones consumidas hoy con estado 2 (almorzaron)
       prisma.Colacion.count({
         where: {
-          Estado: 2, FechaSolicitud: {
-            gte: startOfDayUTC,  // Inicio del día de hoy
-            lte: endOfDayUTC     // Fin del día de hoy
-          }
-        }
+          Estado: 2, FechaSolicitud: format(new Date(), 'YYYY-MM-DD', 'cl')
+         }
+    
       }),
 
       // Contar el total de pacientes hospitalizados
@@ -86,7 +77,7 @@ async function renderDashboard(req, res) {
       // Colaciones confirmadas y pacientes en ayuno por los últimos 7 días
       Promise.all(days.map(async (day) => ({ 
         day,
-        confirmados: await prisma.Colacion.count({ where: { Estado: 2, FechaSolicitud: { gte: new Date(day), lte: new Date(day) } } }),
+        confirmados: await prisma.Colacion.count({ where: { Estado: 2, FechaSolicitud: format(new Date(day), 'YYYY-MM-DD', 'cl') } }),
         ayuno: await prisma.Hospitalizado.count({ where: { FechaFinAyuno: { gte: new Date(day) } } })
       }))),
 

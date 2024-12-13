@@ -1,6 +1,5 @@
 const prisma = require('../server/prisma');
-const tenpo = require("@formkit/tempo");
-const moment = require('moment-timezone'); // Asegúrate de usar moment-timezone
+const { parse, format } = require('@formkit/tempo')
 
 function renderTotem(req, res) {
     res.render('totem/home', {
@@ -46,18 +45,14 @@ async function checkInLunch(req, res) {
             });
         }
 
-        // Obtener el inicio y fin del día actual en la zona horaria de Santiago
-        const startOfDay = moment().tz('America/Santiago').startOf('day').toISOString();
-        const endOfDay = moment().tz('America/Santiago').endOf('day').toISOString();
+        // Obtener el inicio y fin del día actual en la zona horaria de Santiago usando Tempo.js
+        const currentDate = format(new Date(), 'YYYY-MM-DD', 'cl'); // Fecha actual en formato YYYY-MM-DD
 
         // Buscar la colación para el empleado en la fecha actual
         const colacion = await prisma.Colacion.findFirst({
             where: {
                 RutSolicitante: rutSolicitante.trim(),
-                FechaSolicitud: {
-                    gte: new Date(startOfDay), // Inicio del día
-                    lte: new Date(endOfDay),   // Fin del día
-                },
+                FechaSolicitud: currentDate,
             },
         });
 
@@ -95,25 +90,22 @@ async function checkInLunch(req, res) {
                 codigo_http: 500
             }
         });
-        return res.status(500).json({ message: 'Error al procesar el check-in' + error });
+        return res.status(500).json({ message: 'Error al procesar el check-in: ' + error });
     }
 }
+
 
 async function registerLunchAtTotem(req, res) {
     try {
         const { rutSolicitante, menu } = req.body;
 
         // Inicio y fin del día en la zona horaria de Santiago
-        const startOfDay = moment().tz('America/Santiago').startOf('day').toISOString();
-        const endOfDay = moment().tz('America/Santiago').endOf('day').toISOString();
+        const currentDate = format(new Date(), 'YYYY-MM-DD', 'cl');
 
         let colacion = await prisma.Colacion.findFirst({
             where: {
                 RutSolicitante: rutSolicitante,
-                FechaSolicitud: {
-                    gte: new Date(startOfDay),  // Inicio del día de hoy
-                    lte: new Date(endOfDay)     // Fin del día de hoy
-                }
+                FechaSolicitud: currentDate
             },
         });
 
@@ -134,7 +126,7 @@ async function registerLunchAtTotem(req, res) {
         colacion = await prisma.Colacion.create({
             data: {
                 RutSolicitante: rutSolicitante,
-                FechaSolicitud: new Date(moment().tz('America/Santiago').toISOString()),
+                FechaSolicitud: currentDate,
                 Menu: parseInt(menu),
                 Estado: 1, // 0 - Solicitado, 1 - Confirmado, 2 - Retirado
                 TipoUnidad: {
@@ -160,6 +152,7 @@ async function registerLunchAtTotem(req, res) {
         res.status(500).json({ message: 'Error al registrar la colación en el tótem' + error });
     }
 }
+
 
 module.exports = {
     renderTotem,

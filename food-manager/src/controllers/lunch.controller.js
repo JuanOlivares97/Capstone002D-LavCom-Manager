@@ -1,22 +1,16 @@
 const prisma = require('../server/prisma');
-const moment = require('moment-timezone');
+const { parse, format } = require('@formkit/tempo')
 
 async function renderHome(req, res) {
     try {
         const tipoUsuario = req.user.tipo_usuario; // Obtiene el tipo de usuario desde las cookies
 
-        // Obtener el inicio y fin del día actual en la zona horaria de Santiago
-        const startOfDay = moment().tz('America/Santiago').startOf('day').toISOString();
-        const endOfDay = moment().tz('America/Santiago').endOf('day').toISOString();
-
+        const currentDate = format(new Date(), 'YYYY-MM-DD', 'cl');
         // Verifica si el usuario ya registró una colación hoy
         const existingLunch = await prisma.Colacion.findFirst({
             where: {
                 RutSolicitante: req.user["rutLogueado"] + "-" + req.user["DvLogueado"], // Combina el RUT y DV del usuario
-                FechaSolicitud: {
-                    gte: new Date(startOfDay), // Inicio del día
-                    lte: new Date(endOfDay),   // Fin del día
-                },
+                FechaSolicitud: currentDate,
             },
         });
 
@@ -75,7 +69,7 @@ async function registrationLunch(req, res) {
         const dv = req.user["DvLogueado"];
 
         // Obtener la fecha actual ajustada a la zona horaria de Santiago
-        const today = moment().tz('America/Santiago').startOf('day').toISOString();
+        const currentDate = format(new Date(), 'YYYY-MM-DD', 'cl');
 
         // Verifica si el funcionario está habilitado
         const funcionario = await prisma.Funcionario.findFirst({
@@ -102,7 +96,7 @@ async function registrationLunch(req, res) {
         const nuevaColacion = await prisma.Colacion.create({
             data: {
                 RutSolicitante: rutSolicitante, // RUT completo del solicitante
-                FechaSolicitud: new Date(today), // Fecha de solicitud en formato compatible con Prisma
+                FechaSolicitud: currentDate, // Fecha de solicitud en formato compatible con Prisma
                 Menu: parseInt(menu), // Menú seleccionado
                 Estado: 0, // Estado inicial: 0 - Solicitado
                 TipoUnidad: {
@@ -134,21 +128,15 @@ async function renderLunchList(req, res) {
     try {
         const tipoUsuario = req.user.tipo_usuario;
 
-        // Obtener fecha y hora de Santiago en formato ISO-8601
-        const santiagoTime = moment().tz('America/Santiago').startOf('day').toISOString();
-        const endOfSantiagoDay = moment().tz('America/Santiago').endOf('day').toISOString();
-
+        const currentDate = format(new Date(), 'YYYY-MM-DD', 'cl');
         // Obtiene las colaciones confirmadas para hoy
         const lunches = await prisma.Colacion.findMany({
             where: {
-                FechaSolicitud: {
-                    gte: new Date(santiagoTime), // Inicio del día
-                    lte: new Date(endOfSantiagoDay), // Fin del día
-                },
+                FechaSolicitud: currentDate,
                 Estado: 1, // Estado 1 - Confirmado
             },
             orderBy: {
-                FechaSolicitud: 'asc', // Ordena por fecha ascendente
+                IdColacion: 'asc', // Ordena por fecha ascendente
             },
         });
 
@@ -173,18 +161,12 @@ async function registrarColacionRetirada(req, res) {
     const idColacion = req.params.id; // Obtiene el ID de la colación desde los parámetros
 
     try {
-        // Obtener el inicio y fin del día actual en la zona horaria de Santiago
-        const startOfDay = moment().tz('America/Santiago').startOf('day').toISOString();
-        const endOfDay = moment().tz('America/Santiago').endOf('day').toISOString();
-
+        const currentDate = format(new Date(), 'YYYY-MM-DD', 'cl');
         // Verifica si existe una colación con el ID y la fecha de hoy
         const existingLunch = await prisma.Colacion.findFirst({
             where: {
                 IdColacion: parseInt(idColacion),
-                FechaSolicitud: {
-                    gte: new Date(startOfDay), // Inicio del día
-                    lte: new Date(endOfDay),   // Fin del día
-                },
+                FechaSolicitud: currentDate,
             },
         });
 
