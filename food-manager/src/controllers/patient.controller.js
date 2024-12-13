@@ -172,6 +172,57 @@ async function getPacientes(req, res) {
   }
 }
 
+async function editPaciente(req, res) {
+  try {
+      const { id, nombre, apellidoP, apellidoM, telefono, correo, direccion } = req.body;
+
+      // Validar que los datos requeridos estén presentes
+      if (!id || !nombre || !apellidoP || !apellidoM || !direccion) {
+          return res.status(400).json({ message: 'Faltan datos obligatorios para editar el paciente.' });
+      }
+
+      // Buscar el paciente por ID
+      const paciente = await prisma.Hospitalizado.findUnique({
+          where: {
+              IdHospitalizado: parseInt(id)
+          }
+      });
+
+      if (!paciente) {
+          return res.status(404).json({ message: 'Paciente no encontrado.' });
+      }
+
+      // Actualizar solo los datos personales permitidos
+      const updatedPaciente = await prisma.Hospitalizado.update({
+          where: {
+              IdHospitalizado: parseInt(id)
+          },
+          data: {
+              NombreHospitalizado: nombre,
+              ApellidoP: apellidoP,
+              ApellidoM: apellidoM,
+              Telefono: telefono ? parseInt(telefono) : null,
+              Correo: correo || null,
+              Direccion: direccion
+          }
+      });
+
+      return res.status(200).json({ message: 'Paciente actualizado exitosamente.', paciente: updatedPaciente });
+  } catch (error) {
+      await prisma.error_log.create({
+          data: {
+              id_usuario: null,
+              tipo_error: "Error interno del servidor",
+              mensaje_error: JSON.stringify(error),
+              ruta_error: "hospitalizado/editPaciente",
+              codigo_http: 500
+          }
+      });
+      return res.status(500).json({ message: 'Error al editar el paciente: ' + error });
+  }
+}
+
+
 async function createPaciente(req, res) {
   try {
     // Verificar si `Rut` está presente en el cuerpo de la solicitud
@@ -1000,5 +1051,6 @@ module.exports = {
   changeFastingDate,
   getPaciente,
   movePatientUnidad,
-  removeFastingDate
+  removeFastingDate,
+  editPaciente
 };
