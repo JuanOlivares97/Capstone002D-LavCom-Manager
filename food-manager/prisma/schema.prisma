@@ -10,7 +10,7 @@ datasource db {
 model Colacion {
   IdColacion     Int        @id @default(autoincrement())
   RutSolicitante String     @db.VarChar(255)
-  FechaSolicitud DateTime   @db.DateTime(0)
+  FechaSolicitud String     @db.VarChar(255)
   Estado         Int        @default(0)
   Menu           Int
   IdTipoUnidad   Int
