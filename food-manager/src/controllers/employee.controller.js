@@ -112,27 +112,35 @@ async function getFuncionarios(req, res) {
 }
 
 // Crea un nuevo empleado
-// Generar un username único
-async function generateUniqueUsername(nombre_usuario, apellido_paterno, dv_usuario) {
-    let baseUsername = `${nombre_usuario.charAt(0).toLowerCase()}.${apellido_paterno.toLowerCase()}.${dv_usuario}`;
-    let username = baseUsername;
-    let suffix = 1;
 
-    // Verifica si el username ya existe en la base de datos
-    while (await prisma.Funcionario.findUnique({ where: { username } })) {
-        username = `${baseUsername}${suffix}`; // Añade un sufijo numérico
-        suffix++;
-    }
-
-    return username;
-}
 
 async function createEmployee(req, res) {
     try {
+        const requiredFields = [
+            "nombre_usuario",
+            "apellido_paterno",
+            "RutCompleto",
+            "tipoEstamento",
+            "tipoServicio",
+            "tipoUnidad",
+            "tipoContrato",
+            "tipoFuncionario"
+        ];
+
+        // Validar campos obligatorios
+        for (const field of requiredFields) {
+            if (!req.body[field]) {
+                await logError(req, "Validación de campos", `Falta el campo: ${field}`);
+                return res.status(400).json({ message: `El campo ${field} es obligatorio` });
+            }
+        }
+
         const {
             nombre_usuario,
             apellido_paterno,
             apellido_materno,
+            FechaInicioContrato,
+            FechaTerminoContrato,
             RutCompleto,
             tipoEstamento,
             tipoServicio,
@@ -141,38 +149,19 @@ async function createEmployee(req, res) {
             tipoFuncionario,
         } = req.body;
 
-        // Validar campos obligatorios
-        if (!nombre_usuario || !apellido_paterno || !RutCompleto || !tipoEstamento || !tipoServicio || !tipoUnidad || !tipoContrato || !tipoFuncionario) {
-            await prisma.error_log.create({
-                data: {
-                    id_usuario: req.user["id_usuario"] || null,
-                    tipo_error: "Validación de campos",
-                    mensaje_error: "Faltan campos requeridos",
-                    ruta_error: "food-manager/employee/home",
-                    codigo_http: 400,
-                },
-            });
-            return res.status(400).json({ message: "Todos los campos son requeridos" });
-        }
-
         // Validar formato del RUT
         if (!RutCompleto.includes("-")) {
-            
-            await prisma.error_log.create({
-                data: {
-                    id_usuario: req.user["id_usuario"] || null,
-                    tipo_error: "Validación de formato",
-                    mensaje_error: "El RUT no tiene el formato correcto",
-                    ruta_error: "food-manager/employee/home",
-                    codigo_http: 400,
-                },
-            });
+            await logError(req, "Validación de formato", "El RUT no tiene el formato correcto");
             return res.status(400).json({
                 message: "El RUT debe estar en el formato correcto (12345678-9).",
             });
         }
 
-        const [rut_usuario, dv_usuario] = RutCompleto.split("-"); // Separa el RUT del DV
+        const [rut_usuario, dv_usuario] = RutCompleto.split("-");
+        if (!rut_usuario || !dv_usuario) {
+            await logError(req, "Validación de formato", "El RUT o DV es inválido");
+            return res.status(400).json({ message: "El RUT o DV es inválido." });
+        }
 
         // Busca si el empleado ya existe
         const existingEmployee = await prisma.Funcionario.findUnique({
@@ -215,7 +204,8 @@ async function createEmployee(req, res) {
                 apellido_materno: apellido_materno?.toUpperCase() || '',
                 RutFuncionario: rut_usuario,
                 DvFuncionario: dv_usuario,
-                username:username,
+                FechaInicioContrato: new Date(FechaInicioContrato.replace(/-/g, '/')),
+                username: username,
                 contrasena: password,
                 Habilitado: "S",
                 TipoEstamento: { connect: { IdTipoEstamento: parseInt(tipoEstamento) } },
@@ -228,18 +218,24 @@ async function createEmployee(req, res) {
 
         return res.status(201).json(funcionario);
     } catch (error) {
-        await prisma.error_log.create({
+        await logError(req, "Error interno del servidor", error.message);
+        return res.status(500).json({ message: "Internal server error: " + error.message });
+    }
+}
+
+async function logError(req, tipo_error, mensaje_error) {
+    try {
+        return await prisma.error_log.create({
             data: {
-                id_usuario: req.user["id_usuario"] || null,
-                tipo_error: "Error interno del servidor",
-                mensaje_error: JSON.stringify(error),
-                ruta_error: "food-manager/employee/home",
-                codigo_http: 500,
+                id_usuario: req.user?.id_usuario || null,
+                tipo_error,
+                mensaje_error,
+                ruta_error: req.originalUrl || "Ruta desconocida",
+                codigo_http: 400,
             },
         });
-        return res
-            .status(500)
-            .json({ message: "Internal server error" });
+    } catch (logError) {
+        console.error("Error al registrar log:", logError);
     }
 }
 
@@ -248,14 +244,14 @@ async function generateUniqueUsername(nombre_usuario, apellido_paterno, dv_usuar
     let username = baseUsername;
     let suffix = 1;
 
-    // Verifica si el username ya existe en la base de datos
-    while (await prisma.Funcionario.findUnique({ where: { username } })) {
-        username = `${baseUsername}${suffix}`; // Añade un sufijo numérico
+    while (await prisma.Funcionario.findFirst({ where: { username } })) {
+        username = `${baseUsername}${suffix}`;
         suffix++;
     }
 
     return username;
 }
+
 
 // Actualiza los datos de un empleado existente
 async function updateEmployee(req, res) {

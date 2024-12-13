@@ -5,7 +5,7 @@ const { loginRequired, rolesAllowed } = require('../server/authentication');
 const router = Router();
 
 router.get('/home', lunchController.renderHome)
-router.get('/list', rolesAllowed([7]), lunchController.renderLunchList);
+router.get('/list', rolesAllowed([2,7]), lunchController.renderLunchList);
     
 router.post('/register-lunch', lunchController.registrationLunch);
 
