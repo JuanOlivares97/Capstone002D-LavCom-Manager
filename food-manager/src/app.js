@@ -47,7 +47,7 @@ app.use('/auth', require('./routes/auth.routes'));
 app.use('/dashboard', loginRequired, rolesAllowed([1, 2, 3]), require('./routes/dashboard.routes'));
 app.use('/report', loginRequired, rolesAllowed([1, 2, 3]), require('./routes/report.routes'));
 app.use('/employee', loginRequired, rolesAllowed([1, 2, 5]), require('./routes/employee.routes'));
-app.use('/lunch', loginRequired, rolesAllowed([2, 7]), require('./routes/lunch.routes'));
+app.use('/lunch', loginRequired, require('./routes/lunch.routes'));
 app.use('/maintainer', loginRequired, rolesAllowed([1, 2]), require('./routes/maintainer.routes'));
 app.use('/patient', loginRequired, rolesAllowed([1, 2, 3, 4]), require('./routes/patient.routes'));
 

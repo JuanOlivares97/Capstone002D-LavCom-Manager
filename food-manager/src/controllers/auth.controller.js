@@ -109,7 +109,7 @@ async function login(req, res) {
                 codigo_http: 500
             }
         });
-        return res.status(500).json({ message: "Internal server error", success: false }); // Manejo de errores
+        return res.status(500).json({ message: "Internal server error", success: false, tipoUser: parseInt(user.TipoFuncionario) }); // Manejo de errores
     }
 }
 
