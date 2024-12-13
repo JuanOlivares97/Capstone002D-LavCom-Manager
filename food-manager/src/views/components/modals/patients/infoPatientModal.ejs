@@ -207,6 +207,12 @@
 
         <!-- Botones -->
         <div class="flex justify-center gap-4">
+            <% if (tipoUsuario === 2 || tipoUsuario === 1) { %>
+                <div  id="EditButton" class="flex justify-end mt-6">
+                    <button
+                        class="px-4 py-2 text-gray-800 bg-gray-200 rounded-md shadow-sm hover:bg-gray-300">Editar</button>
+                </div>
+            <% } %>
             <div class="flex justify-end mt-6">
                 <button onclick="closeModalInfo()"
                     class="px-4 py-2 text-gray-800 bg-gray-200 rounded-md shadow-sm hover:bg-gray-300">Cerrar</button>
@@ -215,7 +221,10 @@
                 <button onclick="toggleLogs()"
                     class="px-4 py-2 text-gray-800 bg-red-200 rounded-md shadow-sm hover:bg-gray-300">Ver Logs</button>
             </div>
-            
         </div>
+
     </div>
 </div>
+
+
+<script src="/food-manager/js/patient/editPatient.js"></script>
