@@ -1,0 +1,34 @@
+<div id="reportes_diario_modal_usigcom" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden opacity-0 transition-opacity duration-300">  
+    <div class="bg-white rounded-lg shadow-lg p-8 w-5/6 transform scale-95 transition-transform duration-300">
+        <div class="grid grid-cols-2">
+            <div class="text-center">
+                <h1 class="text-2xl text-center">Seleccione fecha</h1>
+                <input type="date" name="fecha" id="fecha_input_usigcom" class="w-1/2 p-2 border border-gray-300 rounded mt-2 text-center">
+            </div>
+            <div class="flex flex-col items-center">
+                <h1 class="text-2xl text-center">Seleccione unidad sigcom</h1>
+                <select name="usigcom" id="rep_usigcom_d" class="w-1/2 p-2 border rounded">
+                    <option value="0" selected disabled>Seleccionar unidad sigcom</option>
+                    <% unidades.forEach(u => { %>
+                        <option value="<%= u.id_unidad_sigcom %>"><%= u.unidad_sigcom %></option>
+                    <% }) %>
+                </select>
+            </div>
+        </div>
+        <h1 class="text-2xl text-center">Ropa limpia entregada a unidades sigcom</h1>
+        <button class="w-full mt-2 bg-green-500 text-white p-2 rounded hover:bg-green-400 report-daily-usigcom" data-tipo="1">Generar Excel</button>
+        <hr>
+        <h1 class="text-2xl text-center">Ropa sucia recibida desde unidades sigcom</h1>
+        <button class="w-full mt-2 bg-green-500 text-white p-2 rounded hover:bg-green-400 report-daily-usigcom" data-tipo="2">Generar Excel</button>
+        <hr>
+        <h1 class="text-2xl text-center">Ropa sucia entregada a lavanderia externa</h1>
+        <button class="w-full mt-2 bg-green-500 text-white p-2 rounded hover:bg-green-400 report-daily-usigcom" data-tipo="3">Generar Excel</button>
+        <hr>
+        <h1 class="text-2xl text-center">Ropa limpia recibida desde lavanderia externa</h1>
+        <button class="w-full mt-2 bg-green-500 text-white p-2 rounded hover:bg-green-400 report-daily-usigcom" data-tipo="4">Generar Excel</button>
+        <hr>
+        <h1 class="text-2xl text-center">Ropa perdida y dada de baja</h1>
+        <button class="w-full mt-2 bg-green-500 text-white p-2 rounded hover:bg-green-400 report-daily-bp-usigcom">Generar Excel</button>
+        <button id="closeModalReportesDiarioUnidad" class="w-full mt-2 bg-red-500 text-white p-2 rounded hover:bg-red-400">Cerrar</button>
+    </div>
+</div>
