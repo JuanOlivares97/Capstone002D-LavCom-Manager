@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hospital de Melipilla</title>
     <script src="https://cdn.tailwindcss.com"></script>
+
     <script>
         tailwind.config = {
             theme: {
@@ -17,25 +18,25 @@
         }
     </script>
 </head>
-<body class="min-h-screen flex flex-col items-center justify-center bg-hospital-waiting-room bg-cover bg-center">
+<body class="flex flex-col items-center justify-center min-h-screen bg-center bg-cover bg-hospital-waiting-room">
     <div class="absolute inset-0 bg-black opacity-50"></div>
-    <h1 class="text-4xl font-bold text-white mb-8 z-10">Hospital de Melipilla</h1>
-    <div class="flex flex-col md:flex-row gap-6 z-10">
-        <a href="/food-manager" class="w-72 h-40 bg-white bg-opacity-90 hover:bg-opacity-100 transition-all rounded-lg shadow-lg overflow-hidden">
+    <h1 class="z-10 mb-8 text-4xl font-bold text-white">Hospital de Melipilla</h1>
+    <div class="z-10 flex flex-col gap-6 md:flex-row">
+        <a href="/food-manager" class="h-40 overflow-hidden transition-all bg-white rounded-lg shadow-lg w-72 bg-opacity-90 hover:bg-opacity-100">
             <div class="flex flex-col items-center justify-center h-full p-4">
                 <svg xmlns="http://www.w3.org/2000/svg" class="w-12 h-12 mb-2 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h18v18H3zM12 6v12m-6-6h12"/>
                 </svg>
-                <h2 class="text-xl font-semibold text-center">Food-Manager</h2>
+                <h2 class="text-xl font-semibold text-center">SISTEMA DE CONTROL DE ALIMENTACIÓN</h2>
                 <p class="text-sm text-center text-gray-600">Registro de colaciones para funcionarios</p>
             </div>
         </a>
-        <a href="/laundry-manager" class="w-72 h-40 bg-white bg-opacity-90 hover:bg-opacity-100 transition-all rounded-lg shadow-lg overflow-hidden">
+        <a href="/laundry-manager" class="h-40 overflow-hidden transition-all bg-white rounded-lg shadow-lg w-72 bg-opacity-90 hover:bg-opacity-100">
             <div class="flex flex-col items-center justify-center h-full p-4">
                 <svg xmlns="http://www.w3.org/2000/svg" class="w-12 h-12 mb-2 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v18m0-9H3m18 0h-9"/>
                 </svg>
-                <h2 class="text-xl font-semibold text-center">Laundry-Manager</h2>
+                <h2 class="text-xl font-semibold text-center">SISTEMA DE CONTROL DE LAVANDERÍA</h2>
                 <p class="text-sm text-center text-gray-600">Gestión de ingreso y egreso de ropa</p>
             </div>
         </a>

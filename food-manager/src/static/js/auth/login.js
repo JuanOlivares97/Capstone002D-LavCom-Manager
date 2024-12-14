@@ -2,14 +2,14 @@ const form = document.getElementById("login-form");
 form.addEventListener("submit", async (e) => {
     e.preventDefault();
 
-    const rutCompleto = form.querySelector("input[name='RutCompleto']").value;
+    const username = form.querySelector("input[name='username']").value;
     const pwd = form.querySelector("input[name='pwd']").value;
     const response = await fetch("/food-manager/auth/login", {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
         },
-        body: JSON.stringify({ rutCompleto, pwd })
+        body: JSON.stringify({ username, pwd })
     });
 
     const data = await response.json();
@@ -74,7 +74,7 @@ form.addEventListener("submit", async (e) => {
         position: 'top-end',
         showConfirmButton: false, // No mostrar botón de confirmación
         willClose: () => {
-            window.location.href = "/food-manager/dashboard/home"; // Redirigir cuando la alerta se cierre
+            window.location.href = "/food-manager/help/home"; // Redirigir cuando la alerta se cierre
         }
     });
 });

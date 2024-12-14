@@ -96,7 +96,7 @@
 
     // Datos para el gráfico de dona de distribución de tipos de régimen (con datos reales)
     const dataDistribucionRegimen = {
-        labels: <%- JSON.stringify(distribucionRegimen.map(item => 'Régimen ' + item.IdTipoRegimen)) %>,
+        labels: <%- JSON.stringify(distribucionRegimen.map(item => 'Régimen ' + item.TipoRegimen.DescTipoRegimen)) %>,
         datasets: [
             {
                 data: <%- JSON.stringify(distribucionRegimen.map(item => item._count.IdTipoRegimen)) %>,

@@ -23,7 +23,15 @@ async function loginRequired(req, res, next) {
             return res.redirect("/food-manager/auth/login");
         }
 
-        req.user = user; // Añadir el usuario al objeto req
+        req.user = {
+            id_usuario: user.IdFuncionario,
+            nombre: user.NombreFuncionario,
+            tipo_usuario: user.IdTipoFuncionario,
+            email: user.correo,
+            rutLogueado: user.RutFuncionario,
+            DvLogueado: user.DvFuncionario,
+            
+        }; // Añadir el usuario al objeto req
         next();
     } catch (error) {
         console.error("Error during authentication:", error);
@@ -31,6 +39,24 @@ async function loginRequired(req, res, next) {
     }
 }
 
+// Función para verificar el rol del usuario
+function rolesAllowed(roles) {
+    return (req, res, next) => {
+        try {
+            const role = req.user.tipo_usuario;
+            
+            if (!roles.includes(role)) {
+                return res.status(403).render("404", {layout: false, message: "No tienes suficientes permisos para acceder a esta ruta"});
+            }
+
+            next();
+        } catch (error) {
+            return res.status(500).json({ message: "Internal server error" });
+        }
+    }
+}
+
 module.exports = {
-    loginRequired
+    loginRequired,
+    rolesAllowed
 }

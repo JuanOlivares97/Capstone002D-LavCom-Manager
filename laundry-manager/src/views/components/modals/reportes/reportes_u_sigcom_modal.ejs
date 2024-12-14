@@ -1,0 +1,14 @@
+<div id="reportes_fecha_modal_usigcom" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden opacity-0 transition-opacity duration-300">  
+    <div class="bg-white rounded-lg shadow-lg p-8 w-5/6 transform scale-95 transition-transform duration-300">
+        <%- include('../../mes_anio_usigcom') %>
+        <h1 class="text-2xl text-center">Ropa limpia entregada</h1>
+        <button class="w-full mt-2 bg-green-500 text-white p-2 rounded hover:bg-green-400 report-date-usigcom" data-tipo="1">Generar Excel</button>
+        <hr>
+        <h1 class="text-2xl text-center">Ropa sucia recibida</h1>
+        <button class="w-full mt-2 bg-green-500 text-white p-2 rounded hover:bg-green-400 report-date-usigcom" data-tipo="2">Generar Excel</button>
+        <hr>
+        <h1 class="text-2xl text-center">Ropa perdida y dada de baja</h1>
+        <button class="w-full mt-2 bg-green-500 text-white p-2 rounded hover:bg-green-400 report-date-bp-usigcom">Generar Excel</button>
+        <button id="closeModalReportesFechaUsigcom" class="w-full mt-2 bg-red-500 text-white p-2 rounded hover:bg-red-400">Cerrar</button>
+    </div>
+</div>

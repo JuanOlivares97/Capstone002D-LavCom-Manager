@@ -1,129 +1,211 @@
 const prisma = require('../server/prisma');
-const moment = require('moment');
+const { parse, format } = require('@formkit/tempo')
 
 async function renderHome(req, res) {
     try {
-        const tipoUsuario = req.cookies['tipo_usuario'];
-        const today = moment().format('YYYY-MM-DD'); // Format today's date
+        const tipoUsuario = req.user.tipo_usuario; // Obtiene el tipo de usuario desde las cookies
 
+        const currentDate = format(new Date(), 'YYYY-MM-DD', 'cl');
+        // Verifica si el usuario ya registró una colación hoy
         const existingLunch = await prisma.Colacion.findFirst({
             where: {
-                RutSolicitante: req.cookies["rutLogueado"] + "-" + req.cookies["dvLogueado"],
-                FechaSolicitud: new Date(today) // Use formatted date
+                RutSolicitante: req.user["rutLogueado"] + "-" + req.user["DvLogueado"], // Combina el RUT y DV del usuario
+                FechaSolicitud: currentDate,
             },
         });
 
+        // Si ya existe una colación, muestra un mensaje y oculta el menú
         if (existingLunch) {
-            return res.render('lunch/home', { tipoUsuario: parseInt(tipoUsuario), Message: 'Ya has registrado una colación hoy', mostrarMenu: false });
+            return res.render('lunch/home', {
+                tipoUsuario: parseInt(tipoUsuario),
+                Message: 'Ya has registrado una colación hoy',
+                mostrarMenu: false
+            });
         }
-        return res.render('lunch/home', { tipoUsuario: parseInt(tipoUsuario), mostrarMenu: true });
+
+        // Si no existe, muestra el menú
+        return res.render('lunch/home', {
+            tipoUsuario: parseInt(tipoUsuario),
+            mostrarMenu: true
+        });
     } catch (error) {
+        // Registrar el error en la base de datos
+        const error_log = await prisma.error_log.create({
+            data: {
+                id_usuario: req.user["id_usuario"] || null,
+                tipo_error: "Error interno del servidor",
+                mensaje_error: JSON.stringify(error),
+                ruta_error: "food-manager/lunch/home",
+                codigo_http: 500
+            }
+        });
+        // Manejo de errores
         return res.status(500).json({ message: "Internal server error" });
     }
 }
 
+
+// Registra una nueva colación
 async function registrationLunch(req, res) {
     try {
-        const { menu } = req.body;
+        const { menu } = req.body; // Obtiene el menú seleccionado desde el cuerpo de la solicitud
 
-        // Validate menu is a valid number
+        // Valida que el menú sea un número válido
         if (!menu || isNaN(parseInt(menu))) {
-            return res.status(400).json({ message: "Menu selection is invalid" });
+            await prisma.error_log.create({
+                data: {
+                    id_usuario: req.user["id_usuario"] || null,
+                    tipo_error: "Solicitud inválida",
+                    mensaje_error: "El menú proporcionado no es válido",
+                    ruta_error: "food-manager/lunch/home",
+                    codigo_http: 400
+                }
+            });
+            return res.status(400).json({ message: "Selección de menú no válida" });
         }
 
-        const rutSolicitante = req.cookies["rutLogueado"] + "-" + req.cookies["dvLogueado"];
-        const rut = req.cookies["rutLogueado"];
-        const dv = req.cookies["dvLogueado"];
-        
-        const today = moment().format('YYYY-MM-DD');
+        const rutSolicitante = req.user["rutLogueado"] + "-" + req.user["DvLogueado"]; // Combina el RUT y DV del usuario
+        const rut = req.user["rutLogueado"];
+        const dv = req.user["DvLogueado"];
 
+        // Obtener la fecha actual ajustada a la zona horaria de Santiago
+        const currentDate = format(new Date(), 'YYYY-MM-DD', 'cl');
 
+        // Verifica si el funcionario está habilitado
         const funcionario = await prisma.Funcionario.findFirst({
             where: {
                 RutFuncionario: rut,
-                DvFuncionario: dv
-            }
-        });
-        
-        if (!funcionario || funcionario.Habilitado !== 'S') {
-            return res.status(404).json({ message: "Funcionario no habilitado" });
-        }
-        
-        // Register the lunch
-        const nuevaColacion = await prisma.Colacion.create({
-            data: {
-                RutSolicitante: rutSolicitante,
-                FechaSolicitud: new Date(today),
-                Menu: parseInt(menu),
-                Estado: 0, // 0 - Solicitado, 1 - Confirmado, 2 - Retirado
-                TipoUnidad: {
-                    connect: { IdTipoUnidad: funcionario.IdTipoUnidad } // Connect to existing TipoUnidad by Id
-                }
+                DvFuncionario: dv,
             },
         });
 
+        if (!funcionario || funcionario.Habilitado !== 'S') {
+            await prisma.error_log.create({
+                data: {
+                    id_usuario: req.user["id_usuario"] || null,
+                    tipo_error: "Funcionario no habilitado",
+                    mensaje_error: "El funcionario no está habilitado",
+                    ruta_error: "food-manager/lunch/home",
+                    codigo_http: 404
+                }
+            });
+            return res.status(404).json({ message: "Funcionario no habilitado" });
+        }
 
-        return res.status(200).json({ message: 'Colacion Ingresada exitosamente' });
+        // Registra la nueva colación
+        const nuevaColacion = await prisma.Colacion.create({
+            data: {
+                RutSolicitante: rutSolicitante, // RUT completo del solicitante
+                FechaSolicitud: currentDate, // Fecha de solicitud en formato compatible con Prisma
+                Menu: parseInt(menu), // Menú seleccionado
+                Estado: 0, // Estado inicial: 0 - Solicitado
+                TipoUnidad: {
+                    connect: { IdTipoUnidad: funcionario.IdTipoUnidad }, // Conecta con la unidad del funcionario
+                },
+            },
+        });
+
+        // Devuelve un mensaje de éxito
+        return res.status(200).json({ message: 'Colación ingresada exitosamente' });
     } catch (error) {
+        await prisma.error_log.create({
+            data: {
+                id_usuario: req.user["id_usuario"] || null,
+                tipo_error: "Error interno del servidor",
+                mensaje_error: JSON.stringify(error),
+                ruta_error: "food-manager/lunch/home",
+                codigo_http: 500
+            }
+        });
+        // Manejo de errores
         console.error(error);
         res.status(500).send('Error al registrar la colación: ' + error);
     }
 }
 
+// Renderiza el listado de colaciones confirmadas
 async function renderLunchList(req, res) {
     try {
-        const tipoUsuario = req.cookies['tipo_usuario'];
-        const today = moment().format('YYYY-MM-DD');
+        const tipoUsuario = req.user.tipo_usuario;
+
+        const currentDate = format(new Date(), 'YYYY-MM-DD', 'cl');
+        // Obtiene las colaciones confirmadas para hoy
         const lunches = await prisma.Colacion.findMany({
             where: {
-                FechaSolicitud: new Date(today),
-                Estado: 1 // Solo mostrar colaciones confirmadas
+                FechaSolicitud: currentDate,
+                Estado: 1, // Estado 1 - Confirmado
             },
             orderBy: {
-                FechaSolicitud: 'asc',
+                IdColacion: 'asc', // Ordena por fecha ascendente
             },
         });
+
+        // Renderiza la vista con la lista de colaciones
         res.render('totem/LunchList', { lunches, tipoUsuario: parseInt(tipoUsuario) });
     } catch (error) {
-        console.error(error);
-        res.status(500).send('Error al cargar el listado de colaciones');
+        // Registrar el error en la base de datos
+        const error_log = await prisma.error_log.create({
+            data: {
+                id_usuario: req.user["id_usuario"] || null,
+                tipo_error: "Error interno del servidor",
+                mensaje_error: JSON.stringify(error),
+                ruta_error: "food-manager/lunch/home",
+                codigo_http: 500
+            }
+        });
+        res.status(500).send('Error al cargar el listado de colaciones: ' + error.message);
     }
 }
 
-async function registrarColacionRetirada(req, res){
-    const idColacion = req.params.id
-    const today = moment().format('YYYY-MM-DD');
+async function registrarColacionRetirada(req, res) {
+    const idColacion = req.params.id; // Obtiene el ID de la colación desde los parámetros
+
     try {
+        const currentDate = format(new Date(), 'YYYY-MM-DD', 'cl');
+        // Verifica si existe una colación con el ID y la fecha de hoy
         const existingLunch = await prisma.Colacion.findFirst({
             where: {
                 IdColacion: parseInt(idColacion),
-                FechaSolicitud: new Date(today)
+                FechaSolicitud: currentDate,
             },
         });
 
+        // Si no existe, devuelve un error 404
         if (!existingLunch) {
             return res.status(404).json({ message: "Colación no encontrada" });
         }
 
-        // Update the lunch
+        // Actualiza el estado de la colación a 2 (Retirada)
         await prisma.Colacion.update({
             where: {
-                IdColacion: parseInt(idColacion)
+                IdColacion: parseInt(idColacion),
             },
             data: {
-                Estado: 2, // Retirada
+                Estado: 2, // Estado actualizado a "Retirada"
             },
         });
 
+        // Devuelve un mensaje de éxito
         return res.status(200).json({ message: 'Colación retirada exitosamente' });
     } catch (error) {
-        return res.status(500).json({ message: 'Error al retirar la colación '});
+        // Registrar el error en la base de datos
+        const error_log = await prisma.error_log.create({
+            data: {
+                id_usuario: req.user["id_usuario"] || null,
+                tipo_error: "Error interno del servidor",
+                mensaje_error: JSON.stringify(error),
+                ruta_error: "food-manager/lunch/home",
+                codigo_http: 500
+            }
+        });
+        return res.status(500).json({ message: 'Error al retirar la colación', error });
     }
 }
 
+
 module.exports = {
-    renderHome,
-    registrationLunch,
-    renderLunchList,
-    registrarColacionRetirada
+    renderHome, // Renderiza la página principal de colaciones
+    registrationLunch, // Registra una nueva colación
+    renderLunchList, // Renderiza el listado de colaciones
+    registrarColacionRetirada, // Marca una colación como retirada
 };

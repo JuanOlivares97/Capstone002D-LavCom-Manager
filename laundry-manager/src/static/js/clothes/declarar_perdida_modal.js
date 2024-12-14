@@ -18,7 +18,7 @@ async function addArticuloDeclararPerdida() {
         <option value="">Seleccionar artículo</option>
         <!-- Agregar opciones dinámicamente desde el servidor -->
       </select>
-      <input type="number" name="cantidad_${rowIdDeclararPerdida}" class="w-28 p-2 border rounded" placeholder="Cantidad" required>
+      <input type="number" min="1" name="cantidad_${rowIdDeclararPerdida}" class="w-28 p-2 border rounded" placeholder="Cantidad" required>
       <button type="button" class="bg-red-500 text-white p-2 rounded hover:bg-red-700 remove-articulo-declarar-perdida">Borrar</button>
     `;
     document.getElementById('declarar_perdida_container').appendChild(newRow);
@@ -103,6 +103,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                 modal.classList.add('hidden');
                 e.target.reset();
                 document.getElementById('declarar_perdida_container').innerHTML = '';
+                document.getElementById('grid').innerHTML = '';
+                window.generateGrid();
             })
             return;
         }

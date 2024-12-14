@@ -1,5 +1,6 @@
 import { AG_GRID_LOCALE_ES } from "../utils.js";
-document.addEventListener("DOMContentLoaded", async function () {
+
+window.generateGrid = async function () {
     let gridApi;
 
     const response = await fetch("/laundry-manager/clothes/get-clothes");
@@ -9,6 +10,7 @@ document.addEventListener("DOMContentLoaded", async function () {
         // Data to be displayed
         rowData: articulos,
         localeText: AG_GRID_LOCALE_ES,
+        getRowId: (params) => params.data.id_articulo.toString(), 
         // Columns to be displayed (Should match rowData properties)
         columnDefs: [
             { headerName: "ID", field: "id_articulo", flex: 1 },
@@ -17,6 +19,7 @@ document.addEventListener("DOMContentLoaded", async function () {
                 field: "nombre_articulo",
                 flex: 1,
                 filter: true,
+                floatingFilter: true,
             },
             { field: "stock", flex: 1 },
             {
@@ -88,6 +91,7 @@ window.deleteArticulo = function (rowIndex, articulo) {
         cancelButtonColor: "#d33",
         confirmButtonText: "Sí, bórralo!",
         cancelButtonText: "Cancelar",
+        showCancelButton: true,
     }).then(async (result) => {
         if (result.isConfirmed) {
             await fetch("/laundry-manager/clothes/delete-clothes", {
@@ -108,7 +112,7 @@ window.deleteArticulo = function (rowIndex, articulo) {
                     return;
                 }
                 Swal.fire(data.message).then(() => {
-                    const rowNode = gridApi.getRowNode(rowIndex);
+                    const rowNode = gridApi.getRowNode(articulo.id_articulo);
                     gridApi.applyTransaction({ remove: [rowNode.data] });
                 })
                 return;
@@ -118,4 +122,6 @@ window.deleteArticulo = function (rowIndex, articulo) {
 };
 
 window.gridApi = gridApi;
-});
+}
+
+document.addEventListener("DOMContentLoaded", window.generateGrid);

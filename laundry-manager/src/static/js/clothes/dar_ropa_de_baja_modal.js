@@ -18,7 +18,7 @@ async function addArticuloDarRopaDeBaja() {
         <option value="">Seleccionar artículo</option>
         <!-- Agregar opciones dinámicamente desde el servidor -->
       </select>
-      <input type="number" name="cantidad_${rowIdDarRopaDeBaja}" class="w-28 p-2 border rounded" placeholder="Cantidad" required>
+      <input type="number" min="1" name="cantidad_${rowIdDarRopaDeBaja}" class="w-28 p-2 border rounded" placeholder="Cantidad" required>
       <button type="button" class="bg-red-500 text-white p-2 rounded hover:bg-red-700 remove-articulo-dar-ropa-de-baja">Borrar</button>
     `;
     document.getElementById('dar_ropa_de_baja_container').appendChild(newRow);
@@ -104,6 +104,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                 modal.classList.add('hidden');
                 e.target.reset();
                 document.getElementById('dar_ropa_de_baja_container').innerHTML = '';
+                document.getElementById('grid').innerHTML = '';
+                window.generateGrid();
             })
             return;
         }

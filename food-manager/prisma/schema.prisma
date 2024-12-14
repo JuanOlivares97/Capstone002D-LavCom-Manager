@@ -10,7 +10,7 @@ datasource db {
 model Colacion {
   IdColacion     Int        @id @default(autoincrement())
   RutSolicitante String     @db.VarChar(255)
-  FechaSolicitud DateTime   @db.Date
+  FechaSolicitud String     @db.VarChar(255)
   Estado         Int        @default(0)
   Menu           Int
   IdTipoUnidad   Int
@@ -23,17 +23,20 @@ model Funcionario {
   IdFuncionario        Int             @id @default(autoincrement())
   RutFuncionario       String          @db.VarChar(20)
   DvFuncionario        String          @db.Char(1)
-  NombreFuncionario    String          @db.VarChar(255)
+  apellido_paterno     String          @db.VarChar(30)
+  apellido_materno     String          @db.VarChar(30)
   FechaInicioContrato  DateTime?       @db.DateTime(0)
   FechaTerminoContrato DateTime?       @db.DateTime(0)
   Habilitado           String?         @default("S") @db.Char(1)
   correo               String?         @db.VarChar(100)
+  username             String          @db.VarChar(20)
   contrasena           String?         @db.VarChar(255)
   IdTipoUnidad         Int
   IdTipoFuncionario    Int
   IdTipoServicio       Int
   IdTipoContrato       Int
   IdTipoEstamento      Int
+  NombreFuncionario    String          @db.VarChar(255)
   TipoContrato         TipoContrato    @relation(fields: [IdTipoContrato], references: [IdTipoContrato], map: "fk_funcionario_contrato")
   TipoEstamento        TipoEstamento   @relation(fields: [IdTipoEstamento], references: [IdTipoEstamento], map: "fk_funcionario_estamento")
   TipoServicio         TipoServicio    @relation(fields: [IdTipoServicio], references: [IdTipoServicio], map: "fk_funcionario_servicio")
@@ -169,12 +172,13 @@ model logMovimientosPaciente {
 
 /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 model error_log {
-  id_error      Int         @id @default(autoincrement())
-  id_usuario    Int
-  tipo_error    String      @db.VarChar(30)
-  mensaje_error String      @db.LongText
-  ruta_error    String      @db.VarChar(40)
-  Funcionario   Funcionario @relation(fields: [id_usuario], references: [IdFuncionario], onUpdate: Restrict, map: "fk_user_error")
+  id_error      Int          @id @default(autoincrement())
+  id_usuario    Int?
+  tipo_error    String       @db.VarChar(30)
+  mensaje_error String       @db.LongText
+  ruta_error    String       @db.VarChar(40)
+  codigo_http   Int
+  Funcionario   Funcionario? @relation(fields: [id_usuario], references: [IdFuncionario], onDelete: Restrict, onUpdate: Restrict, map: "fk_user_error")
 
   @@index([id_usuario], map: "fk_user_error")
 }

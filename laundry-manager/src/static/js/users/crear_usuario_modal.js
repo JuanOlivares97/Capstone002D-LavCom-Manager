@@ -21,19 +21,6 @@ document.addEventListener("DOMContentLoaded", function() {
         e.preventDefault();
         const formData = new FormData(e.target);
         const newUser = Object.fromEntries(formData);
-        
-        const valid = Fn.validaRut(newUser.rut_usuario);
-        
-        if (!valid) {
-            Swal.fire({
-                icon: 'error',
-                title: 'Error',
-                text: `El rut ${newUser.rut_usuario} es inválido`,
-                toast: true,
-                position: 'top-end',
-            })
-            return;
-        }
 
         const response = await fetch('/laundry-manager/users/create-user', {
             method: 'POST',
@@ -65,6 +52,7 @@ document.addEventListener("DOMContentLoaded", function() {
             const gridData = {
                 ...data.user,
                 rut: `${data.user.rut_usuario}-${data.user.dv_usuario}`,
+                email: ""
             }
             window.gridApi.applyTransaction({ add: [gridData] });
             e.target.reset();

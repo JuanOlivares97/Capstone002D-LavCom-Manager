@@ -22,4 +22,5 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     toggleModal('#modal_minuta_diaria','#openModalRegimenDiarios','#closeModalReporteDiario')
+    toggleModal('#modalReporteHospitalizados','#openModalReparto','#closeModalReparto')
 });

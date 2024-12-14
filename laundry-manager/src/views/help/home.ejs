@@ -1,8 +1,28 @@
 <div>
-    <embed
-      src="/laundry-manager/pdf/Manual de Usuario, Lavanderia.pdf"
+    <% if (tipo_usuario === 1) { %>
+      <embed
+      src="/laundry-manager/pdf/Manual de Usuario Lavanderia (Administrador).pdf"
       type="application/pdf"
       width="100%"
       height="1000vh"
     />
+    <% } %>
+
+    <% if (tipo_usuario === 2) { %>
+      <embed
+      src="/laundry-manager/pdf/Manual de Usuario Lavanderia(Ropa Limpia).pdf"
+      type="application/pdf"
+      width="100%"
+      height="1000vh"
+    />
+    <% } %>
+
+    <% if (tipo_usuario === 3) { %>
+      <embed
+      src="/laundry-manager/pdf/Manual de Usuario lavanderia (Ropa Sucia).pdf"
+      type="application/pdf"
+      width="100%"
+      height="1000vh"
+    />
+    <% } %>
 </div>

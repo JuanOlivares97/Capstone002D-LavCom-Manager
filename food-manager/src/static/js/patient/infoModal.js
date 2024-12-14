@@ -16,7 +16,7 @@ function openModalInfo(paciente) {
     document.getElementById('infoServicio').value = paciente.IdTipoServicio !== null && paciente.IdTipoServicio !== undefined ? paciente.IdTipoServicio : '';
     document.getElementById('infoVia').value = paciente.IdTipoVia !== null && paciente.IdTipoVia !== undefined ? paciente.IdTipoVia : '';
     document.getElementById('infoRegimen').value = paciente.IdTipoRegimen !== null && paciente.IdTipoRegimen !== undefined ? paciente.IdTipoRegimen : '';
-    
+
 
 
 
@@ -89,64 +89,14 @@ function closeModalInfo() {
     document.getElementById('patientModal').classList.add('hidden');
 }
 
-function filterByUnit(unit) {
-    const cards = document.querySelectorAll('#cardGridPacientes > div');
-    cards.forEach(card => {
-        if (card.getAttribute('data-unidad') === unit) {
-            card.classList.remove('hidden');
-        } else {
-            card.classList.add('hidden');
-        }
-    });
-}
-
-function removeAccents(str) {
-    return str.normalize("NFD").replace(/[\u0300-\u036f]/g, ""); // Elimina tildes
-}
-
-function searchByName(event) {
-    event.preventDefault();
-    const query = removeAccents(document.getElementById('searchQuery').value.toLowerCase());
-    const cards = document.querySelectorAll('#cardGridPacientes > div');
-
-    cards.forEach(card => {
-        const nombre = removeAccents(card.querySelector('h2').textContent.toLowerCase());
-        if (nombre.includes(query)) {
-            card.classList.remove('hidden');
-        } else {
-            card.classList.add('hidden');
-        }
-    });
-}
-
-function searchByRut() {
-    const query = document.getElementById('rutInput').value.trim();
-    const cards = document.querySelectorAll('#cardGridPacientes > div');
-    cards.forEach(card => {
-        const rut = card.querySelector('#rutSpan').textContent.trim();
-        if (rut === query) {
-            card.classList.remove('hidden');
-        } else {
-            card.classList.add('hidden');
-        }
-    });
-}
-
-function formatRut(input) {
-    let value = input.value.replace(/\./g, '').replace(/-/g, ''); // Eliminar puntos y guión anteriores
-    if (value.length > 1) {
-        value = value.slice(0, -1).replace() + '-' + value.slice(-1);
-    }
-    input.value = value;
-}
-
 document.addEventListener('DOMContentLoaded', () => {
     // Elemento del botón
     const changeObservacionesGeneralesButton = document.getElementById('changeObservacionesGenerales');
     const changeObservacionesNutricionistaButton = document.getElementById('changeObservacionesNutricionista');
     const changeViaButton = document.getElementById('changeVia');
     const changeRegimenButton = document.getElementById('changeRegimen');
-
+    const changeServicioButton = document.getElementById('changeServicio');
+    const changeUnidadButton = document.getElementById('changeUnidad');
 
     // Verificar que los botones existen antes de añadir el evento
     if (changeObservacionesGeneralesButton) {
@@ -164,8 +114,74 @@ document.addEventListener('DOMContentLoaded', () => {
     if (changeRegimenButton) {
         changeRegimenButton.addEventListener('click', sendNewRegimen);
     }
+
+    if (changeServicioButton) {
+        changeServicioButton.addEventListener('click', sendNewServicio);
+    }
+
+    if(changeUnidadButton){
+        changeUnidadButton.addEventListener('click', sendNewUnidad)
+    }
+    
 });
 
+async function sendNewServicio(event) {
+    event.preventDefault();
+
+    const newServicio = document.getElementById('infoServicio').value;
+    const newCodigoCama = document.getElementById('infoCama').value;
+    const idPaciente = document.getElementById('idPaciente').value;
+
+    if (!newServicio || !newCodigoCama || !idPaciente) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Debe seleccionar un nuevo servicio y ingresar el número de cama',
+            confirmButtonText: 'Ok'
+        });
+        return; // Salir de la función si faltan datos
+    }
+
+    const result = await Swal.fire({
+        icon: 'warning',
+        title: '¿Estás seguro?',
+        text: '¿Deseas cambiar el servicio del paciente?',
+        confirmButtonText: 'Sí',
+        cancelButtonText: 'No',
+        showCancelButton: true
+    });
+
+    if (result.isConfirmed) {
+        try {
+            // Hacer la petición PUT al servidor para actualizar el servicio
+            const response = await fetch(`/food-manager/patient/move-service/${idPaciente}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ newService: newServicio, newCodigoCama: newCodigoCama })
+            });
+
+            if (!response.ok) {
+                throw new Error('Error al enviar el cambio de servicio');
+            }
+
+            await Swal.fire({
+                icon: 'success',
+                title: 'Actualización exitosa',
+                text: 'El servicio del paciente se ha actualizado correctamente',
+                confirmButtonText: 'Ok'
+            });
+        } catch (error) {
+            await Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Error al enviar el cambio de servicio',
+                confirmButtonText: 'Ok'
+            });
+        }
+    }
+}
 
 async function sendObservacionesGenerales(event) {
     event.preventDefault();
@@ -398,6 +414,60 @@ async function sendNewRegimen(event) {
             icon: 'error',
             title: 'Error',
             text: `Error al enviar el cambio de régimen: ${error.message}`,
+            confirmButtonText: 'Ok'
+        });
+    }
+}
+
+async function sendNewUnidad(event) {
+    event.preventDefault();
+
+    // Obtener los valores del select y del ID del paciente
+    const newUnidad = document.getElementById('infoUnidad').value;
+    const idPaciente = document.getElementById('idPaciente').value;
+
+    // Convertir el valor del régimen en número y verificar que sea válido
+    const newUnidadValue = parseInt(newUnidad);
+    if (isNaN(newUnidadValue)) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'El valor seleccionado no es válido',
+            confirmButtonText: 'Ok'
+        });
+        return;
+    }
+
+    try {
+        // Hacer la petición PUT al servidor para actualizar el régimen
+        const response = await fetch(`/food-manager/patient/change-unidad/${idPaciente}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ newUnidad: newUnidadValue })
+        });
+
+        // Verificar si la respuesta del servidor fue exitosa
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Error al enviar el cambio de régimen');
+        }
+
+        // Mostrar mensaje de éxito si la solicitud fue correcta
+        Swal.fire({
+            icon: 'success',
+            title: 'Actualización exitosa',
+            text: 'La Unidad se ha actualizado correctamente',
+            confirmButtonText: 'Ok'
+        });
+
+    } catch (error) {
+        // Mostrar alerta en caso de error al enviar la solicitud y loguear el error
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: `Error al enviar el cambio de Unidad: ${error.message}`,
             confirmButtonText: 'Ok'
         });
     }

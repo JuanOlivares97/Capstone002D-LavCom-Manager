@@ -1,27 +1,58 @@
 const prisma = require("../server/prisma");
-
+const {
+    getServicio,
+    getUnidad,
+    getVia,
+    getRegimen,
+  } = require("./maintainer.controller");
 async function renderHome(req, res) {
     try {
         const reportes = await getReports();
-        const tipoUsuario = req.cookies['tipo_usuario']
-        res.render('report/home', { reportes, tipoUsuario: parseInt(tipoUsuario) });
+        const tipoUsuario = req.user.tipo_usuario;
+        const unidades = await getUnidad();
+        return res.render('report/home', { reportes, tipoUsuario: parseInt(tipoUsuario), unidades });
     } catch (error) {
-        console.error('Error al obtener los reportes:', error);
-        res.status(500).json({ message: "Error al obtener los reportes" });
+        const error_log = await prisma.error_log.create({
+            data: {
+                id_usuario: req.user["id_usuario"] || null,
+                tipo_error: "Error interno del servidor",
+                mensaje_error: JSON.stringify(error),
+                ruta_error: "food-manager/report/home",
+                codigo_http: 500
+            }
+        });
+        return res.status(500).json({ message: "Error al obtener los reportes" });
     }
 }
 
 async function getReports() {
     try {
-        // Obtiene el mes y año actuales
+        // Calcular los últimos 6 meses desde la fecha actual
         const currentDate = new Date();
+        const currentMonth = currentDate.getMonth() + 1; // Los meses en JavaScript van de 0 a 11
         const currentYear = currentDate.getFullYear();
-        const currentMonth = currentDate.getMonth() + 1; // Los meses en JavaScript son 0-11, por lo que sumamos 1
-        // Obtén los datos de la tabla Reportes filtrando por el mes y año actuales
+        
+        // Calcular el rango de meses y años
+        const months = [];
+        const years = [];
+        for (let i = 0; i < 6; i++) {
+            let month = currentMonth - i;
+            let year = currentYear;
+            if (month <= 0) {
+                month += 12;
+                year -= 1;
+            }
+            months.push(month);
+            years.push(year);
+        }
+        
+        // Obtener los reportes filtrados por mes y año
         const reportes = await prisma.Reportes.findMany({
             where: {
-                Anio: currentYear,
-                Mes: currentMonth,
+                OR: months.map((month, index) => ({
+                    Mes: month,
+                    Anio: years[index]
+                }))
             },
             include: {
                 TipoUnidad: true
@@ -29,68 +60,88 @@ async function getReports() {
         });
         return reportes;
     } catch (error) {
-        console.error(error);
+        await prisma.error_log.create({
+            data: {
+                id_usuario: req?.user?.id_usuario || null,
+                tipo_error: "Error interno del servidor",
+                mensaje_error: JSON.stringify(error),
+                ruta_error: "food-manager/report/home",
+                codigo_http: 500
+            }
+        });
+        throw error; // Relanzar el error para que sea manejado en el controlador principal
     }
 }
+
 
 async function fillTable(req, res) {
     try {
-        const fechaActual = new Date();
-        const yearInt = fechaActual.getFullYear();
-        const monthInt = fechaActual.getMonth() + 1;
-        
-        // Ejecuta el procedimiento almacenado y obtiene los reportes
-        const reportes = await prisma.$queryRaw`CALL GenerarReporte(${monthInt}, ${yearInt});`;
+        const { mes, anio } = req.query;
 
-        // Procesa los datos según tus necesidades
+        // Validar que los parámetros sean válidos
+        if (!mes || !anio || isNaN(mes) || isNaN(anio)) {
+            return res.status(400).json({ message: "Mes y año son requeridos y deben ser números válidos." });
+        }
+
+        const monthInt = parseInt(mes);
+        const yearInt = parseInt(anio);
+
+        // Verifica que el mes esté en el rango correcto
+        if (monthInt < 1 || monthInt > 12) {
+            return res.status(400).json({ message: "El mes debe estar entre 1 y 12." });
+        }
+
+        // Ejecuta el procedimiento almacenado
+        await prisma.$queryRaw`CALL GenerarReporte(${monthInt}, ${yearInt});`;
+
+        // Respuesta exitosa
         return res.status(200).json({
-            message: 'Tabla generada con éxito'
+            message: `Tabla generada con éxito para el mes ${monthInt}/${yearInt}`
         });
     } catch (error) {
-        console.error('Error al ejecutar GenerarReporte:', error);
-        res.status(500).json({ message: "Error al obtener los datos" });
+        // Registrar el error
+        await prisma.error_log.create({
+            data: {
+                id_usuario: req?.user?.id_usuario || null,
+                tipo_error: "Error interno del servidor",
+                mensaje_error: JSON.stringify(error),
+                ruta_error: "food-manager/report/fill-table",
+                codigo_http: 500
+            }
+        });
+
+        // Respuesta de error
+        res.status(500).json({ message: "Error al generar el reporte." });
     }
 }
 
+
+// Endpoint para obtener el reporte por unidad
 async function reportHospitalizadoDiario(req, res) {
     try {
-        // Obtener el número de página y el tamaño de página desde la consulta
-        const page = parseInt(req.query.page) || 1;
-        const pageSize = parseInt(req.query.pageSize) || 10;
-
-        // Calcular el desplazamiento
-        const skip = (page - 1) * pageSize;
-
-        // Obtener el inicio de hoy en UTC
-        const today = new Date();
-        today.setUTCHours(0, 0, 0, 0);
-
-        // Obtener las unidades disponibles
+        // Obtener las unidades habilitadas
         const unidades = await prisma.TipoUnidad.findMany({
             select: {
                 IdTipoUnidad: true,
                 DescTipoUnidad: true,
             },
-            where: {
-                Habilitado: 'S',
-            },
-            orderBy: {
-                DescTipoUnidad: 'asc',
-            },
+            where: { Habilitado: 'S' },
+            orderBy: { DescTipoUnidad: 'asc' },
         });
 
-        // Obtener los pacientes agrupados por unidad
-        const reportesPorUnidad = {};
+        // Crear un objeto para almacenar reportes por unidad
+        const reportes = {};
 
+        // Iterar por cada unidad para buscar los pacientes hospitalizados
         for (const unidad of unidades) {
             const pacientes = await prisma.Hospitalizado.findMany({
                 where: {
                     IdTipoUnidad: unidad.IdTipoUnidad,
-                    // Agregar condición para excluir pacientes dados de alta
                     OR: [
                         { FechaAlta: null },
-                        { FechaAlta: { gt: today } },
+                        { FechaAlta: { gte: new Date() } },
                     ],
+                    
                 },
                 select: {
                     CodigoCama: true,
@@ -99,43 +150,49 @@ async function reportHospitalizadoDiario(req, res) {
                     NombreHospitalizado: true,
                     ApellidoP: true,
                     ApellidoM: true,
+                    ObservacionesNutricionista: true,
                     TipoRegimen: {
-                        select: {
-                            DescTipoRegimen: true,
-                        },
+                        select: { DescTipoRegimen: true },
                     },
                 },
-                orderBy: {
-                    CodigoCama: 'asc',
-                },
-                skip: skip,
-                take: pageSize,
+                orderBy: { CodigoCama: 'asc' },
             });
 
-            // Formatear los datos de los pacientes
+            // Formatear los pacientes
             const pacientesFormateados = pacientes.map((paciente) => ({
                 CodigoCama: paciente.CodigoCama,
                 RutPaciente: `${paciente.RutHospitalizado}-${paciente.DvHospitalizado}`,
                 NombrePaciente: `${paciente.NombreHospitalizado} ${paciente.ApellidoP} ${paciente.ApellidoM}`,
-                DescTipoRegimen: paciente.TipoRegimen.DescTipoRegimen,
+                DescTipoRegimen: paciente.TipoRegimen?.DescTipoRegimen || 'No especificado',
+                ObservacionesNutricionista: paciente.ObservacionesNutricionista || '-',
+                enAyuno: paciente.FechaFinAyuno
+        ? moment(paciente.FechaFinAyuno).isAfter(startOfTodayUTC)
+        : false,
             }));
 
+            // Añadir la unidad solo si tiene pacientes
             if (pacientesFormateados.length > 0) {
-                reportesPorUnidad[unidad.DescTipoUnidad] = pacientesFormateados;
+                reportes[unidad.DescTipoUnidad] = pacientesFormateados;
             }
         }
 
-        // Enviar los datos al frontend para renderizar el modal
-        return res.status(200).json({
-            data: reportesPorUnidad,
-            currentPage: page,
-            pageSize: pageSize,
-        });
+        // Enviar respuesta al frontend
+        res.status(200).json({ data: reportes });
     } catch (error) {
-        console.error('Error en reportHospitalizadoDiario:', error);
-        return res.status(500).json({ message: 'Error al obtener los reportes' });
+        console.error("Error en el servidor:", error);
+        await prisma.error_log.create({
+            data: {
+                id_usuario: req.user?.id_usuario || null,
+                tipo_error: "Error interno del servidor",
+                mensaje_error: JSON.stringify(error),
+                ruta_error: req.originalUrl,
+                codigo_http: 500,
+            },
+        });
+        res.status(500).json({ message: "Error al obtener los reportes por unidad" });
     }
 }
+
 
 module.exports = {
     renderHome,

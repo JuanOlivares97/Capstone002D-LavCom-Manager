@@ -1,103 +1,131 @@
 const prisma = require("../server/prisma");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const mailer = require("../server/mailer")
+const mailer = require("../server/mailer");
 
-function renderLogin(req, res) {
+// Renderiza la página de inicio de sesión
+async function renderLogin(req, res) {
     try {
-        return res.render("auth/login", { layout: false });
+        return res.render("auth/login", { layout: false }); // Renderiza la vista sin layout
     } catch (error) {
-        return res.status(500).json({ message: "Internal server error" });
+        const error_log = await prisma.error_log.create({
+            data: {
+                id_usuario: req.user["id_usuario"] || null,
+                tipo_error: "Error de renderizado",
+                mensaje_error: JSON.stringify(error),
+                ruta_error: "food-manager/auth/login",
+                codigo_http: 500
+            }
+        });
+        return res.status(500).json({ message: "Internal server error" }); // Manejo de errores
     }
 }
 
-function renderRecuperarContrasenaForm(req, res) {
+// Renderiza el formulario de recuperación de contraseña
+async function renderRecuperarContrasenaForm(req, res) {
     try {
-        return res.render("auth/recuperar_pwd_form", { layout: false });
+        return res.render("auth/recuperar_pwd_form", { layout: false }); // Renderiza la vista sin layout
     } catch (error) {
-        return res.status(500).json({ message: "Internal server error" });
+        const error_log = await prisma.error_log.create({
+            data: {
+                id_usuario: req.user["id_usuario"] || null,
+                tipo_error: "Error de renderizado",
+                mensaje_error: JSON.stringify(error),
+                ruta_error: "food-manager/auth/login",
+                codigo_http: 500
+            }
+        }); 
+        return res.status(500).json({ message: "Internal server error" }); // Manejo de errores
     }
 }
 
-function renderRecuperarContrasenaInfo(req, res) {
+// Renderiza la página de información de recuperación de contraseña
+async function renderRecuperarContrasenaInfo(req, res) {
     try {
-        return res.render("auth/recuperar_pwd_info", { layout: false });
+        return res.render("auth/recuperar_pwd_info", { layout: false }); // Renderiza la vista sin layout
     } catch (error) {
-        return res.status(500).json({ message: "Internal server error" });
+        const error_log = await prisma.error_log.create({
+            data: {
+                id_usuario: req.user["id_usuario"] || null,
+                tipo_error: "Error de renderizado",
+                mensaje_error: JSON.stringify(error),
+                ruta_error: "food-manager/auth/login",
+                codigo_http: 500
+            }
+        });
+        return res.status(500).json({ message: "Internal server error" }); // Manejo de errores
     }
 }
 
+// Autenticación de usuarios
 async function login(req, res) {
     try {
-        const { rutCompleto, pwd } = req.body;
+        const { username, pwd } = req.body;
 
-        // Verificar si rutCompleto y pwd están presentes
-        if (!rutCompleto || !pwd) {
-            return res.status(400).json({ message: "RUT y contraseña son obligatorios", success: false });
-        }
-
-        // Dividir el RUT en dos partes: número y dígito verificador
-        const [RutFuncionario, DvFuncionario] = rutCompleto.split('-');
-
-        // Consulta al usuario
+        // Busca al usuario en la base de datos incluyendo su tipo de funcionario
         const user = await prisma.Funcionario.findFirst({
             where: {
-                RutFuncionario: RutFuncionario,
-                DvFuncionario: DvFuncionario
+                username: username
             },
             include: {
-                TipoFuncionario: true 
+                TipoFuncionario: true // Relación con el tipo de funcionario
             }
         });
 
         if (!user || !user.contrasena) {
-            return res.status(401).json({ message: "Rut o contraseña incorrectos", success: false });
+            return res.status(401).json({ message: "Rut o contraseña incorrectos", success: false }); // Validación de usuario
         }
 
-        // Verificación de contraseña
+        // Compara la contraseña ingresada con el hash almacenado
         const isPasswordValid = await bcrypt.compare(pwd, user.contrasena);
         if (!isPasswordValid) {
-            return res.status(401).json({ message: "Rut o contraseña incorrectos", success: false });
+            return res.status(401).json({ message: "Rut o contraseña incorrectos", success: false }); // Contraseña incorrecta
         }
 
-        // Hashear el nombre del usuario
+        // Genera un hash para el nombre del usuario
         if (!user.NombreFuncionario) {
             return res.status(500).json({ message: "Error: Nombre de usuario no disponible", success: false });
         }
         const hashName = await bcrypt.hash(user.NombreFuncionario, 10);
 
-        // Creación del token
+        // Crea un token JWT con información del usuario
         const token_data = {
             id_usuario: user.IdFuncionario,
             nombre: hashName,
         };
         const token = jwt.sign(token_data, process.env.JWT_SECRET, { expiresIn: "8h" });
 
-        // Configuración de cookies
-        res.cookie("token", token, { path: "/food-manager" });
-        res.cookie("logged-in", true, { path: "/food-manager" });
-        res.cookie("tipo_usuario", user.IdTipoFuncionario, { path: "/food-manager" });
-        res.cookie("rutLogueado", user.RutFuncionario, { path: "/food-manager" });
-        res.cookie("dvLogueado", user.DvFuncionario, { path: "/food-manager" });
+        // Establece cookies para autenticación
+        res.cookie("token", token, { path: "/food-manager", httpOnly: true, sameSite: "Strict" });
 
         return res.status(200).json({ message: "Has iniciado sesión, bienvenido", success: true, user });
     } catch (error) {
-        console.error("Error en el login:", error);
-        return res.status(500).json({ message: "Internal server error: " + error.message, success: false });
+        const error_log = await prisma.error_log.create({
+            data: {
+                id_usuario: null,
+                tipo_error: "Error de autenticación",
+                mensaje_error: JSON.stringify(error),
+                ruta_error: "food-manager/auth/login",
+                codigo_http: 500
+            }
+        });
+        return res.status(500).json({ message: "Internal server error", success: false, tipoUser: parseInt(user.TipoFuncionario) }); // Manejo de errores
     }
 }
 
-
+// Establece el correo electrónico de un usuario
 async function setEmail(req, res) {
     try {
         const email = req.body.email;
+
+        // Busca al usuario por ID
         const user = await prisma.Funcionario.findUnique({ where: { IdFuncionario: req.body.IdFuncionario } });
 
-
         if (!user) {
-            return res.status(401).json({ message: "Usuario no encontrado", success: false });
+            return res.status(401).json({ message: "Usuario no encontrado", success: false }); // Validación de usuario
         }
 
+        // Actualiza el correo del usuario
         const updatedUser = await prisma.Funcionario.update({
             where: { IdFuncionario: req.body.IdFuncionario },
             data: {
@@ -111,66 +139,98 @@ async function setEmail(req, res) {
 
         return res.status(200).json({ message: "Correo electrónico establecido", success: true });
     } catch (error) {
-        return res.status(500).json({ message: "Internal server error " + error, success: false });
+        const error_log = await prisma.error_log.create({
+            data: {
+                id_usuario:  null,
+                tipo_error: "Error al actualizar el correo electrónico",
+                mensaje_error: JSON.stringify(error),
+                ruta_error: "food-manager/auth/login",
+                codigo_http: 500
+            }
+        });
+        return res.status(500).json({ message: "Internal server error " + error, success: false }); // Manejo de errores
     }
 }
 
+// Envía un correo con un código de recuperación de contraseña
 async function sendPwdEmail(req, res) {
     try {
         const email = req.body.email;
         const rutCompleto = req.body.rutCompleto;
 
+        // Divide el RUT en número y dígito verificador
         const [RutFuncionario, DvFuncionario] = rutCompleto.split('-');
 
+        // Busca al usuario por RUT
         const user = await prisma.Funcionario.findUnique({
             where: {
                 RutFuncionario_DvFuncionario: {
                     RutFuncionario: RutFuncionario,
-                    DvFuncionario: DvFuncionario
-                }
-            }
+                    DvFuncionario: DvFuncionario,
+                },
+            },
         });
 
         if (!user || user.correo !== email) {
-            return res.status(500).json({ message: "Usuario no encontrado" });
+            return res.status(500).json({ message: "Usuario no encontrado" }); // Validación del usuario
         }
 
+        // Genera un código aleatorio de 4 dígitos
         const code = Math.floor(Math.random() * (9999 - 1000 + 1)) + 1000;
 
-        res.cookie("pwdcode", bcrypt.hashSync(code.toString(), 10), { path: "/" });
-        res.cookie("username", rutCompleto, { path: "/food-manager" });
+        // Hashea el código para mayor seguridad
+        const hashedCode = bcrypt.hashSync(code.toString(), 10);
 
+        // Guarda el código y el RUT en cookies
+        res.cookie("pwdcode", hashedCode, { path: "/food-manager", httpOnly: true, sameSite: "Strict" });
+        res.cookie("username", rutCompleto, { path: "/food-manager", httpOnly: true, sameSite: "Strict" });
+
+        // Envía el correo con el código
         await mailer.enviarCorreo(email, code.toString());
 
-        return res.redirect("/auth/recuperar-pwd-info");
+        return res.redirect("/food-manager/auth/recuperar-pwd-info");
     } catch (error) {
-        return res.status(500).json({ message: "Internal server error", error: error.message });
+        const error_log = await prisma.error_log.create({
+            data: {
+                id_usuario: null,
+                tipo_error: "Error al enviar el correo electrónico",
+                mensaje_error: JSON.stringify(error),
+                ruta_error: "food-manager/auth/login",
+                codigo_http: 500
+            }
+        });
+        return res.status(500).json({ message: "Internal server error", error: error.message }); // Manejo de errores
     }
 }
 
-
+// Cambia la contraseña del usuario
 async function changePwd(req, res) {
     try {
-        const code = req.body.code
-        const pwd = req.body.pwd
+        const code = req.body.code;
+        const pwd = req.body.pwd;
 
-        const hashedCode = req.cookies.pwdcode
+        // Recupera el código hasheado de las cookies
+        const hashedCode = req.cookies.pwdcode;
 
         if (!hashedCode) {
-            return res.status(500).json({ success: false, message: "Código no encontrado" })
+            return res.status(500).json({ success: false, message: "Código no encontrado" });
         }
 
-        const isCodeValid = await bcrypt.compare(code, hashedCode)
+        // Compara el código ingresado con el almacenado
+        const isCodeValid = await bcrypt.compare(code, hashedCode);
 
         if (!isCodeValid) {
-            return res.status(500).json({ success: false, message: "Código inválido, intente nuevamente" })
+            return res.status(500).json({ success: false, message: "Código inválido, intente nuevamente" });
         }
 
-        const hashedPwd = bcrypt.hashSync(pwd, 10)
+        // Hashea la nueva contraseña
+        const hashedPwd = bcrypt.hashSync(pwd, 10);
 
-        const rutCompleto = req.cookies["username"]
+        // Recupera el RUT del usuario desde las cookies
+        const rutCompleto = req.cookies["username"];
         const [RutFuncionario, DvFuncionario] = rutCompleto.split('-');
 
+        // Actualiza la contraseña en la base de datos
         await prisma.Funcionario.update({
             where: {
                 RutFuncionario_DvFuncionario: {
@@ -181,23 +241,42 @@ async function changePwd(req, res) {
             data: {
                 contrasena: hashedPwd
             }
-        })
+        });
 
-        return res.status(200).json({ success: true, message: "Contraseña actualizada" })
+        res.clearCookie("pwdcode", {path: "/food-manager"})
+        res.clearCookie("username", {path: "/food-manager"})
+
+        return res.status(200).json({ success: true, message: "Contraseña actualizada" });
     } catch (error) {
-        return res.status(500).json({ success: false, message: "Internal server error " + error, error: error.message })
+        const error_log = await prisma.error_log.create({
+            data: {
+                id_usuario: null,
+                tipo_error: "Error al cambiar la contraseña",
+                mensaje_error: JSON.stringify(error),
+                ruta_error: "food-manager/auth/login",
+                codigo_http: 500
+            }
+        });
+        return res.status(500).json({ success: false, message: "Internal server error " + error, error: error.message });
     }
 }
 
+// Cierra la sesión del usuario
 async function logout(req, res) {
     try {
-        res.clearCookie("token", { path: '/food-manager' });  // Asegúrate de que la ruta sea la misma
-        res.clearCookie("logged-in", { path: '/food-manager' });
-        res.clearCookie("tipo_usuario", { path: '/food-manager' });
-        res.clearCookie("rutLogueado", { path: '/food-manager' });
-        res.clearCookie("dvLogueado", { path: '/food-manager' });   
+        // Limpia las cookies de autenticación
+        res.clearCookie("token", { path: '/food-manager' });
         return res.status(200).json({ message: "Has cerrado sesión", success: true });
     } catch (error) {
+        const error_log = await prisma.error_log.create({
+            data: {
+                id_usuario: null,
+                tipo_error: "Error al cerrar sesión",
+                mensaje_error: JSON.stringify(error),
+                ruta_error: "food-manager/auth/login",
+                codigo_http: 500
+            }
+        });
         return res.status(500).json({ message: "Internal server error", success: false });
     }
 }
@@ -211,4 +290,4 @@ module.exports = {
     setEmail,
     sendPwdEmail,
     changePwd
-}
+};

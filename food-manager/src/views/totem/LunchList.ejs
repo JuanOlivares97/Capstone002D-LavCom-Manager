@@ -1,23 +1,21 @@
 <body class="bg-gray-100">
-  <div class="container mx-auto py-8">
-    <h1 class="text-3xl font-bold text-center mb-6 text-gray-800">Listado de Colaciones</h1>
-    <ul id="lunchList" class="bg-white shadow rounded-lg p-6 space-y-4">
+  <div class="container py-8 mx-auto">
+    <h1 class="mb-6 text-3xl font-bold text-center text-gray-800">Listado de Colaciones</h1>
+    <ul id="lunchList" class="p-6 space-y-4 bg-white rounded-lg shadow">
       <% lunches.forEach(function(lunch) { %>
-        <li class="p-4 bg-white rounded-lg shadow flex items-center justify-between">
-          <div>
-            <p class="font-bold text-gray-800 text-lg">Menú <%= lunch.Menu===1 ? 'Común' : 'Vegetariano' %>
+        <li class="flex items-center justify-between p-4 bg-white rounded-lg shadow">
+          <div class="flex gap-4">
+              <div class="flex items-center justify-center p-6 rounded-lg bg-slate-100"><p># <%= lunch.IdColacion %></p></div>
+            <div><p class="text-lg font-bold text-gray-800">Menú <%= lunch.Menu===1 ? 'Común' : 'Vegetariano' %>
             </p>
             <p class="text-sm text-gray-600">Rut: <%= lunch.RutSolicitante %>
             </p>
 
-            <% const FechaSolicitud=new Date(lunch.FechaSolicitud); const options={ day: '2-digit' , month: '2-digit' ,
-              year: 'numeric' }; const formattedDate=new Intl.DateTimeFormat('es-ES', options).format(FechaSolicitud);
-              %>
-              <p class="text-sm text-gray-600">Fecha Solicitud: <%= formattedDate %>
-              </p>
+              <p class="text-sm text-gray-600">Fecha Solicitud: <%= lunch.FechaSolicitud %>
+              </p></div>
           </div>
           <button onclick="editarColacion('<%= lunch.IdColacion %>')"
-            class="px-4 py-2 bg-blue-500 text-white rounded-md shadow hover:bg-blue-600 focus:outline-none transition duration-200">
+            class="px-4 py-2 text-white transition duration-200 bg-blue-500 rounded-md shadow hover:bg-blue-600 focus:outline-none">
             Marcar como retirado
           </button>
         </li>
@@ -27,6 +25,8 @@
 
   <script>
     function editarColacion(idColacion) {
+      const lunchItem = event.target.closest('li');
+      
       fetch(`/food-manager/lunch/update-lunch/${idColacion}`, {
         method: 'PUT',
         headers: {
@@ -35,6 +35,8 @@
       })
         .then(response => {
           if (response.ok) {
+            lunchItem.remove();
+            
             Swal.fire({
               icon: 'success',
               title: 'Edición Completa',
@@ -64,7 +66,7 @@
   <script type="module">
     import { io } from "https://cdn.socket.io/4.3.0/socket.io.esm.min.js";
 
-    const socket = io('http://localhost:8080/food-manager', {
+    const socket = io('/food-manager', {
       path: '/food-manager/socket.io',
       transports: ['websocket']
     });
@@ -84,12 +86,12 @@
       item.className = 'p-4 bg-white rounded-lg shadow flex items-center justify-between';
       item.innerHTML = `
     <div>
-      <p class="font-bold text-gray-800 text-lg">Menú ${lunch.Menu === 1 ? 'Común' : 'Vegetariano'}</p>
+      <p class="text-lg font-bold text-gray-800">Menú ${lunch.Menu === 1 ? 'Común' : 'Vegetariano'}</p>
       <p class="text-sm text-gray-600">Rut: ${lunch.RutSolicitante}</p>
       <p class="text-sm text-gray-600">Fecha Solicitud: ${formattedDate}</p>
     </div>
     <button onclick="editarColacion('${lunch.IdColacion}')"
-            class="px-4 py-2 bg-blue-500 text-white rounded-md shadow hover:bg-blue-600 focus:outline-none transition duration-200">
+            class="px-4 py-2 text-white transition duration-200 bg-blue-500 rounded-md shadow hover:bg-blue-600 focus:outline-none">
       Marcar como retirado
     </button>
   `;

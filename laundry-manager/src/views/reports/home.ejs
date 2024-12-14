@@ -1,16 +1,17 @@
-<% if (1 === 1) { %>
-    <h2 class="text-2xl mb-3">Menú de Reportes</h2>
-    <%- include('../components/menus/menu_reportes') %>
-<% } %>
 
-<% if (2 === 1) { %>
-    <h1>admin</h1>
-<% } %>
+<h2 class="text-2xl mb-3">Menú de Reportes</h2>
+<%- include('../components/menus/menu_reportes') %>
+
 <%- include('../components/modals/reportes/stock_general_modal') %>
 <%- include('../components/modals/reportes/stock_ropa_servicios_modal') %>
 <%- include('../components/modals/reportes/stock_ropa_baja_servicios_modal') %> 
 <%- include('../components/modals/reportes/stock_sucia_roperia_modal') %> 
 <%- include('../components/modals/reportes/stock_ropa_transito_modal') %> 
 <%- include('../components/modals/reportes/reporte_perdida_bajas_modal') %> 
+<%- include('../components/modals/reportes/reportes_fecha_modal') %>
+<%- include('../components/modals/reportes/reportes_u_sigcom_modal') %>
+<%- include('../components/modals/reportes/reportes_diario_modal') %>
 <script type="module" src="/laundry-manager/js/reportsHome_grid.js"></script>
+<script type="module" src="/laundry-manager/js/registrosGrid.js"></script>
 <script defer src="/laundry-manager/js/openReport_modal.js"></script>
+<script defer src="/laundry-manager/js/reportes_fecha.js"></script>

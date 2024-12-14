@@ -1,41 +1,110 @@
-<a href="javascript:void(0);" onclick="generarReporte()" class="bg-blue-500 hover:bg-blue-700 text-white font-bold p-2 text-md rounded mr-1 rounded-full">Generar Reporte</a>
-<%- include('../components/menus/reportes') %>
-<%- include('../components/modals/reportes/reportes_minuta') %>
-<%- include('../components/modals/reportes/ReporteDiarioHospitalizado') %>
+<button id="generarReporteBtn" class="bg-blue-500 text-white px-4 py-2 rounded">
+  Generar Reporte
+</button>
+
+<%- include('../components/menus/reportes') %> <%-
+include('../components/modals/reportes/reportes_minuta') %> <%-
+include('../components/modals/reportes/ReporteDiarioHospitalizado') %>
 <script src="/food-manager/js/reportes/open_modal.js"></script>
 <script>
-    function generarReporte() {
-  fetch('/food-manager/report/fill-table', {
-    method: 'GET',
-  })
-    .then(response => {
-      if (response.ok) {
-        // Si la respuesta es exitosa
-        Swal.fire({
-          icon: 'success',
-          title: 'Reporte Generado',
-          text: 'El reporte se ha generado correctamente.',
-          confirmButtonText: 'OK'
-        });
-      } else {
-        // Si hubo un error en la respuesta
-        Swal.fire({
-          icon: 'error',
-          title: 'Error',
-          text: 'No se pudo generar el reporte. Inténtelo de nuevo.',
-          confirmButtonText: 'OK'
-        });
-      }
-    })
-    .catch(error => {
-      // Si hay un problema con la conexión o el fetch
+  document
+    .getElementById("generarReporteBtn")
+    .addEventListener("click", function () {
       Swal.fire({
-        icon: 'error',
-        title: 'Error de Conexión',
-        text: 'Ocurrió un error de conexión. Inténtelo más tarde.',
-        confirmButtonText: 'OK'
+        title: "Generar Reporte",
+        html: `
+              <div class="flex w-full">
+   <div class="flex-1">
+      <label for="mes" style="display: block; margin-bottom: 10px;">Mes:</label>
+      <select id="mes" class="swal2-input " placeholder="Mes">
+         <option value="1">01</option>
+         <option value="2">02</option>
+         <option value="3">03</option>
+         <option value="4">04</option>
+         <option value="5">05</option>
+         <option value="6">06</option>
+         <option value="7">07</option>
+         <option value="8">08</option>
+         <option value="9">09</option>
+         <option value="10">10</option>
+         <option value="11">11</option>
+         <option value="12">12</option>
+      </select>
+   </div>
+   <div class="flex-1"> 
+      <label for="anio" style="display: block; margin-bottom: 10px;">Año:</label>
+      <select id="anio" class="swal2-input" placeholder="Año">
+         <option value="2024">2024</option>
+         <option value="2025">2025</option>
+         <option value="2026">2026</option>
+         <option value="2027">2027</option>
+         <option value="2028">2028</option>
+         <option value="2029">2029</option>
+         <option value="2030">2030</option>
+      </select>
+   </div>
+</div>
+          `,
+        focusConfirm: false,
+        showCancelButton: true,
+        customClass: {
+        popup: 'custom-swal-height' // Aplica una clase personalizada al popup
+    },
+        confirmButtonText: "Generar",
+        preConfirm: () => {
+          const mes = document.getElementById("mes").value;
+          const anio = document.getElementById("anio").value;
+          if (!mes || !anio || isNaN(mes) || isNaN(anio)) {
+            Swal.showValidationMessage(
+              "Por favor, ingrese un mes y año válidos."
+            );
+          } else if (mes < 1 || mes > 12) {
+            Swal.showValidationMessage("El mes debe estar entre 1 y 12.");
+          }
+          return { mes, anio };
+        },
+      }).then((result) => {
+        if (result.isConfirmed) {
+          const { mes, anio } = result.value;
+
+          // Realizar la solicitud al servidor
+          fetch(`/food-manager/report/fill-table?mes=${mes}&anio=${anio}`, {
+            method: "GET",
+          })
+            .then((response) => {
+              // Manejar la respuesta HTTP
+              if (!response.ok) {
+                throw new Error("Error en la generación del reporte.");
+              }
+              return response.json(); // Convertir la respuesta a JSON
+            })
+            .then((data) => {
+              Swal.fire({
+                icon: "success",
+                title: "Reporte Generado",
+                text: data.message,
+                confirmButtonText: "OK",
+              }).then(() => {
+                // Recargar la página después de la confirmación
+                window.location.reload();
+              });
+            })
+            .catch((error) => {
+              Swal.fire({
+                icon: "error",
+                title: "Error",
+                text: error.message || "No se pudo generar el reporte.",
+                confirmButtonText: "OK",
+              });
+            });
+        }
       });
     });
-}
-
 </script>
+<style>
+    .custom-swal-height {
+        max-height: 90vh; /* Ajusta la altura máxima del modal */
+        height: 600px;    /* Fija una altura específica, si lo deseas */
+        overflow-y: auto; /* Agrega un scroll si el contenido supera la altura */
+    }
+</style>
