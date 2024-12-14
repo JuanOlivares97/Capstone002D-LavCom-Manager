@@ -23,7 +23,7 @@ LavCom Manager es un software integral diseñado para mejorar la eficiencia y la
 
 ## Despliegue del Ambiente de Desarrollo
 
-Este proyecto está desarrollado utilizando **SvelteKit**. A continuación, se describe el proceso para desplegar el ambiente de desarrollo para cada uno de los módulos.
+Este proyecto está desarrollado utilizando **Node.Js**. A continuación, se describe el proceso para desplegar el ambiente de desarrollo para cada uno de los módulos.
 
 ### Pasos para el Despliegue
 
