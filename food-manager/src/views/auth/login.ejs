@@ -17,30 +17,30 @@
     </style>
 </head>
 
-<body class="h-screen flex items-center justify-center">
-    <a href="/" class="absolute top-2 left-2 text-white font-bold flex items-center justify-center gap-2 border bg-red-500 border-black p-2 rounded-lg">Volver al inicio</a>
-    <div class="bg-white shadow-lg rounded-2xl p-8 max-w-sm w-full border-2 border-black">
+<body class="flex items-center justify-center h-screen">
+    <a href="/" class="absolute flex items-center justify-center gap-2 p-2 font-bold text-white bg-red-500 border border-black rounded-lg top-2 left-2">Volver al inicio</a>
+    <div class="w-full max-w-sm p-8 bg-white border-2 border-black shadow-lg rounded-2xl">
         <div class="flex justify-center mb-6">
             <%- include("../icons/logo_hospital") %>
         </div>
-        <h1 class="text-2xl mb-6 text-center text-black">Iniciar sesión</h1>
+        <h1 class="mb-6 text-2xl text-center text-black">Iniciar sesión</h1>
         <form id="login-form">
             <div class="mb-4">
-                <label for="username" class="block text-black-700 mb-2">Rut de Usuario</label>
-                <input type="text" id="username" name="username" class="w-full p-2 border rounded-lg" placeholder="Ingrese su Rut">
+                <label for="username" class="block mb-2 text-black-700">Usuario</label>
+                <input type="text" id="username" name="username" class="w-full p-2 border rounded-lg" placeholder="Ingrese su Usuario">
             </div>
             <div class="mb-6">
-                <label for="pwd" class="block text-black-700 mb-2">Contraseña</label>
+                <label for="pwd" class="block mb-2 text-black-700">Contraseña</label>
                 <input type="password" id="pwd" name="pwd" class="w-full p-2 border rounded-lg" placeholder="Contraseña">
             </div>
-            <button type="submit" class="w-full bg-black text-white p-2 rounded-lg hover:bg-gray-800 font-bold">Iniciar
+            <button type="submit" class="w-full p-2 font-bold text-white bg-black rounded-lg hover:bg-gray-800">Iniciar
                 Sesion</button>
         </form>
         <p class="mt-2 text-center text-black-700">
-            <a href="/food-manager/auth/recuperar-pwd-form" class="text-blue-500 hover:underline font-bold flex items-center justify-center gap-2 border border-blue-500 p-2 rounded-lg">Recuperar contraseña</a>
+            <a href="/food-manager/auth/recuperar-pwd-form" class="flex items-center justify-center gap-2 p-2 font-bold text-blue-500 border border-blue-500 rounded-lg hover:underline">Recuperar contraseña</a>
         </p>
         <p class="mt-2 text-center text-black-700">
-            <a href="/food-manager/totem/home" class="text-indigo-500 hover:underline font-bold flex items-center justify-center gap-2 border border-indigo-500 p-2 rounded-lg">Ir al Totem <%- include("../icons/totem") %></a>
+            <a href="/food-manager/totem/home" class="flex items-center justify-center gap-2 p-2 font-bold text-indigo-500 border border-indigo-500 rounded-lg hover:underline">Ir al Totem <%- include("../icons/totem") %></a>
         </p>
 
     </div>
