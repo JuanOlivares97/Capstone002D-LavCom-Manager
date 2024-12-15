@@ -354,3 +354,138 @@ document.addEventListener('DOMContentLoaded', () => {
         window.URL.revokeObjectURL(url);
     });
 });
+
+document.addEventListener('DOMContentLoaded', () => {
+    const modal = document.querySelector('#reportes_diario_modal_usigcom');
+    const openModal = document.querySelector('#openModalReportesDiarioUnidad');
+    const closeModal = document.querySelector('#closeModalReportesDiarioUnidad');
+    const reportButton = document.querySelectorAll('.report-daily-usigcom');
+
+    openModal.addEventListener('click', () => {
+        modal.classList.remove('hidden');
+        setTimeout(() => {
+            modal.classList.remove('opacity-0');
+            modal.querySelector('.transform').classList.remove('scale-95');
+        }, 10); // Small delay to ensure the class is applied after removing 'hidden'
+    });
+
+    closeModal.addEventListener('click', () => {
+        modal.classList.add('opacity-0');
+        modal.querySelector('.transform').classList.add('scale-95');
+        setTimeout(() => {
+            modal.classList.add('hidden');
+        }, 300); // Duration should match the CSS transition duration
+    });
+
+    reportButton.forEach(button => {
+        button.addEventListener('click', async () => {
+            const fecha = document.getElementById('fecha_input_usigcom').value;
+            const tipo = button.getAttribute('data-tipo');
+            const usigcom = document.getElementById('rep_usigcom_d').value;
+
+            if (fecha == "") {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Debes seleccionar una fecha',
+                    showConfirmButton: true
+                })
+                return;
+            }
+
+            if (usigcom == "" || usigcom == "0") {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Debes seleccionar una unidad sigcom',
+                    showConfirmButton: true
+                })
+                return;
+            }
+
+            const url_fetch = `/laundry-manager/reports/get-daily-report-usigcom/${fecha}/${tipo}/${usigcom}`;
+
+            const response = await fetch(url_fetch)
+            const data = await response.json();
+            const result = data.result
+
+            const workbook = new ExcelJS.Workbook();
+            const worksheet = workbook.addWorksheet('Reporte Diario');
+
+            worksheet.columns = [
+                { header: 'Articulo', key: 'nombre_articulo', width: 24 },
+                { header: 'Cantidad', key: 'cantidad_total' },
+            ];
+
+            result.forEach(item => {
+                worksheet.addRow({ nombre_articulo: item.nombre_articulo, cantidad_total: item.cantidad_total });
+            });
+
+            const buffer = await workbook.xlsx.writeBuffer();
+            const blob = new Blob([buffer], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+            const url = window.URL.createObjectURL(blob);
+            const anchor = document.createElement('a');
+            anchor.href = url;
+            anchor.download = data.file;  // El nombre del archivo es dinámico
+            anchor.click();
+            window.URL.revokeObjectURL(url);
+        });
+    });
+
+    document.querySelector(".report-daily-bp-usigcom").addEventListener('click', async () => {
+        const fecha = document.getElementById('fecha_input_usigcom').value;
+        const usigcom = document.getElementById('rep_usigcom_d').value;
+
+        if (fecha == "") {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Debes seleccionar una fecha',
+                showConfirmButton: true
+            })
+            return;
+        }
+
+        if (usigcom == "" || usigcom == "0") {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Debes seleccionar una unidad sigcom',
+                showConfirmButton: true
+            })
+            return;
+        }
+
+        const url_fetch = `/laundry-manager/reports/get-bp-daily-usigcom/${fecha}/${usigcom}`;
+
+        const response = await fetch(url_fetch) 
+        const data = await response.json();
+        const result = data.result
+
+        const workbook = new ExcelJS.Workbook();
+        const worksheet = workbook.addWorksheet('Reporte Diario');
+
+        worksheet.columns = [
+            { header: 'Articulo', key: 'nombre_articulo', width: 24 },
+            { header: 'Perdidas internas', key: 'perdidas_internas', width: 19 },
+            { header: 'Bajas servicio', key: 'bajas_servicio', width: 19 }, 
+        ];
+
+        result.forEach(item => {
+            worksheet.addRow({
+                nombre_articulo: item.nombre_articulo,
+                perdidas_internas: item.perdidas_internas,
+                bajas_servicio: item.bajas_servicio,
+            });
+        });
+
+        const buffer = await workbook.xlsx.writeBuffer();
+        const blob = new Blob([buffer], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+        const url = window.URL.createObjectURL(blob);
+        const anchor = document.createElement('a');
+        anchor.href = url;
+        anchor.download = data.file;  // El nombre del archivo es dinámico
+        anchor.click();
+        window.URL.revokeObjectURL(url);
+    });
+})
