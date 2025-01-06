@@ -5,6 +5,8 @@ const {
     getVia,
     getRegimen,
   } = require("./maintainer.controller");
+const moment = require('moment');
+
 async function renderHome(req, res) {
     try {
         const reportes = await getReports();
@@ -141,7 +143,6 @@ async function reportHospitalizadoDiario(req, res) {
                         { FechaAlta: null },
                         { FechaAlta: { gte: new Date() } },
                     ],
-                    
                 },
                 select: {
                     CodigoCama: true,
@@ -154,21 +155,28 @@ async function reportHospitalizadoDiario(req, res) {
                     TipoRegimen: {
                         select: { DescTipoRegimen: true },
                     },
+                    FechaFinAyuno: true,
                 },
                 orderBy: { CodigoCama: 'asc' },
             });
 
+            const startOfTodayUTC = moment().utc().startOf('day');
+
             // Formatear los pacientes
-            const pacientesFormateados = pacientes.map((paciente) => ({
-                CodigoCama: paciente.CodigoCama,
-                RutPaciente: `${paciente.RutHospitalizado}-${paciente.DvHospitalizado}`,
-                NombrePaciente: `${paciente.NombreHospitalizado} ${paciente.ApellidoP} ${paciente.ApellidoM}`,
-                DescTipoRegimen: paciente.TipoRegimen?.DescTipoRegimen || 'No especificado',
-                ObservacionesNutricionista: paciente.ObservacionesNutricionista || '-',
-                enAyuno: paciente.FechaFinAyuno
-        ? moment(paciente.FechaFinAyuno).isAfter(startOfTodayUTC)
-        : false,
-            }));
+            const pacientesFormateados = pacientes.map((paciente) => {
+                const enAyuno = paciente.FechaFinAyuno
+                    ? moment(paciente.FechaFinAyuno).isAfter(startOfTodayUTC)
+                    : false;
+
+                return {
+                    CodigoCama: paciente.CodigoCama,
+                    RutPaciente: `${paciente.RutHospitalizado}-${paciente.DvHospitalizado}`,
+                    NombrePaciente: `${paciente.NombreHospitalizado} ${paciente.ApellidoP} ${paciente.ApellidoM}`,
+                    DescTipoRegimen: paciente.TipoRegimen?.DescTipoRegimen || 'No especificado',
+                    ObservacionesNutricionista: paciente.ObservacionesNutricionista || '-',
+                    enAyuno,
+                };
+            });
 
             // Añadir la unidad solo si tiene pacientes
             if (pacientesFormateados.length > 0) {
@@ -192,6 +200,7 @@ async function reportHospitalizadoDiario(req, res) {
         res.status(500).json({ message: "Error al obtener los reportes por unidad" });
     }
 }
+
 
 
 module.exports = {
